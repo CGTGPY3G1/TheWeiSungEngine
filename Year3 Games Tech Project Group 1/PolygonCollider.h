@@ -11,7 +11,10 @@ public:
 	~PolygonCollider();
 	const ComponentType Type() const override { return COMPONENT_POLYGON_COLLIDER_2D; }
 	void Init(const Vector2 & center, std::initializer_list<Vector2> verts, const bool & isSensor = false, const float & friction = 1.0f, const float & restitution = 1.0f);
+	Vector2 GetOffset() override;
+	void SetOffset(const Vector2 & newOffset) override;
 private:
+	Vector2 offset;
 	b2PolygonShape* shape;
 };
 

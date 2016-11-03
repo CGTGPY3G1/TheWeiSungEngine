@@ -26,3 +26,11 @@ void CircleCollider::Init(const Vector2 & position, const float & radius, const 
 	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
 	gameObject.lock()->HandleMessage(m);
 }
+
+Vector2 CircleCollider::GetOffset() {
+	return TypeConversion::ConvertToVector2(shape->m_p);
+}
+
+void CircleCollider::SetOffset(const Vector2 & newOffset) {
+	shape->m_p = TypeConversion::ConvertToB2Vector2(newOffset);
+}

@@ -10,7 +10,7 @@ BoxCollider::~BoxCollider() {
 
 }
 
-void BoxCollider::Init(const Vector2 & position, const Vector2 & size, const bool & isSensor, const float & friction, const float & restitution) {
+void BoxCollider::Init(const Vector2 & centre, const Vector2 & size, const bool & isSensor, const float & friction, const float & restitution) {
 	fixtureDef = new b2FixtureDef();
 	fixtureDef->isSensor = isSensor;
 	fixtureDef->friction = friction;
@@ -19,7 +19,7 @@ void BoxCollider::Init(const Vector2 & position, const Vector2 & size, const boo
 	shape = new b2PolygonShape();
 	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL, (size.y / 2) * Physics::METRES_PER_PIXEL);
 	
-	SetPosition(position);
+	SetOffset(centre);
 	fixtureDef->shape = shape;
 	colliderData = new ColliderData();
 	colliderData->comp = GetWeak();
@@ -29,15 +29,21 @@ void BoxCollider::Init(const Vector2 & position, const Vector2 & size, const boo
 	gameObject.lock()->HandleMessage(m);
 }
 
-void BoxCollider::SetPosition(const Vector2 & newPosition) {
+void BoxCollider::SetOffset(const Vector2 & newOffset) {
+	Vector2 difference = newOffset - offset;
+	offset = newOffset;
+	b2Vec2 newPos;
 	for(size_t i = 0; i < shape->GetVertexCount(); i++) {
-		b2Vec2 newPos = shape->m_vertices[i];
-		newPos += TypeConversion::ConvertToB2Vector2(newPosition);
+		newPos = shape->m_vertices[i] + TypeConversion::ConvertToB2Vector2(difference);
 		shape->m_vertices[i].Set(newPos.x, newPos.y);
 	}
-	b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(newPosition);
+	newPos = TypeConversion::ConvertToB2Vector2(newOffset);
 	shape->m_centroid.Set(newPos.x, newPos.y);
 }
 
 void BoxCollider::SetRotation(const float & angle) {
+}
+
+Vector2 BoxCollider::GetOffset() {
+	return Vector2();
 }

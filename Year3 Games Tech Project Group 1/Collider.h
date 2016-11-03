@@ -20,6 +20,8 @@ public:
 	friend class PhysicsSystem;
 	b2Fixture * fixture;
 	b2FixtureDef * fixtureDef;
+	virtual Vector2 GetOffset() = 0;
+	virtual void SetOffset(const Vector2 &  newOffset) = 0;
 protected:
 	ColliderData * colliderData;
 };
