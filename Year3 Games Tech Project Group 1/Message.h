@@ -1,0 +1,43 @@
+#pragma once
+#ifndef WS_MESSAGE_H
+#define WS_MESSAGE_H
+
+enum MessageScope {
+	MESSAGE_SCOPE_GLOBAL = 0,
+	MESSAGE_SCOPE_GAMEOBJECT,
+	MESSAGE_SCOPE_GAMEOBJECT_AND_ANCESTORS,
+	MESSAGE_SCOPE_GAMEOBJECT_AND_CHILDREN,
+	MESSAGE_SCOPE_PHYSICS_SYSTEM
+};
+
+enum MessageType {
+	MESSAGE_TYPE_VOID = 0,
+	MESSAGE_TYPE_POSITION_UPDATE,
+	MESSAGE_TYPE_SCALE_UPDATE,
+	MESSAGE_TYPE_ROTATION_UPDATE,
+	MESSAGE_TYPE_COLLISION_STARTED,
+	MESSAGE_TYPE_COLLISION_STOPPED,
+	MESSAGE_TYPE_REGISTER_RIGIDBODY,
+	MESSAGE_TYPE_UNREGISTER_RIGIDBODY,
+	MESSAGE_TYPE_REGISTER_COLLIDER,
+	MESSAGE_TYPE_UNREGISTER_COLLIDER
+};
+
+enum MessageDataType {
+	MESSAGE_NULL_DATA_TYPE = -1,
+	MESSAGE_COLLIDER_DATA_TYPE = 0,
+	MESSAGE_RIGIDBODY_DATA_TYPE,
+	MESSAGE_TRANSFORM_DATA_TYPE
+};
+
+class Message {
+public:
+	Message() {}
+	Message(const MessageType & messageType) : type(messageType) {}
+	Message(const MessageType & messageType, const MessageDataType & messageDataType, void * messageData) : type(messageType), dataType(messageDataType), data(messageData) {}
+	MessageType	type = MESSAGE_TYPE_VOID;
+	MessageDataType dataType = MESSAGE_NULL_DATA_TYPE;
+	void * data;
+};
+
+#endif // !WS_MESSAGE_H
