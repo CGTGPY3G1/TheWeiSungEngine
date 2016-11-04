@@ -36,7 +36,7 @@ public:
 	Vector2 GetVelocity();
 	void SetVelocity(const Vector2 & newVelocity);
 	float GetSpeed();
-	void Init(const b2BodyType & type = b2BodyType::b2_kinematicBody, const float & angularDampening = 0.05f, const float & linearDeag = 1.0f);
+	void Init(const b2BodyType & type = b2BodyType::b2_kinematicBody, const float & angularDampening = 0.05f, const float & linearDampening = 1.0f);
 private:
 	friend class PhysicsSystem;
 	friend class Collider;

@@ -9,7 +9,7 @@ public:
 	CircleCollider(std::weak_ptr<GameObject> gameObject);
 	~CircleCollider();
 	const ComponentType Type() const override { return COMPONENT_CIRCLE_COLLIDER; }
-	void Init(const Vector2 & position, const float & radius, const bool & isSensor = false, const float & friction = 1.0f, const float & restitution = 1.0f);
+	void Init(const Vector2 & position, const float & radius, const bool & isSensor = false, const float & friction = 0.4f, const float & restitution = 0.0f);
 	Vector2 GetOffset() override;
 	void SetOffset(const Vector2 & newOffset) override;
 	b2CircleShape *shape;

@@ -9,6 +9,7 @@ struct TransformData {
 	float rotation;
 };
 
+struct CollisionData;
 class GameObject;
 class ComponentManager {
 public:
@@ -19,12 +20,13 @@ public:
 	template <typename T> std::list<std::weak_ptr<T>> GetComponents();
 	template <typename T> std::weak_ptr<T> AddComponent();
 	template <typename T> T GetComponentData();
-	template <> TransformData GetComponentData();
 	void Start();
 	void Update();
 	void Update(double deltaTime);
 	void FixedUpdate(double fixedDeltaTime);
 	void LateUpdate();
+	void StartColliding(const CollisionData & data);
+	void StopColliding(const CollisionData & data);
 private:
 	int ownerID = 0;
 	std::list<std::shared_ptr<Component>> components;
@@ -40,17 +42,12 @@ template<typename T> std::weak_ptr<T> ComponentManager::AddComponent() {
 		components.push_back(t);
 		return t;
 	}
+	return std::weak_ptr<T>();
 }
 
 template<typename T>
 T ComponentManager::GetComponentData() {
 	return T();
-}
-
-template<>
-TransformData ComponentManager::GetComponentData() {
-	std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
-	return TransformData(t->GetPosition(), t->GetScale(), t->GetRotation());
 }
 
 template<typename T>

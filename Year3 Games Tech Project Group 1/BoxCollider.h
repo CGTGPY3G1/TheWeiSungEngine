@@ -10,7 +10,7 @@ public:
 	BoxCollider(std::weak_ptr<GameObject> gameObject);
 	~BoxCollider();
 	const ComponentType Type() const override { return COMPONENT_BOX_COLLIDER_2D; }
-	void Init(const Vector2 & centre, const Vector2 & size, const bool & isSensor = false, const float & friction = 1.0f, const float & restitution = 1.0f);
+	void Init(const Vector2 & centre, const Vector2 & size, const bool & isSensor = false, const float & friction = 0.4f, const float & restitution = 0.0f);
 	void SetRotation(const float & angle);
 	Vector2 GetOffset() override;
 	void SetOffset(const Vector2 & newOffset) override;

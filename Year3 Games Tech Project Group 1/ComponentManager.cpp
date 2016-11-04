@@ -1,5 +1,6 @@
 #include "ComponentManager.h"
 #include "ComponentHeaders.h"
+#include "CollisionData.h"
 
 ComponentManager::ComponentManager() {
 }
@@ -47,4 +48,10 @@ void ComponentManager::LateUpdate() {
 		//		(*i)->lateUpdate();
 		//	}
 	}
+}
+
+void ComponentManager::StartColliding(const CollisionData & data) {
+}
+
+void ComponentManager::StopColliding(const CollisionData & data) {
 }

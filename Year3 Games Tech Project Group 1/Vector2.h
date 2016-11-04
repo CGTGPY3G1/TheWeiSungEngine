@@ -3,6 +3,7 @@
 #define WS_VECTOR2_H
 
 #include<iostream>
+#include <string>
 #include <SFML\System\Vector2.hpp>
 class Vector2 {
 public:
@@ -65,7 +66,7 @@ public:
 	Vector2 Flip90(const bool & clockwise);
 	Vector2 Copy();
 	friend std::ostream & operator << (std::ostream & out, const Vector2 toPrint) {
-		return out << "X = " << toPrint.x << " Y = " << toPrint.y;
+		return out << "X = " << std::to_string(toPrint.x) << " Y = " << std::to_string(toPrint.y);
 	}
 	Vector2 & operator = (const sf::Vector2f & in) {
 		x = in.x, y = in.y;

@@ -3,14 +3,34 @@
 #include "PhysicsSystem.h"
 #include "TypeInfo.h"
 Scene::Scene() {
+	static unsigned int id = 0;
+	sceneID = ++id;
+	Start();
+}
+
+Scene::~Scene() {
+	End();
+}
+
+void Scene::Start() {
 	gameObjectManager = std::make_shared<GameObjectManager>(this);
 	physicsSystem = new PhysicsSystem(this);
 }
 
-Scene::~Scene() {
+void Scene::Reset() {
+	End();
+	Start();
 }
 
-void Scene::Update(const float & step) {
+void Scene::Update(const float & deltaTime) {
+	if(physicsSystem && drawColliders) physicsSystem->Draw();
+}
+
+void Scene::End() {
+	if(physicsSystem) {
+		delete physicsSystem; 
+		physicsSystem = NULL;
+	}
 	
 }
 
@@ -33,7 +53,11 @@ std::weak_ptr<GameObjectManager> Scene::GetGameObjectManager() {
 PhysicsSystem * Scene::GetPhysicsSystem() {
 	return physicsSystem;
 }
-;
+
+bool Scene::operator == (Scene other) {
+	return sceneID == other.sceneID;
+}
+
 
 
 

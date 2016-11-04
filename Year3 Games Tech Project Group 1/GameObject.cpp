@@ -2,6 +2,7 @@
 #include "GameObjectManager.h"
 #include "Scene.h"
 #include "PhysicsSystem.h"
+#include "CollisionData.h"
 GameObject::GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & id, const std::string & goName) : manager(gameObjectManager), objectID(id), name(goName) {
 	this->name = "New GameObject";
 }
@@ -55,7 +56,17 @@ void GameObject::HandleMessage(const Message & message) {
 	default:
 		break;
 	}
-};
+}
+
+void GameObject::StartColliding(const CollisionData & data) {
+	if(componentManager.GetComponent<CircleCollider>().use_count() > 0) std::cout << "Player:" << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	else std::cout << "Other:" << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	componentManager.StartColliding(data);
+}
+
+void GameObject::StopColliding(const CollisionData & data) {
+	componentManager.StopColliding(data);
+}
 
 
 bool operator<(const GameObject & a, const GameObject & b) {

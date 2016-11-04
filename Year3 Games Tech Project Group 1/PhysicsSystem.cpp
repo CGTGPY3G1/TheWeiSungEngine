@@ -3,12 +3,15 @@
 #include "Engine.h"
 #include "DebugDraw.h"
 #include "Scene.h"
-#include "TypeInfo.h"
 #include "Math.h"
+#include "Vector2.h"
+#include "CollisionData.h"
+
 PhysicsSystem::PhysicsSystem(Scene * owner) : scene(owner) {
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
 	world->SetDebugDraw(Engine::GetInstance().GetDebugDraw());
+	world->SetContactListener(this);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -80,6 +83,89 @@ void PhysicsSystem::CreateBox(const float & x, const float & y, const float & wi
 
 void PhysicsSystem::SetGravity(const float & x, const float & y) {
 	world->SetGravity(b2Vec2(x, y));
+}
+
+void PhysicsSystem::BeginContact(b2Contact* contact) {
+	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
+	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
+	ColliderData * colliderData1 = (ColliderData *)fixture1->GetUserData();
+	ColliderData * colliderData2 = (ColliderData *)fixture2->GetUserData();
+	if(colliderData1 && colliderData2) {
+		b2WorldManifold worldManifold;
+		contact->GetWorldManifold(&worldManifold);
+		b2Vec2 vel1 = body1->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		b2Vec2 vel2 = body2->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		Vector2 relativeVelocity = TypeConversion::ConvertToVector2(vel1 - vel2);
+		b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
+		b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
+		Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
+		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
+		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
+		std::weak_ptr<GameObject> gameObject1 = collider1.lock()->GetGameObject();
+		std::weak_ptr<GameObject> gameObject2 = collider2.lock()->GetGameObject();
+		const size_t cps = 2;
+		ContactPoint contactPoints[2];
+		for(size_t i = 0; i < cps; i++) {
+			contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
+			contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
+		}
+		{
+			CollisionData collisionData = CollisionData(gameObject2, collider2, normal, relativeVelocity);
+	
+			for(size_t i = 0; i < cps; i++) {
+				collisionData.contactPoints[i] = contactPoints[i];
+			}
+			gameObject1.lock()->StartColliding(collisionData);
+		}
+		{
+			CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -relativeVelocity);
+			for(size_t i = 0; i < cps; i++) {
+				collisionData.contactPoints[i] = contactPoints[i];
+			}
+			gameObject2.lock()->StartColliding(collisionData);
+		}
+	}
+}
+
+void PhysicsSystem::EndContact(b2Contact* contact) {
+	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
+	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
+	ColliderData * colliderData1 = (ColliderData *)fixture1->GetUserData();
+	ColliderData * colliderData2 = (ColliderData *)fixture2->GetUserData();
+	if(colliderData1 && colliderData2) {
+		b2WorldManifold worldManifold;
+		contact->GetWorldManifold(&worldManifold);
+		b2Vec2 vel1 = body1->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		b2Vec2 vel2 = body2->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		Vector2 impactVelocity = TypeConversion::ConvertToVector2(vel1 - vel2);
+		b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
+		b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
+		Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
+		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
+		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
+		std::weak_ptr<GameObject> gameObject1 = collider1.lock()->GetGameObject();
+		std::weak_ptr<GameObject> gameObject2 = collider2.lock()->GetGameObject();
+		const size_t cps = 2;
+		ContactPoint contactPoints[2];
+		for(size_t i = 0; i < cps; i++) {
+			contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
+			contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
+		}
+		{
+			CollisionData collisionData(gameObject2, collider2, normal, impactVelocity);
+			for(size_t i = 0; i < cps; i++) {
+				collisionData.contactPoints[i] = contactPoints[i];
+			}
+			gameObject1.lock()->StopColliding(collisionData);
+		}
+		{
+			CollisionData collisionData(gameObject1, collider1, -normal, -impactVelocity);
+			for(size_t i = 0; i < cps; i++) {
+				collisionData.contactPoints[i] = contactPoints[i];
+			}
+			gameObject2.lock()->StopColliding(collisionData);
+		}
+	}
 }
 
 void PhysicsSystem::HandleMessage(const Message & message) {

@@ -4,6 +4,7 @@
 #include "ComponentManager.h"
 #include <string>
 
+struct CollisionData;
 class GameObject : public std::enable_shared_from_this<GameObject> {
 public:
 	friend class GameObjectManager;
@@ -25,11 +26,12 @@ public:
 	virtual void Init();
 	virtual void Init(const Vector2 & position, const float & rotation);
 	void HandleMessage(const Message & message);
-	template <typename T> T GetComponentData();
+	void StartColliding(const CollisionData & data);
+	void StopColliding(const CollisionData & data);
 protected:	
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;
-	unsigned int componentMask;
+	unsigned int componentMask = 0;
 	ComponentManager componentManager;
 	std::string name;
 	std::weak_ptr<GameObjectManager> manager;
@@ -65,8 +67,6 @@ inline T GameObject::GetComponentData() {
 	return componentManager.GetComponentData<T>();
 }
 
-template<typename T>
-inline void GameObject::AddToMask() {
-}
+
 
 #endif // !WS_GAMEOBJECT_H

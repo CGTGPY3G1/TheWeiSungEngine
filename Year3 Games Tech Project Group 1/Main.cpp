@@ -22,7 +22,7 @@ sf::CircleShape circle;
 Vector2 mousePosition;
 
 Scene * scene = new Scene();
-
+Scene * scene2 = new Scene();
 unsigned int fps = 0;
 float WorldToScreenY(const float & y) {
 	return engine.GetGraphics()->GetScreenResolution().y - y;
@@ -135,24 +135,20 @@ void CreateObjects() {
 	g2 = v;
 	std::shared_ptr<Transform2D> t1 = u->AddComponent<Transform2D>().lock(); 
 	std::shared_ptr<Transform2D> t2 = v->AddComponent<Transform2D>().lock();
-	std::cout << std::to_string(t1.use_count()) << std::endl;
-	std::cout << std::to_string(t2.use_count()) << std::endl;
 
 	t1->SetPosition(Vector2(640.0f, 360.0f));
 	std::shared_ptr<RigidBody2D> r = t1->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody);
 	std::shared_ptr<CircleCollider> c = t1->AddComponent<CircleCollider>().lock();
 	c->Init(Vector2(), 20.0f);
-	
 
 	std::shared_ptr<RigidBody2D> r2 = t2->AddComponent<RigidBody2D>().lock();
-	std::cout << std::to_string(r2.use_count()) << std::endl;
 	r2->Init(b2BodyType::b2_kinematicBody);
 	std::shared_ptr<PolygonCollider> p = t2->AddComponent<PolygonCollider>().lock();
 	p->Init(Vector2(350.0f, 150.0f), {Vector2(-50.0f, 50.0f), Vector2(0.0f, -50.0f), Vector2(50.0f, 50.0f)});
 	for(size_t i = 0; i < 3; i++) {
 		std::shared_ptr<BoxCollider> b = t2->AddComponent<BoxCollider>().lock();
-		b->Init(Vector2(1000.0f, 384 * i), Vector2(512.0f, 256.0f));
+		b->Init(Vector2(1000.0f, 384.0f * i), Vector2(512.0f, 256.0f));
 	}
 }
 
@@ -171,7 +167,8 @@ void main(int argA, char** argB) {
 	while(graphics->GetWindowOpen()) {
 		graphics->Clear();
 		Test();
-		scene->GetPhysicsSystem()->Draw();
+		float delta = engine.GetTimer()->GetDeltaTime();
+		scene->Update(delta);
 		graphics->Update();
 		framesThisSecond++;
 		fpsTimer += engine.GetTimer()->GetDeltaTime();

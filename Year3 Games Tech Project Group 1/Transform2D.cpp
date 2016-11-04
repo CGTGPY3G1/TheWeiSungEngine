@@ -134,7 +134,7 @@ void Transform2D::CalculateWorldTransform() {
 void Transform2D::SetDirty() {
 	if(!dirty) {
 		dirty = true;
-		for(int i = 0; i < children.size(); i++) {
+		for(size_t i = 0; i < children.size(); i++) {
 			std::shared_ptr<Transform2D> c = children[i].lock();
 			c->SetDirty();
 		}

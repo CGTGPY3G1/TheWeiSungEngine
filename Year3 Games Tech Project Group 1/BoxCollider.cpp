@@ -33,7 +33,7 @@ void BoxCollider::SetOffset(const Vector2 & newOffset) {
 	Vector2 difference = newOffset - offset;
 	offset = newOffset;
 	b2Vec2 newPos;
-	for(size_t i = 0; i < shape->GetVertexCount(); i++) {
+	for(int i = 0; i < shape->GetVertexCount(); i++) {
 		newPos = shape->m_vertices[i] + TypeConversion::ConvertToB2Vector2(difference);
 		shape->m_vertices[i].Set(newPos.x, newPos.y);
 	}
