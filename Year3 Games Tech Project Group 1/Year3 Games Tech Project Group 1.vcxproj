@@ -173,7 +173,9 @@
     <ClInclude Include="PolygonCollider.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="RigidBody2D.h" />
+    <ClInclude Include="RunShootDrive.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="TestScene.h" />
     <ClInclude Include="TypeConversion.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Time.h" />
@@ -203,8 +205,10 @@
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PolygonCollider.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
+    <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform2D.cpp" />
     <ClCompile Include="Vector2.cpp" />

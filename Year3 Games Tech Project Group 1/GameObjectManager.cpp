@@ -1,11 +1,11 @@
 #include "GameObjectManager.h"
 #include "Scene.h"
-GameObjectManager::GameObjectManager(Scene * owner) :scene(owner) {
+GameObjectManager::GameObjectManager(std::weak_ptr<Scene> owner) :scene(owner) {
 
 }
 
 GameObjectManager::~GameObjectManager() {
-	scene = nullptr; 
+
 }
 
 std::weak_ptr<GameObject> GameObjectManager::CreateGameObject() {
@@ -56,6 +56,6 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::GetGameObjectsWithCo
 	return toReturn;
 }
 
-Scene * GameObjectManager::GetScene() {
+std::weak_ptr<Scene> GameObjectManager::GetScene() {
 	return scene;
 }

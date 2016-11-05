@@ -98,6 +98,10 @@ Vector2 Vector2::operator /= (const float & scalar) {
 	return *this;
 }
 
+bool Vector2::operator==(const Vector2 & other) {
+	return x == other.x && y == other.y;
+}
+
 float Vector2::Dot(const Vector2 & other) {
 	return Dot(other.x, other.y);
 }

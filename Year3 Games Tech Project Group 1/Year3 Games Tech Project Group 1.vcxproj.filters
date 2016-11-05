@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Engine\Math">
       <UniqueIdentifier>{b4ce623d-6fd7-459d-a6bd-d23ba7828fe3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game">
+      <UniqueIdentifier>{9a6a4990-7c66-4118-b800-db7028997018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game">
+      <UniqueIdentifier>{c6affc79-6ed8-4585-9969-690007b44faa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -129,6 +135,12 @@
     <ClInclude Include="CollisionData.h">
       <Filter>Header Files\Engine\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="RunShootDrive.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -202,6 +214,12 @@
     </ClCompile>
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RunShootDrive.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

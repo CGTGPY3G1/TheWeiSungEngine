@@ -51,7 +51,7 @@ void GameObject::HandleMessage(const Message & message) {
 	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
 	case MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY:
 	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
-		manager.lock()->GetScene()->GetPhysicsSystem()->HandleMessage(message);
+		manager.lock()->GetScene().lock()->GetPhysicsSystem()->HandleMessage(message);
 		break;
 	default:
 		break;

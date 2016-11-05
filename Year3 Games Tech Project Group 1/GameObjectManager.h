@@ -9,7 +9,7 @@
 class Scene;
 class GameObjectManager : public std::enable_shared_from_this<GameObjectManager> {
 public:
-	GameObjectManager(Scene * owner);
+	GameObjectManager(std::weak_ptr<Scene> owner);
 	~GameObjectManager();
 	std::weak_ptr<GameObject> CreateGameObject();
 	std::weak_ptr<GameObject> CreateGameObject(const std::string name);
@@ -26,9 +26,9 @@ public:
 			break;
 		}
 	};
-	Scene * GetScene();
+	std::weak_ptr<Scene> GetScene();
 private:
-	Scene * scene;
+	std::weak_ptr<Scene> scene;
 	unsigned int nextID = 0;
 	std::vector<unsigned int> freeIDs;
 	std::vector<std::shared_ptr<GameObject>> gameObjects;

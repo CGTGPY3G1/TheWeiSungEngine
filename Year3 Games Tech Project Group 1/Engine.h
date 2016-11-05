@@ -1,7 +1,7 @@
 #pragma once
 #ifndef WS_ENGINE_H
 #define WS_ENGINE_H
-
+#include <memory>
 class Graphics;
 class Input;
 class Time;
@@ -13,24 +13,28 @@ public:
 
 	~Engine();
 	static Engine & GetInstance();
-	void Init();
+	void Start();
 	void Run();
+	void End();
 	void Close();
 	bool IsRunning();
+	void SetGame(std::shared_ptr<Game> newGame);
 	Graphics * GetGraphics();
 	DebugDraw * GetDebugDraw();
 	Input * GetInput();
 	Time * GetTimer();
-	FileIO * GetFileIO();
+	unsigned int GetFPS();
+
 private:
 	Engine();
 	Graphics * graphics;
 	Input * input;
 	Time * timer;
-	FileIO * fileIO;
-	Game * game;
+	std::shared_ptr<Game> game;
 	DebugDraw * debugDraw;
 	bool running;
+	unsigned int fps = 0, framesThisSecond = 0;
+	float fpsTimer = 0.0f;
 };
 
 

@@ -2,12 +2,11 @@
 #include "Physics.h"
 #include "Engine.h"
 #include "DebugDraw.h"
-#include "Scene.h"
 #include "Math.h"
 #include "Vector2.h"
 #include "CollisionData.h"
 
-PhysicsSystem::PhysicsSystem(Scene * owner) : scene(owner) {
+PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
 	world->SetDebugDraw(Engine::GetInstance().GetDebugDraw());

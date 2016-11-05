@@ -21,10 +21,9 @@ struct PhysicsSettings {
 class Vector2;
 class b2World;
 class b2Body;
-class Scene;
 class PhysicsSystem : public b2ContactListener {
 public:
-	PhysicsSystem(Scene * owner);
+	PhysicsSystem();
 	~PhysicsSystem();
 	void Update(const float & deltaTime);
 	b2Body * CreateBody(const Vector2 & position, const PhysicsBodyType & type);
@@ -38,7 +37,6 @@ private:
 	b2World * world;
 	PhysicsSettings settings;
 	float accumulator = 0.0f;
-	Scene * scene;
 };
 
 

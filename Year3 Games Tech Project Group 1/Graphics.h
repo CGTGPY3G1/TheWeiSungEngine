@@ -14,12 +14,12 @@ enum TextAlignment {
 
 struct GraphicsSettings {
 	std::string windowTitle = "Unnamed Window";
-	Vector2 screenPosition = Vector2(100.0f, 50.0f), resolution = Vector2(800.0f, 600.0f);
+	Vector2 screenPosition = {500.0f, 20.0f}, resolution = {1280.0f, 720.0f};
 	unsigned int depthBits = 24, antialiasingLevel = 0, minorVersion = 2, majorversion = 3, maxFPS = 60;
-	bool fullScreen = false, resizeable = false, vSync = false;
+	bool fullScreen = false, resizeable = true, vSync = false;
 	 
 	bool operator == (GraphicsSettings other) {
-		return (depthBits == other.depthBits && antialiasingLevel == other.antialiasingLevel && minorVersion == other.minorVersion &&
+		return (screenPosition == screenPosition && resolution == resolution && depthBits == other.depthBits && antialiasingLevel == other.antialiasingLevel && minorVersion == other.minorVersion &&
 				majorversion == other.majorversion && maxFPS == other.maxFPS && fullScreen == other.fullScreen &&
 				resizeable == other.resizeable && vSync == other.vSync && windowTitle == other.windowTitle);
 	}

@@ -5,7 +5,6 @@
 Scene::Scene() {
 	static unsigned int id = 0;
 	sceneID = ++id;
-	Start();
 }
 
 Scene::~Scene() {
@@ -13,8 +12,8 @@ Scene::~Scene() {
 }
 
 void Scene::Start() {
-	gameObjectManager = std::make_shared<GameObjectManager>(this);
-	physicsSystem = new PhysicsSystem(this);
+	gameObjectManager = std::make_shared<GameObjectManager>(GetWeak());
+	physicsSystem = new PhysicsSystem();
 }
 
 void Scene::Reset() {
@@ -40,7 +39,7 @@ void Scene::HandleMessage(const Message & message) {
 	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
 	case MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY:
 	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
-//		physicsSystem->HandleMessage(message);
+		physicsSystem->HandleMessage(message);
 		break;
 	default:
 		break;
