@@ -4,8 +4,7 @@
 #include "ComponentManager.h"
 #include <string>
 
-struct CollisionData;
-class GameObject : public std::enable_shared_from_this<GameObject> {
+class GameObject : public std::enable_shared_from_this<GameObject>, public CollisionHandler {
 public:
 	friend class GameObjectManager;
 	friend class ComponentManager;
@@ -13,7 +12,8 @@ public:
 	~GameObject();
 	template<typename T> std::weak_ptr<T> AddComponent();
 	template<typename T> std::weak_ptr<T> GetComponent();
-	template<typename T> std::list<std::weak_ptr<T>> GetComponents();
+	template<typename T> std::weak_ptr<T> GetComponentInParent();
+	template<typename T> std::vector<std::weak_ptr<T>> GetComponents();
 	friend bool operator < (const GameObject & a, const GameObject & b);
 	friend bool operator == (const GameObject & a, const GameObject & b);
 	std::string GetName();
@@ -26,8 +26,8 @@ public:
 	virtual void Init();
 	virtual void Init(const Vector2 & position, const float & rotation);
 	void HandleMessage(const Message & message);
-	void StartColliding(const CollisionData & data);
-	void StopColliding(const CollisionData & data);
+	void OnCollisionEnter(const CollisionData & data) override;
+	void OnCollisionExit(const CollisionData & data) override;
 protected:	
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;
@@ -51,8 +51,13 @@ std::weak_ptr<T> GameObject::GetComponent() {
 }
 
 template<typename T>
-std::list<std::weak_ptr<T>> GameObject::GetComponents() {
-	return HasComponent<T>() ? componentManager.GetComponents<T>() : std::list<std::weak_ptr<T>>();
+inline std::weak_ptr<T> GameObject::GetComponentInParent() {
+	return std::weak_ptr<T>();
+}
+
+template<typename T>
+std::vector<std::weak_ptr<T>> GameObject::GetComponents() {
+	return HasComponent<T>() ? componentManager.GetComponents<T>() : std::vector<std::weak_ptr<T>>();
 }
 
 template<typename T>

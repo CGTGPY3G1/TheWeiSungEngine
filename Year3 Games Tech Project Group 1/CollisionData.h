@@ -3,7 +3,7 @@
 #define WS_COLLISION_DATA_H
 
 #include "Vector2.h"
-#include "GameObject.h"
+
 #include "Collider.h"
 
 struct ContactPoint {
@@ -12,9 +12,7 @@ struct ContactPoint {
 };
 
 struct CollisionData {
-	CollisionData(const std::weak_ptr<GameObject> & otherGameObject, const std::weak_ptr<Collider> & otherFixture, const Vector2 & cNormal, const Vector2 & velocity) :
-		gameObject(otherGameObject), fixture(otherFixture), normal(cNormal), relativeVelocity(velocity) {
-	}
+	CollisionData(const std::weak_ptr<GameObject> & otherGameObject, const std::weak_ptr<Collider> & otherFixture, const Vector2 & cNormal, const Vector2 & velocity);
 	std::weak_ptr<GameObject> gameObject;
 	std::weak_ptr<Collider> fixture;
 	Vector2 normal, relativeVelocity;

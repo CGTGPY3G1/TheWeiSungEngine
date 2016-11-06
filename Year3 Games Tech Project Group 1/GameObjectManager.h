@@ -11,8 +11,7 @@ class GameObjectManager : public std::enable_shared_from_this<GameObjectManager>
 public:
 	GameObjectManager(std::weak_ptr<Scene> owner);
 	~GameObjectManager();
-	std::weak_ptr<GameObject> CreateGameObject();
-	std::weak_ptr<GameObject> CreateGameObject(const std::string name);
+	std::weak_ptr<GameObject> CreateGameObject(const std::string & name = "New GameObject");
 	std::weak_ptr<GameObject> GetGameObject(const unsigned int & id);
 	std::weak_ptr<GameObject> GetGameObject(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithName(const std::string & name);

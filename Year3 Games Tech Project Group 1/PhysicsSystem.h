@@ -6,7 +6,6 @@
 #include <Box2D\Dynamics\Contacts\b2Contact.h>
 #include "Message.h"
 
-
 enum PhysicsBodyType {
 	STATIC_BODY = 0,
 	KINEMATIC_BODY = 1,
@@ -38,7 +37,5 @@ private:
 	PhysicsSettings settings;
 	float accumulator = 0.0f;
 };
-
-
 
 #endif // !WS_PHYSICS_SYSTEM_H

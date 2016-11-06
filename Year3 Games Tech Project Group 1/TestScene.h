@@ -2,6 +2,7 @@
 #ifndef WS_TEST_SCENE_H
 #define WS_TEST_SCENE_H
 #include "Scene.h"
+#include "Vector2.h"
 class GameObject;
 class TestScene : public Scene {
 public:
@@ -9,11 +10,12 @@ public:
 	~TestScene();
 	void Start() override;
 	void Update(const float & deltaTime) override;
+	void Render() override;
 	void SetUpShapes();
 	void Test(const float & deltaTime);
 private:
 	std::weak_ptr<GameObject> g1, g2;
-	
+	Vector2 mousePosition;
 };
 
 

@@ -4,8 +4,8 @@
 #include "DebugDraw.h"
 #include "Math.h"
 #include "Vector2.h"
-#include "CollisionData.h"
 
+#include "GameObject.h"
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
@@ -94,7 +94,7 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 		contact->GetWorldManifold(&worldManifold);
 		b2Vec2 vel1 = body1->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 		b2Vec2 vel2 = body2->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-		Vector2 relativeVelocity = TypeConversion::ConvertToVector2(vel1 - vel2);
+		Vector2 relativeVelocity = TypeConversion::ConvertToVector2(vel2 - vel1);
 		b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
 		b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
 		Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
@@ -114,14 +114,14 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 			for(size_t i = 0; i < cps; i++) {
 				collisionData.contactPoints[i] = contactPoints[i];
 			}
-			gameObject1.lock()->StartColliding(collisionData);
+			gameObject1.lock()->OnCollisionEnter(collisionData);
 		}
 		{
 			CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -relativeVelocity);
 			for(size_t i = 0; i < cps; i++) {
 				collisionData.contactPoints[i] = contactPoints[i];
 			}
-			gameObject2.lock()->StartColliding(collisionData);
+			gameObject2.lock()->OnCollisionEnter(collisionData);
 		}
 	}
 }
@@ -155,14 +155,14 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 			for(size_t i = 0; i < cps; i++) {
 				collisionData.contactPoints[i] = contactPoints[i];
 			}
-			gameObject1.lock()->StopColliding(collisionData);
+			gameObject1.lock()->OnCollisionExit(collisionData);
 		}
 		{
 			CollisionData collisionData(gameObject1, collider1, -normal, -impactVelocity);
 			for(size_t i = 0; i < cps; i++) {
 				collisionData.contactPoints[i] = contactPoints[i];
 			}
-			gameObject2.lock()->StopColliding(collisionData);
+			gameObject2.lock()->OnCollisionExit(collisionData);
 		}
 	}
 }

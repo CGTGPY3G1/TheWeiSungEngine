@@ -66,7 +66,10 @@ public:
 	Vector2 RotatedInDegrees(const float & angle);
 	Vector2 Flip90(const bool & clockwise);
 	Vector2 Copy();
-	friend std::ostream & operator << (std::ostream & out, const Vector2 toPrint) {
+	std::string ToString() {
+		return "X = " + std::to_string(x) + " Y = " + std::to_string(y);
+	}
+	friend std::ostream & operator << (std::ostream & out, const Vector2 & toPrint) {
 		return out << "X = " << std::to_string(toPrint.x) << " Y = " << std::to_string(toPrint.y);
 	}
 	Vector2 & operator = (const sf::Vector2f & in) {

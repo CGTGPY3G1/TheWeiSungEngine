@@ -18,8 +18,8 @@ TestScene::~TestScene() {
 void TestScene::Start() {
 	Scene::Start();
 	SetUpShapes();
-	std::shared_ptr<GameObject> u = gameObjectManager->CreateGameObject().lock();
-	std::shared_ptr<GameObject> v = gameObjectManager->CreateGameObject().lock();
+	std::shared_ptr<GameObject> u = gameObjectManager->CreateGameObject("Player").lock();
+	std::shared_ptr<GameObject> v = gameObjectManager->CreateGameObject("Background").lock();
 	u->Init();
 	v->Init();
 	g1 = u;
@@ -34,8 +34,10 @@ void TestScene::Start() {
 	c->Init(Vector2(), 20.0f);
 	std::shared_ptr<RigidBody2D> r2 = t2->AddComponent<RigidBody2D>().lock();
 	r2->Init(b2BodyType::b2_kinematicBody);
-	std::shared_ptr<PolygonCollider> p = t2->AddComponent<PolygonCollider>().lock();
-	p->Init(Vector2(350.0f, 150.0f), {Vector2(-50.0f, 50.0f), Vector2(0.0f, -50.0f), Vector2(50.0f, 50.0f)});
+	std::shared_ptr<PolygonCollider> roof = t2->AddComponent<PolygonCollider>().lock();
+	roof->Init(Vector2(350.0f, 150.0f), {Vector2(-50.0f, 50.0f), Vector2(0.0f, -50.0f), Vector2(50.0f, 50.0f)});
+	std::shared_ptr<BoxCollider> house = t2->AddComponent<BoxCollider>().lock();
+	house->Init(Vector2(350.0f, 264.0f), Vector2(100.0f, 128.0f));
 	for(size_t i = 0; i < 3; i++) {
 		std::shared_ptr<BoxCollider> b = t2->AddComponent<BoxCollider>().lock();
 		b->Init(Vector2(1000.0f, 384.0f * i), Vector2(512.0f, 256.0f));
@@ -43,8 +45,18 @@ void TestScene::Start() {
 }
 
 void TestScene::Update(const float & deltaTime) {
-	Test(deltaTime);
 	Scene::Update(deltaTime);
+	Test(deltaTime);
+}
+
+void TestScene::Render() {
+	Engine & engine = Engine::GetInstance();
+	engine.GetGraphics()->Draw(circle, g1.lock()->GetComponent<Transform2D>().lock()->GetWorldTransform());
+	engine.GetGraphics()->Draw("Delta Time = " + std::to_string(engine.GetTimer()->GetDeltaTime()), Vector2(540.0f, 650.0f), 30);
+	engine.GetGraphics()->Draw("FPS = " + std::to_string(engine.GetFPS()), Vector2(1180.0f, 650.0f), 30, RIGHT_ALIGNED);
+	engine.GetGraphics()->Draw("Total Time = " + std::to_string(engine.GetTimer()->GetTotalTime()), Vector2(100.0f, 650.0f), 30);
+	engine.GetGraphics()->Draw("Mouse Position | X = " + std::to_string((int)mousePosition.x) + "  Y = " + std::to_string((int)mousePosition.y), Vector2(100.0f, 50.0f), 30);
+	Scene::Render();
 }
 
 void TestScene::SetUpShapes() {
@@ -68,7 +80,7 @@ void TestScene::SetUpShapes() {
 void TestScene::Test(const float & deltaTime) {
 	Engine engine = Engine::GetInstance();
 	Input * input = engine.GetInput();
-	Vector2 mousePosition = input->GetMousePosition();;
+	mousePosition = input->GetMousePosition();
 
 	std::shared_ptr<GameObject> gameObject = g1.lock();
 	// Input test
@@ -77,7 +89,6 @@ void TestScene::Test(const float & deltaTime) {
 	   input->GetMouseButton(MouseButtons::MouseButton::XButton2)) engine.GetGraphics()->Draw("Mouse Button Pressed", Vector2(1180, 100), 30, TextAlignment::RIGHT_ALIGNED);
 
 	// Box2D test
-	physicsSystem->Update(deltaTime);
 	if(input->GetMouseButtonDown(MouseButtons::MouseButton::Right)) physicsSystem->CreateBox(mousePosition.x, mousePosition.y, Physics::PIXELS_PER_METRE, Physics::PIXELS_PER_METRE);
 
 	// Movement Test
@@ -86,19 +97,11 @@ void TestScene::Test(const float & deltaTime) {
 	if(input->GetKey(KeyCodes::KeyCode::Down)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * deltaTime), ForceType::IMPULSE_FORCE);
 	if(input->GetKey(KeyCodes::KeyCode::Left)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * deltaTime, 0.0f), ForceType::IMPULSE_FORCE);
 	if(input->GetKey(KeyCodes::KeyCode::Right)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(moveAmount * deltaTime, 0.0f), ForceType::IMPULSE_FORCE);
-	engine.GetGraphics()->Draw(circle, gameObject->GetComponent<Transform2D>().lock()->GetWorldTransform());
-
-
-	// Graphics test
-	engine.GetGraphics()->Draw("Delta Time = " + std::to_string(deltaTime), Vector2(540.0f, 650.0f), 30);
-	engine.GetGraphics()->Draw("FPS = " + std::to_string(engine.GetFPS()), Vector2(1180.0f, 650.0f), 30, RIGHT_ALIGNED);
-	engine.GetGraphics()->Draw("Total Time = " + std::to_string(engine.GetTimer()->GetTotalTime()), Vector2(100.0f, 650.0f), 30);
-	engine.GetGraphics()->Draw("Mouse Position | X = " + std::to_string((int)mousePosition.x) + "  Y = " + std::to_string((int)mousePosition.y), Vector2(100, 100), 30);
-
+	
 	// Camera test
 	if(input->GetKey(KeyCodes::KeyCode::W)) engine.GetGraphics()->MoveCamera(0.0f, -500.0f * deltaTime);
-	if(input->GetKey(KeyCodes::KeyCode::A)) engine.GetGraphics()->MoveCamera(0.0f, 500.0f * deltaTime);
-	if(input->GetKey(KeyCodes::KeyCode::S)) engine.GetGraphics()->MoveCamera(-500.0f * deltaTime, 0.0f);
+	if(input->GetKey(KeyCodes::KeyCode::S)) engine.GetGraphics()->MoveCamera(0.0f, 500.0f * deltaTime);
+	if(input->GetKey(KeyCodes::KeyCode::A)) engine.GetGraphics()->MoveCamera(-500.0f * deltaTime, 0.0f);
 	if(input->GetKey(KeyCodes::KeyCode::D)) engine.GetGraphics()->MoveCamera(500.0f * deltaTime, 0.0f);
 
 	// Component Retrieval test
@@ -113,10 +116,10 @@ void TestScene::Test(const float & deltaTime) {
 	}
 
 	if(input->GetKey(KeyCodes::KeyCode::G)) {
-		std::list<std::weak_ptr<Transform2D>> c = g1.lock()->GetComponents<Transform2D>();
+		std::vector<std::weak_ptr<Transform2D>> c = g1.lock()->GetComponents<Transform2D>();
 		const int SPACING = 30;
 		int offsetY = ((SPACING * c.size()) / 2) - SPACING / 2;
-		for(std::list<std::weak_ptr<Transform2D>>::iterator i = c.begin(); i != c.end(); ++i, offsetY -= SPACING) {
+		for(std::vector<std::weak_ptr<Transform2D>>::iterator i = c.begin(); i != c.end(); ++i, offsetY -= SPACING) {
 			engine.GetGraphics()->Draw("Got ComponentType " + std::to_string((*i).lock()->Type()), Vector2(640.0f, 360.0f + offsetY), 30, CENTRE_ALIGNED);
 		}
 	}

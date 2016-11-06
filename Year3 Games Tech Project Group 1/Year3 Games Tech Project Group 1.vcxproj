@@ -156,6 +156,7 @@
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionData.h" />
+    <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentHeaders.h" />
     <ClInclude Include="ComponentManager.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="Time.h" />
     <ClInclude Include="Transform2D.h" />
     <ClInclude Include="TypeInfo.h" />
+    <ClInclude Include="ScriptableComponent.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +192,7 @@
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
+    <ClCompile Include="CollisionData.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
@@ -207,6 +210,7 @@
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="ScriptableComponent.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="Time.cpp" />

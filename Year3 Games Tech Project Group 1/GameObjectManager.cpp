@@ -8,19 +8,8 @@ GameObjectManager::~GameObjectManager() {
 
 }
 
-std::weak_ptr<GameObject> GameObjectManager::CreateGameObject() {
-	unsigned int id;
-	if(!freeIDs.empty()) {
-		id = freeIDs.back();
-		freeIDs.pop_back();
-	}
-	else id = nextID++;
-	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(GetWeak(), id);
-	gameObjects.push_back(g);
-	return g;
-}
 
-std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string name) {
+std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string & name) {
 	unsigned int id;
 	if(!freeIDs.empty()) {
 		id = freeIDs.back();
@@ -29,8 +18,9 @@ std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string 
 	else id = nextID++;
 	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(GetWeak(), id, name);
 	gameObjects.push_back(g);
-	return std::weak_ptr<GameObject>();
+	return g;
 }
+
 
 std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const unsigned int & id) {
 	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasGameObjectID(id));

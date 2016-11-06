@@ -20,6 +20,8 @@ Component::~Component() {
 void Component::SetEnabled(const bool & enabled) {
 	if(this->enabled != enabled) {
 		this->enabled = enabled;
+		if(enabled) OnEnable();
+		else OnDisable();
 	}
 }
 
@@ -55,13 +57,13 @@ std::weak_ptr<GameObject> Component::GetGameObject() {
 void Component::Start() {
 }
 
-void Component::Update() {
+void Component::End() {
 }
 
-void Component::FixedUpdate() {
+void Component::OnEnable() {
 }
 
-void Component::LateUpdate() {
+void Component::OnDisable() {
 }
 
 void Component::Init(const bool & enabled, const std::string & name) {
@@ -143,40 +145,40 @@ template<> std::weak_ptr<PolygonCollider> Component::GetComponent() {
 	return std::weak_ptr<PolygonCollider>();
 }
 
-template<> std::list<std::weak_ptr<Transform2D>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<Transform2D>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<Transform2D>();
-	return std::list<std::weak_ptr<Transform2D>>();
+	return std::vector<std::weak_ptr<Transform2D>>();
 }
 
-template<> std::list<std::weak_ptr<RigidBody2D>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<RigidBody2D>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<RigidBody2D>();
-	return std::list<std::weak_ptr<RigidBody2D>>();
+	return std::vector<std::weak_ptr<RigidBody2D>>();
 }
 
-template<> std::list<std::weak_ptr<SpriteRenderer>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<SpriteRenderer>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<SpriteRenderer>();
-	return std::list<std::weak_ptr<SpriteRenderer>>();
+	return std::vector<std::weak_ptr<SpriteRenderer>>();
 }
 
-template<> std::list<std::weak_ptr<BoxCollider>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<BoxCollider>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<BoxCollider>();
-	return std::list<std::weak_ptr<BoxCollider>>();
+	return std::vector<std::weak_ptr<BoxCollider>>();
 }
 
-template<> std::list<std::weak_ptr<CircleCollider>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<CircleCollider>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<CircleCollider>();
-	return std::list<std::weak_ptr<CircleCollider>>();
+	return std::vector<std::weak_ptr<CircleCollider>>();
 }
 
-template<> std::list<std::weak_ptr<PolygonCollider>> Component::GetComponents() {
+template<> std::vector<std::weak_ptr<PolygonCollider>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<PolygonCollider>();
-	return std::list<std::weak_ptr<PolygonCollider>>();
+	return std::vector<std::weak_ptr<PolygonCollider>>();
 }
 
 

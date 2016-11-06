@@ -12,6 +12,7 @@ public:
 	virtual void Start();
 	virtual void Reset();
 	virtual void Update(const float & deltaTime);
+	virtual void Render();
 	virtual void End();
 	void HandleMessage(const Message & message);
 	std::weak_ptr<GameObjectManager> GetGameObjectManager();

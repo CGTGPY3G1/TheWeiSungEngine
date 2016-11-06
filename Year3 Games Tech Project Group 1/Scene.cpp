@@ -22,6 +22,11 @@ void Scene::Reset() {
 }
 
 void Scene::Update(const float & deltaTime) {
+	physicsSystem->Update(deltaTime);
+	
+}
+
+void Scene::Render() {
 	if(physicsSystem && drawColliders) physicsSystem->Draw();
 }
 

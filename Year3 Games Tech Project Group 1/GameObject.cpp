@@ -4,7 +4,6 @@
 #include "PhysicsSystem.h"
 #include "CollisionData.h"
 GameObject::GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & id, const std::string & goName) : manager(gameObjectManager), objectID(id), name(goName) {
-	this->name = "New GameObject";
 }
 
 GameObject::~GameObject() {
@@ -58,14 +57,14 @@ void GameObject::HandleMessage(const Message & message) {
 	}
 }
 
-void GameObject::StartColliding(const CollisionData & data) {
-	if(componentManager.GetComponent<CircleCollider>().use_count() > 0) std::cout << "Player:" << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
-	else std::cout << "Other:" << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
-	componentManager.StartColliding(data);
+void GameObject::OnCollisionEnter(const CollisionData & data) {
+	std::cout << GetName() + " Started Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	componentManager.OnCollisionEnter(data);
 }
 
-void GameObject::StopColliding(const CollisionData & data) {
-	componentManager.StopColliding(data);
+void GameObject::OnCollisionExit(const CollisionData & data) {
+	std::cout << GetName() + " Stopped Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	componentManager.OnCollisionExit(data);
 }
 
 
