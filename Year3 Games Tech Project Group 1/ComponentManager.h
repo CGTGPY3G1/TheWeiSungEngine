@@ -20,6 +20,8 @@ public:
 	void LateUpdate();
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
+	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 private:
 	int ownerID = 0;
 	std::vector<std::shared_ptr<Component>> components;

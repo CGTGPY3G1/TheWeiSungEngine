@@ -53,3 +53,9 @@ void ComponentManager::OnCollisionEnter(const CollisionData & data) {
 
 void ComponentManager::OnCollisionExit(const CollisionData & data) {
 }
+
+void ComponentManager::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
+}
+
+void ComponentManager::OnSensorExit(const std::weak_ptr<Collider> & collider) {
+}

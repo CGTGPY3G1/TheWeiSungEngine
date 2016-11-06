@@ -67,6 +67,15 @@ void GameObject::OnCollisionExit(const CollisionData & data) {
 	componentManager.OnCollisionExit(data);
 }
 
+void GameObject::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
+	std::cout << GetName() + " Started Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
+	componentManager.OnSensorEnter(collider);
+}
+
+void GameObject::OnSensorExit(const std::weak_ptr<Collider> & collider) {
+	std::cout << GetName() + " Stopped Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
+	componentManager.OnSensorExit(collider);
+}
 
 bool operator<(const GameObject & a, const GameObject & b) {
 	return a.objectID < b.objectID;

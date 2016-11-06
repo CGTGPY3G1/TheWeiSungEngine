@@ -22,6 +22,8 @@ public:
 	b2FixtureDef * fixtureDef;
 	virtual Vector2 GetOffset() = 0;
 	virtual void SetOffset(const Vector2 &  newOffset) = 0;
+	bool IsSensor();
+	void SetSensor(const bool & sensor);
 protected:
 	ColliderData * colliderData;
 };

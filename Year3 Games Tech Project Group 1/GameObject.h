@@ -28,6 +28,8 @@ public:
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
+	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 protected:	
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;

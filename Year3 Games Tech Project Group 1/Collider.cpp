@@ -17,3 +17,11 @@ Collider::~Collider() {
 	if(colliderData) delete colliderData;
 	colliderData = NULL;
 }
+
+bool Collider::IsSensor() {
+	return fixture->IsSensor();
+}
+
+void Collider::SetSensor(const bool & sensor) {
+	fixture->SetSensor(sensor);
+}

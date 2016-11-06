@@ -13,6 +13,8 @@ public:
 	virtual void LateUpdate() {}
 	void OnCollisionEnter(const CollisionData & data) override {}
 	void OnCollisionExit(const CollisionData & data) override {}
+	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override {}
+	void OnSensorExit(const std::weak_ptr<Collider> & collider) override {}
 };
 
 
