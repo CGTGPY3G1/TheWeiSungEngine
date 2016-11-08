@@ -9,10 +9,10 @@ public:
 	ComponentManager();
 	ComponentManager(std::weak_ptr<GameObject> gameObject);
 	~ComponentManager();
-	template <typename T> std::weak_ptr<T> GetComponent();
-	template <typename T> std::weak_ptr<T> GetComponentInParent();
-	template <typename T> std::vector<std::weak_ptr<T>> GetComponents();
-	template <typename T> std::weak_ptr<T> AddComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	void Start();
 	void Update();
 	void Update(double deltaTime);
@@ -25,20 +25,9 @@ public:
 private:
 	int ownerID = 0;
 	std::vector<std::shared_ptr<Component>> components;
+	std::vector<std::shared_ptr<ScriptableComponent>> scriptableComponents;
 	std::weak_ptr<GameObject> gameObject;
 };
-
-
-template<typename T> std::weak_ptr<T> ComponentManager::AddComponent() {
-	if(TypeInfo::IsComponent<T>()) {
-		std::shared_ptr<GameObject> g = gameObject.lock();
-		if(!g->HasComponent<T>()) g->componentMask |= TypeInfo::GetTypeID<T>();
-		std::shared_ptr<T> t = std::make_shared<T>(gameObject);
-		components.push_back(t);
-		return t;
-	}
-	return std::weak_ptr<T>();
-}
 
 template<typename T>
 std::weak_ptr<T> ComponentManager::GetComponent() {
@@ -52,7 +41,7 @@ std::weak_ptr<T> ComponentManager::GetComponent() {
 }
 
 template<typename T>
-inline std::weak_ptr<T> ComponentManager::GetComponentInParent() {
+std::weak_ptr<T> ComponentManager::GetComponentInParent() {
 	std::shared_ptr<Transform2D> parent;
 	ComponentType transformType = TypeInfo::GetTypeID<Transform2D>();
 	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {

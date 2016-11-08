@@ -10,7 +10,7 @@ BoxCollider::~BoxCollider() {
 
 }
 
-void BoxCollider::Init(const Vector2 & centre, const Vector2 & size, const bool & isSensor, const float & friction, const float & restitution) {
+void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool & isSensor, const float & friction, const float & restitution) {
 	fixtureDef = new b2FixtureDef();
 	fixtureDef->isSensor = isSensor;
 	fixtureDef->friction = friction;
@@ -19,7 +19,7 @@ void BoxCollider::Init(const Vector2 & centre, const Vector2 & size, const bool 
 	shape = new b2PolygonShape();
 	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL, (size.y / 2) * Physics::METRES_PER_PIXEL);
 	
-	SetOffset(centre);
+	SetOffset(offset);
 	fixtureDef->shape = shape;
 	colliderData = new ColliderData();
 	colliderData->comp = GetWeak();

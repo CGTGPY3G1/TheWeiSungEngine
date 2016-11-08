@@ -3,7 +3,6 @@
 #define WS_COLLISION_DATA_H
 
 #include "Vector2.h"
-
 #include "Collider.h"
 
 struct ContactPoint {

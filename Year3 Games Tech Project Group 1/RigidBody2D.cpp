@@ -36,7 +36,7 @@ Vector2 RigidBody2D::GetPosition() {
 }
 
 void RigidBody2D::SetPosition(const Vector2 & newPosition) {
-	body->SetTransform(TypeConversion::ConvertToB2Vector2(newPosition * Physics::PIXELS_PER_METRE), body->GetAngle());
+	body->SetTransform(TypeConversion::ConvertToB2Vector2(newPosition), body->GetAngle());
 }
 
 void RigidBody2D::SetRotation(const float & angle) {

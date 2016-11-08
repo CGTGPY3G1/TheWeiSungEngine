@@ -10,10 +10,10 @@ public:
 	friend class ComponentManager;
 	GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & objectID, const std::string & goName = "New GameObject");
 	~GameObject();
-	template<typename T> std::weak_ptr<T> AddComponent();
-	template<typename T> std::weak_ptr<T> GetComponent();
-	template<typename T> std::weak_ptr<T> GetComponentInParent();
-	template<typename T> std::vector<std::weak_ptr<T>> GetComponents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value, Component>::type> std::vector<std::weak_ptr<T>> GetComponents();
 	friend bool operator < (const GameObject & a, const GameObject & b);
 	friend bool operator == (const GameObject & a, const GameObject & b);
 	std::string GetName();
@@ -53,8 +53,8 @@ std::weak_ptr<T> GameObject::GetComponent() {
 }
 
 template<typename T>
-inline std::weak_ptr<T> GameObject::GetComponentInParent() {
-	return std::weak_ptr<T>();
+std::weak_ptr<T> GameObject::GetComponentInParent() {
+	return componentManager.GetComponentInParent<T>();
 }
 
 template<typename T>
@@ -68,12 +68,4 @@ bool GameObject::HasComponent() {
 	unsigned int component = TypeInfo::GetTypeID<T>();
 	return (componentMask & component) == component;
 }
-
-template<typename T>
-inline T GameObject::GetComponentData() {
-	return componentManager.GetComponentData<T>();
-}
-
-
-
 #endif // !WS_GAMEOBJECT_H

@@ -34,10 +34,8 @@ void TestScene::Start() {
 	c->Init(Vector2(), 20.0f);
 	std::shared_ptr<RigidBody2D> r2 = t2->AddComponent<RigidBody2D>().lock();
 	r2->Init(b2BodyType::b2_kinematicBody);
-	std::shared_ptr<PolygonCollider> roof = t2->AddComponent<PolygonCollider>().lock();
-	roof->Init(Vector2(350.0f, 150.0f), {Vector2(-50.0f, 50.0f), Vector2(0.0f, -50.0f), Vector2(50.0f, 50.0f)}, true);
-	std::shared_ptr<BoxCollider> house = t2->AddComponent<BoxCollider>().lock();
-	house->Init(Vector2(350.0f, 264.0f), Vector2(100.0f, 128.0f), true);
+	std::shared_ptr<PolygonCollider> house = t2->AddComponent<PolygonCollider>().lock();
+	house->Init(Vector2(350.0f, 150.0f), {Vector2(-50.0f, 150.0f), Vector2(50.0f, 150.0f), Vector2(50.0f, 50.0f), Vector2(0.0f, -50.0f), Vector2(-50.0f, 50.0f)}, true);
 	for(size_t i = 0; i < 3; i++) {
 		std::shared_ptr<BoxCollider> b = t2->AddComponent<BoxCollider>().lock();
 		b->Init(Vector2(1000.0f, 384.0f * i), Vector2(512.0f, 256.0f));
@@ -82,7 +80,7 @@ void TestScene::Test(const float & deltaTime) {
 	Input * input = engine.GetInput();
 	mousePosition = input->GetMousePosition();
 
-	std::shared_ptr<GameObject> gameObject = g1.lock();
+	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
 	// Input test
 	if(input->GetMouseButton(MouseButtons::MouseButton::Left) || input->GetMouseButton(MouseButtons::MouseButton::Middle) ||
 	   input->GetMouseButton(MouseButtons::MouseButton::Right) || input->GetMouseButton(MouseButtons::MouseButton::XButton1) ||

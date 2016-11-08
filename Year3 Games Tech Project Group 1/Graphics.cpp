@@ -78,7 +78,7 @@ float Graphics::GetScreenY() {
 	return GetScreenPosition().y;
 }
 
-inline void Graphics::SetScreenPosition(const float & x, const float & y) {
+void Graphics::SetScreenPosition(const float & x, const float & y) {
 	if(settings.screenPosition.x != x || settings.screenPosition.y != y) {
 		settings.screenPosition.x = x; settings.screenPosition.y = y;
 		window.setPosition(sf::Vector2i((int)x, (int)y));

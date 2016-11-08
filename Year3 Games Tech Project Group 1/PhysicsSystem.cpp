@@ -4,7 +4,6 @@
 #include "DebugDraw.h"
 #include "Math.h"
 #include "Vector2.h"
-
 #include "GameObject.h"
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
@@ -36,7 +35,7 @@ void PhysicsSystem::Update(const float & deltaTime) {
 					std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
 					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
 					t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
-					t->SetRotation(b->GetAngle()*Math::RadiansToDegrees());
+					t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
 				}
 			}
 			else if(b->GetType() == b2BodyType::b2_kinematicBody) {
@@ -84,16 +83,19 @@ void PhysicsSystem::SetGravity(const float & x, const float & y) {
 }
 
 void PhysicsSystem::BeginContact(b2Contact* contact) {
-	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
-	
+	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();	
 	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
 	ColliderData * colliderData1 = (ColliderData *)fixture1->GetUserData();
 	ColliderData * colliderData2 = (ColliderData *)fixture2->GetUserData();
 	if(colliderData1 && colliderData2) {
 		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
 		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
-		std::weak_ptr<GameObject> gameObject1 = collider1.lock()->GetGameObject();
-		std::weak_ptr<GameObject> gameObject2 = collider2.lock()->GetGameObject();
+		RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
+		RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
+		std::weak_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
+		std::weak_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
+		std::weak_ptr<GameObject> gameObject1 = rigidBody1.lock()->GetGameObject();
+		std::weak_ptr<GameObject> gameObject2 = rigidBody2.lock()->GetGameObject();
 		if(fixture2->IsSensor() || fixture1->IsSensor()) {
 			gameObject1.lock()->OnSensorEnter(collider2);
 			gameObject2.lock()->OnSensorEnter(collider1);
@@ -139,8 +141,12 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 	if(colliderData1 && colliderData2) {
 		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
 		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
-		std::weak_ptr<GameObject> gameObject1 = collider1.lock()->GetGameObject();
-		std::weak_ptr<GameObject> gameObject2 = collider2.lock()->GetGameObject();
+		RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
+		RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
+		std::weak_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
+		std::weak_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
+		std::weak_ptr<GameObject> gameObject1 = rigidBody1.lock()->GetGameObject();
+		std::weak_ptr<GameObject> gameObject2 = rigidBody2.lock()->GetGameObject();
 		if(fixture1->IsSensor() || fixture2->IsSensor()) {
 			gameObject1.lock()->OnSensorExit(collider2);
 			gameObject2.lock()->OnSensorExit(collider1);

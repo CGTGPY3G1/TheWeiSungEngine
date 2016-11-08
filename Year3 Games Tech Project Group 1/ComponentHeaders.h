@@ -4,8 +4,10 @@
 #include "Transform2D.h"
 #include "SpriteRenderer.h"
 #include "RigidBody2D.h"
+#include "Collider.h"
 #include "BoxCollider.h"
 #include "CircleCollider.h"
 #include "PolygonCollider.h"
+#include "ScriptableComponent.h"
 //#include ""
 #endif
