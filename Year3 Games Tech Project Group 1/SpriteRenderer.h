@@ -14,7 +14,7 @@ public:
 	int GetSortLayer();
 	void SetSortLrder(const int & newLayer);
 	float GetPixelsPeMetre();
-	void SetPixelsPeMetr(const float & PPM);
+	void SetPixelsPeMetre(const float & PPM);
 	sf::Sprite & GetSprite();
 	void SetSprite(const sf::Sprite & sprite);
 	void LoadSprite(const std::string path);

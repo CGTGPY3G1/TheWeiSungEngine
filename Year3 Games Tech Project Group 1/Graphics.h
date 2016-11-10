@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include "Vector2.h"
 #include <cstdarg>
+
 enum TextAlignment {
 	LEFT_ALIGNED = 0,
 	CENTRE_ALIGNED,
@@ -44,10 +45,9 @@ public:
 	void SetScreenPosition(const float & x, const float & y);
 	Vector2 GetScreenPosition();
 	void Clear();
-
-	void Draw(sf::Sprite sprite);
+	void Draw(const sf::Sprite & sprite);
 	void Draw(const sf::Shape & shape);
-	void Draw(sf::VertexArray vertexArray);
+	void Draw(const sf::VertexArray & vertexArray);
 	void Draw(const std::string & text, const Vector2 & position, unsigned int characterSize, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
 	void DrawCircle(const sf::CircleShape & c);
 	void Draw(const sf::Drawable & d, const sf::Transform & t);
@@ -55,7 +55,6 @@ public:
 	void DrawRect(const sf::RectangleShape & r);
 	void DrawRect(const Vector2 & position, const Vector2 & size, const float & rotation = 0.0f, bool filled = false, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f);
 	void DrawLine(sf::Vertex line []);
-
 	void SetDepth(const unsigned int & depth);
 	void MoveCamera(const float & x, const float & y) {
 		view.move(sf::Vector2f(x, y));

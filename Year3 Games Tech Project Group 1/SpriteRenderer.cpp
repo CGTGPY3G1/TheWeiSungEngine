@@ -30,7 +30,7 @@ float SpriteRenderer::GetPixelsPeMetre() {
 	return pixelsPerMeter;
 }
 
-void SpriteRenderer::SetPixelsPeMetr(const float & PPM) {
+void SpriteRenderer::SetPixelsPeMetre(const float & PPM) {
 	pixelsPerMeter = PPM;
 }
 

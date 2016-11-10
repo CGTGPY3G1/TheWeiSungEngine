@@ -96,7 +96,7 @@ void Graphics::Clear() {
 	window.clear();
 }
 
-void Graphics::Draw(sf::Sprite sprite) {
+void Graphics::Draw(const sf::Sprite & sprite) {
 	window.draw(sprite);
 }
 
@@ -104,7 +104,7 @@ void Graphics::Draw(const sf::Shape & shape) {
 	window.draw(shape);
 }
 
-void Graphics::Draw(sf::VertexArray vertexArray) {
+void Graphics::Draw(const sf::VertexArray & vertexArray) {
 	window.draw(vertexArray);
 }
 
