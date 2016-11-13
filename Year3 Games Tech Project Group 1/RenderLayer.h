@@ -1,0 +1,8 @@
+#pragma once
+
+enum RenderLayer {
+	BACKGROUND_LAYER = 0,
+	MIDGROUND_LAYER,
+	FOREGROUND_LAYER,
+	MUNBER_OF_LAYERS
+};
