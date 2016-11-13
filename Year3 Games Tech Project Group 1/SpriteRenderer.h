@@ -2,7 +2,8 @@
 #ifndef WS_SPRITE_RENDERER_H
 #define WS_SPRITE_RENDERER_H
 #include"Component.h"
-#include <SFML\Graphics\Sprite.hpp>
+#include "WSSprite.h"
+#include "RenderLayer.h"
 class SpriteRenderer : public Component {
 public:
 	SpriteRenderer();
@@ -11,16 +12,19 @@ public:
 	const ComponentType Type() const override { return COMPONENT_SPRITE_RENDERER; }
 	int GetSortOrder();
 	void SetSortOrder(const int & newOrder);
-	int GetSortLayer();
-	void SetSortLrder(const int & newLayer);
+	RenderLayer GetSortLayer();
+	void SetSortLayer(const RenderLayer & newLayer);
 	float GetPixelsPeMetre();
 	void SetPixelsPeMetre(const float & PPM);
-	sf::Sprite & GetSprite();
-	void SetSprite(const sf::Sprite & sprite);
+	WSSprite & GetSprite();
+	void Init(const WSSprite & sprite, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Init(const std::string path, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void SetSprite(const WSSprite & sprite);
 	void LoadSprite(const std::string path);
 private:
-	sf::Sprite sprite;
-	int sortOrder, sortLayer;
+	WSSprite sprite;
+	int sortOrder;
+	RenderLayer sortLayer;
 	float pixelsPerMeter;
 };
 

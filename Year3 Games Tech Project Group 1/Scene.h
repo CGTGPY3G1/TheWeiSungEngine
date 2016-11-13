@@ -2,9 +2,10 @@
 #ifndef WS_SCENE_H
 #define WS_SCENE_H
 #include "Message.h"
-#include <memory>
+#include "AssetManager.h"
 class GameObjectManager;
 class PhysicsSystem;
+class System;
 class Scene : public std::enable_shared_from_this<Scene> {
 public:
 	Scene();
@@ -14,6 +15,7 @@ public:
 	virtual void Update(const float & deltaTime);
 	virtual void Render();
 	virtual void End();
+	std::weak_ptr<AssetManager> GetAssetManager();
 	void HandleMessage(const Message & message);
 	std::weak_ptr<GameObjectManager> GetGameObjectManager();
 	PhysicsSystem * GetPhysicsSystem();
@@ -24,7 +26,9 @@ protected:
 	bool drawColliders = true;
 	PhysicsSystem * physicsSystem;
 	std::shared_ptr<GameObjectManager> gameObjectManager;
+	std::shared_ptr<AssetManager> assetManager;
 	std::weak_ptr<Scene> GetWeak() { return shared_from_this(); }
+	std::vector<std::shared_ptr<System>> systems;
 };
 
 #endif // !WS_SCENE_H

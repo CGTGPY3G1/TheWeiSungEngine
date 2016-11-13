@@ -44,6 +44,10 @@ void GameObject::Init(const Vector2 & position, const float & rotation) {
 	transform->SetPosition(position); transform->SetRotation(rotation);
 }
 
+std::weak_ptr<GameObjectManager> GameObject::GetManager() {
+	return manager;
+}
+
 void GameObject::HandleMessage(const Message & message) {
 	switch(message.type) {
 	case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:

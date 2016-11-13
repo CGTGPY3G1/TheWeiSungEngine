@@ -2,9 +2,11 @@
 #include "GameObject.h"
 
 Transform2D::Transform2D() : Component(), sf::Transformable() {
+	SetEnabled(true);
 }
 
 Transform2D::Transform2D(std::weak_ptr<GameObject> gameObject) : Component(gameObject) {
+	SetEnabled(true);
 }
 
 Transform2D::~Transform2D() {
@@ -23,7 +25,7 @@ void Transform2D::SetPosition(const Vector2 & newPosition) {
 
 float Transform2D::GetRotation() {
 	if(dirty) CalculateWorldTransform();
-	return getRotation();
+	return world.getRotation();
 }
 
 void Transform2D::SetRotation(const float & newRotation) {
@@ -33,7 +35,7 @@ void Transform2D::SetRotation(const float & newRotation) {
 
 Vector2 Transform2D::GetScale() {
 	if(dirty) CalculateWorldTransform();
-	return Vector2(getScale());
+	return Vector2(world.getScale());
 }
 
 void Transform2D::SetScale(const Vector2 & newScale) {
@@ -73,6 +75,11 @@ const sf::Transform & Transform2D::GetLocalTransform() {
 const sf::Transform & Transform2D::GetWorldTransform() {
 	if(dirty) CalculateWorldTransform();
 	return world.getTransform();
+}
+
+const sf::Transformable & Transform2D::GetWorldTransformable() {
+	if(dirty) CalculateWorldTransform();
+	return world;
 }
 
 int Transform2D::GetChildCount() {

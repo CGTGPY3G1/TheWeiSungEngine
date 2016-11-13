@@ -10,7 +10,7 @@ public:
 	PolygonCollider(std::weak_ptr<GameObject> gameObject);
 	~PolygonCollider();
 	const ComponentType Type() const override { return COMPONENT_POLYGON_COLLIDER_2D; }
-	void Init(const Vector2 & center, std::initializer_list<Vector2> verts, const bool & isSensor = false, const float & friction = 0.4f, const float & restitution = 0.0f);
+	void Init(const Vector2 & center, std::initializer_list<Vector2> verts, const bool & isSensor = false, const float & density = 1.0f, const float & friction = 0.4f, const float & restitution = 0.0f);
 	Vector2 GetOffset() override;
 	void SetOffset(const Vector2 & newOffset) override;
 private:

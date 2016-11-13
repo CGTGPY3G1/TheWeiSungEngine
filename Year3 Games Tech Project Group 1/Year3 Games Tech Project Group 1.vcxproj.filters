@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{c6affc79-6ed8-4585-9969-690007b44faa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\Systems">
+      <UniqueIdentifier>{0383426a-c3fb-494d-a332-ef882a3e6bcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine\Systems">
+      <UniqueIdentifier>{258fc3bb-879d-49f1-9020-13da590b4ea0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -147,6 +153,24 @@
     <ClInclude Include="ScriptableComponent.h">
       <Filter>Header Files\Engine\Components</Filter>
     </ClInclude>
+    <ClInclude Include="SpriteRenderingSystem.h">
+      <Filter>Header Files\Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="SpriteBatch.h">
+      <Filter>Header Files\Engine\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderLayer.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="WSSprite.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Header Files\Engine\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -232,6 +256,18 @@
     </ClCompile>
     <ClCompile Include="CollisionData.cpp">
       <Filter>Source Files\Engine\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteRenderingSystem.cpp">
+      <Filter>Source Files\Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteBatch.cpp">
+      <Filter>Source Files\Engine\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="WSSprite.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

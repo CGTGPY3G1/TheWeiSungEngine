@@ -11,7 +11,7 @@ PolygonCollider::~PolygonCollider() {
 
 }
 
-void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2> verts, const bool & isSensor, const float & friction, const float & restitution) {
+void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2> verts, const bool & isSensor, const float & density, const float & friction, const float & restitution) {
 	unsigned int noOfVerts = verts.size();
 	assert(noOfVerts >= 3);
 	shape = new b2PolygonShape();
@@ -28,7 +28,7 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	fixtureDef->isSensor = isSensor;
 	fixtureDef->friction = friction;
 	fixtureDef->restitution = restitution;
-	fixtureDef->density = 1.0f;
+	fixtureDef->density = density;
 	fixtureDef->shape = shape;
 	colliderData = new ColliderData();
 	colliderData->comp = GetWeak();
@@ -36,6 +36,7 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	fixtureDef->userData = colliderData;
 	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
 	gameObject.lock()->HandleMessage(m);
+	SetEnabled(true);
 }
 
 Vector2 PolygonCollider::GetOffset() {

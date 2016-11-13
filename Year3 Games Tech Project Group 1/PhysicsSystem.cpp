@@ -212,6 +212,7 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			std::shared_ptr<BoxCollider> b = std::static_pointer_cast<BoxCollider>(data->comp.lock());
 			std::shared_ptr<RigidBody2D> r = b->GetComponent<RigidBody2D>().lock();
 			b->fixture = r->body->CreateFixture(b->fixtureDef);
+			r->body->ResetMassData();
 		}
 		else if(data->type == ComponentType::COMPONENT_CIRCLE_COLLIDER) {
 			std::shared_ptr<CircleCollider> c = std::static_pointer_cast<CircleCollider>(data->comp.lock());

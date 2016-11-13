@@ -10,7 +10,7 @@ static bool operator != (sf::ContextSettings lhs, sf::ContextSettings rhs) {
 	return !(lhs == rhs);
 }
 
-sf::Color getSFColour(const float & r, const float & g, const float & b, const float & a) {
+sf::Color GetSFColour(const float & r, const float & g, const float & b, const float & a) {
 	return sf::Color((uint8_t)(r * 255), (uint8_t)(g * 255), (uint8_t)(b * 255), (uint8_t)(a * 255));
 }
 
@@ -130,7 +130,7 @@ void Graphics::Draw(const std::string & text, const Vector2 & position, unsigned
 		if(alignment == TextAlignment::CENTRE_ALIGNED) toDraw.setOrigin(sf::Vector2f(width / 2, 0));
 		else if(alignment == TextAlignment::RIGHT_ALIGNED) toDraw.setOrigin(sf::Vector2f(width, 0));
 	}
-	toDraw.setPosition(position.x, position.y);
+	toDraw.setPosition(window.mapPixelToCoords(TypeConversion::ConvertToSFVector2i(position)));
 	toDraw.setFillColor(sf::Color::White);
 
 	window.draw(toDraw);
@@ -146,7 +146,7 @@ void Graphics::DrawCircle(const sf::CircleShape & c) {
 
 void Graphics::DrawCircle(const Vector2 & position, const float & radius, bool filled, const float & r, const float & g, const float & b, const float & a, const unsigned int & noOfVerts) {
 	sf::CircleShape circle = sf::CircleShape(radius, noOfVerts);
-	sf::Color colour = getSFColour(r, g, b, a);
+	sf::Color colour = GetSFColour(r, g, b, a);
 	circle.setOutlineColor(colour);
 	circle.setOutlineThickness(1);
 	circle.setFillColor(filled ? colour : sf::Color::Transparent);
@@ -162,7 +162,7 @@ void Graphics::DrawRect(const sf::RectangleShape & r) {
 
 void Graphics::DrawRect(const Vector2 & position, const Vector2 & size, const float & rotation, bool filled, const float & r, const float & g, const float & b, const float & a) {
 	sf::RectangleShape rect(sf::Vector2f(size.x, size.y));
-	sf::Color colour = getSFColour(r, g, b, a);
+	sf::Color colour = GetSFColour(r, g, b, a);
 	if(rotation != 0.0f) rect.rotate(rotation);
 	rect.setOutlineColor(colour);
 	rect.setFillColor(filled ? colour : sf::Color::Transparent);

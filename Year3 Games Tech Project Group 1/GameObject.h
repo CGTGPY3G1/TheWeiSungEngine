@@ -25,6 +25,7 @@ public:
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();
 	virtual void Init(const Vector2 & position, const float & rotation);
+	std::weak_ptr<GameObjectManager> GetManager();
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;

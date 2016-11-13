@@ -2,6 +2,7 @@
 #include "GameObjectManager.h"
 #include "PhysicsSystem.h"
 #include "TypeInfo.h"
+#include "SpriteRenderingSystem.h"
 Scene::Scene() {
 	static unsigned int id = 0;
 	sceneID = ++id;
@@ -13,7 +14,9 @@ Scene::~Scene() {
 
 void Scene::Start() {
 	gameObjectManager = std::make_shared<GameObjectManager>(GetWeak());
+	assetManager = std::make_shared<AssetManager>();
 	physicsSystem = new PhysicsSystem();
+	systems.push_back(std::make_shared<SpriteRenderingSystem>());
 }
 
 void Scene::Reset() {
@@ -23,7 +26,10 @@ void Scene::Reset() {
 
 void Scene::Update(const float & deltaTime) {
 	physicsSystem->Update(deltaTime);
-	
+	std::vector<std::shared_ptr<GameObject>> gameObjects = gameObjectManager->GetGameObjects();
+	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
+		(*i)->ProcessComponents(gameObjects);
+	}
 }
 
 void Scene::Render() {
@@ -36,6 +42,10 @@ void Scene::End() {
 		physicsSystem = NULL;
 	}
 	
+}
+
+std::weak_ptr<AssetManager> Scene::GetAssetManager() {
+	return assetManager;
 }
 
 void Scene::HandleMessage(const Message & message) {

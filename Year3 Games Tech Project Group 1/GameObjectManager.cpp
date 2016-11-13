@@ -21,6 +21,10 @@ std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string 
 	return g;
 }
 
+std::vector<std::shared_ptr<GameObject>> GameObjectManager::GetGameObjects() {
+	return gameObjects;
+}
+
 
 std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const unsigned int & id) {
 	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasGameObjectID(id));

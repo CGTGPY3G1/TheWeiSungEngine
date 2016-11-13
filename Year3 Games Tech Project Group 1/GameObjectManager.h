@@ -12,19 +12,11 @@ public:
 	GameObjectManager(std::weak_ptr<Scene> owner);
 	~GameObjectManager();
 	std::weak_ptr<GameObject> CreateGameObject(const std::string & name = "New GameObject");
+	std::vector<std::shared_ptr<GameObject>> GetGameObjects();
 	std::weak_ptr<GameObject> GetGameObject(const unsigned int & id);
 	std::weak_ptr<GameObject> GetGameObject(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithName(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithComponent(const unsigned int & componentMask);
-	void HandleMessage(const Message & message) {
-		switch(message.type) {
-		case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:
-
-			break;
-		default:
-			break;
-		}
-	};
 	std::weak_ptr<Scene> GetScene();
 private:
 	std::weak_ptr<Scene> scene;

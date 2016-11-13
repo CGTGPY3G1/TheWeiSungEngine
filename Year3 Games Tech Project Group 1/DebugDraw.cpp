@@ -6,6 +6,7 @@
 #include "TypeConversion.h"
 DebugDraw::DebugDraw(){ 
 	SetFlags(DebugDraw::e_shapeBit);
+	
 }
 
 void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
@@ -33,7 +34,20 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
 	Engine::GetInstance().GetGraphics()->Draw(circle);
 }
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) { 
-	DrawCircle(center, radius, color);
+	sf::CircleShape circle(radius * Physics::PIXELS_PER_METRE);
+	circle.setOrigin(radius * Physics::PIXELS_PER_METRE, radius * Physics::PIXELS_PER_METRE);
+	circle.setPosition(TypeConversion::ConvertToSFVector2f(center));
+	circle.setFillColor(sf::Color::Transparent);
+	circle.setOutlineThickness(1.f);
+	circle.setOutlineColor(sf::Color::Green);
+
+	b2Vec2 endPoint = center + radius * axis;
+	sf::Vertex line[2] = {
+		sf::Vertex(TypeConversion::ConvertToSFVector2f(center), DebugDraw::GLColorToSFML(color)),
+		sf::Vertex(TypeConversion::ConvertToSFVector2f(endPoint), DebugDraw::GLColorToSFML(color)),
+	};
+	Engine::GetInstance().GetGraphics()->Draw(circle);
+	Engine::GetInstance().GetGraphics()->DrawLine(line);
 }
 void DebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color) {
 	sf::Vertex line [] = {

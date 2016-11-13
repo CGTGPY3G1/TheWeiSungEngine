@@ -50,6 +50,7 @@ float RigidBody2D::GetRotation() {
 void RigidBody2D::SetMass(const float & newMass) {
 	body->GetMassData(massData);
 	massData->mass = newMass;
+	body->SetMassData(massData);
 }
 
 float RigidBody2D::GetMass() {
@@ -68,7 +69,7 @@ float RigidBody2D::GetSpeed() {
 	return body->GetLinearVelocity().Length();
 }
 
-void RigidBody2D::Init(const b2BodyType & type, const float & angularDampening, const float & linearDampening) {
+void RigidBody2D::Init(const b2BodyType & type, const float & mass, const float & angularDampening, const float & linearDampening) {
 	bodyDef = new b2BodyDef();
 	this->bodyDef->type = type;
 	this->bodyDef->angularDamping = angularDampening;
@@ -76,14 +77,15 @@ void RigidBody2D::Init(const b2BodyType & type, const float & angularDampening, 
 	
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	std::shared_ptr<Transform2D> t = g->GetComponent<Transform2D>().lock();
-	//TransformData t = g->GetComponentData<TransformData>();
 	bodyDef->position = TypeConversion::ConvertToB2Vector2(t->GetPosition());
 	bodyDef->angle = t->GetRotation() * Math::DegreesToRadians();
 	std::weak_ptr<Component> r = GetWeak();
 	rigidBodyData = new RigidBodyData(r);
 	bodyDef->userData = rigidBodyData;
 	bodyDef->allowSleep = false;
+	massData = new b2MassData();
 	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY, MessageDataType::MESSAGE_RIGIDBODY_DATA_TYPE, rigidBodyData);
 	g->HandleMessage(m);
-	massData = new b2MassData();
+	SetMass(mass);
+	SetEnabled(true);
 }

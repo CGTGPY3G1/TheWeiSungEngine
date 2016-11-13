@@ -8,7 +8,7 @@
 #include"Component.h"
 #include "Message.h"
 #include "Vector2.h"
-class Transform2D : public Component, private sf::Transformable {
+class Transform2D : public Component, protected sf::Transformable {
 public:
 	Transform2D();
 	Transform2D(std::weak_ptr<GameObject> gameObject);
@@ -27,6 +27,7 @@ public:
 	void Rotate(const float & angle);
 	const sf::Transform & GetLocalTransform();
 	const sf::Transform & GetWorldTransform();
+	const sf::Transformable & GetWorldTransformable();
 	int GetChildCount();
 	std::weak_ptr<Transform2D> GetChild(const unsigned int & index);
 	void AddChild(std::weak_ptr<Transform2D> child);

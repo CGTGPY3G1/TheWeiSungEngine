@@ -10,12 +10,12 @@ BoxCollider::~BoxCollider() {
 
 }
 
-void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool & isSensor, const float & friction, const float & restitution) {
+void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool & isSensor, const float & density, const float & friction, const float & restitution) {
 	fixtureDef = new b2FixtureDef();
 	fixtureDef->isSensor = isSensor;
 	fixtureDef->friction = friction;
 	fixtureDef->restitution = restitution;
-	fixtureDef->density = 1.f;
+	fixtureDef->density = density;
 	shape = new b2PolygonShape();
 	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL, (size.y / 2) * Physics::METRES_PER_PIXEL);
 	
@@ -27,6 +27,7 @@ void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool 
 	fixtureDef->userData = colliderData;
 	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
 	gameObject.lock()->HandleMessage(m);
+	SetEnabled(true);
 }
 
 void BoxCollider::SetOffset(const Vector2 & newOffset) {

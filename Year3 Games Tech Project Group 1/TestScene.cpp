@@ -6,7 +6,7 @@
 #include "GameObject.h"
 #include "GameObjectManager.h"
 #include "PhysicsSystem.h"
-
+#include <random>
 sf::RectangleShape rect;
 sf::CircleShape circle;
 TestScene::TestScene() : Scene() {
@@ -29,9 +29,14 @@ void TestScene::Start() {
 	
 	t1->SetPosition(Vector2(640.0f, 360.0f));
 	std::shared_ptr<RigidBody2D> r = t1->AddComponent<RigidBody2D>().lock();
-	r->Init(b2BodyType::b2_dynamicBody);
+	r->Init(b2BodyType::b2_dynamicBody, 1.0f, 0.5f, 1.0f);
+	r->SetMass(50);
 	std::shared_ptr<CircleCollider> c = t1->AddComponent<CircleCollider>().lock();
-	c->Init(Vector2(), 20.0f);
+	c->Init(Vector2(), 20.0f, false);
+	std::shared_ptr<CircleCollider> playerSensor = t1->AddComponent<CircleCollider>().lock();
+	playerSensor->Init(Vector2(), 200.0f, true);
+	std::shared_ptr<SpriteRenderer> sr = u->AddComponent<SpriteRenderer>().lock();
+	sr->Init("Images/Ball.png", RenderLayer::FOREGROUND_LAYER, 85);
 	t2->SetPosition(Vector2(640.0f, 360.0f));
 	std::shared_ptr<RigidBody2D> r2 = t2->AddComponent<RigidBody2D>().lock();
 	r2->Init(b2BodyType::b2_kinematicBody);
@@ -42,6 +47,30 @@ void TestScene::Start() {
 		std::shared_ptr<BoxCollider> b = t2->AddComponent<BoxCollider>().lock();
 		b->Init(Vector2(512.0f, -yDist + 384.0f * i), Vector2(512.0f, 256.0f));
 	}
+	Engine & engine = Engine::GetInstance();
+	Vector2 res = engine.GetGraphics()->GetScreenResolution();
+	const int NUM_X = 100, NUM_Y = 50;
+	float offsetX = res.x / NUM_X;
+	float offsety = res.y / NUM_Y;
+	std::cout << "Creating " + std::to_string(NUM_X * NUM_Y) + " Sprites";
+	int layer = 0, sortOrder = 0;
+	std::random_device rd;
+	std::mt19937 generator(rd());
+	std::uniform_int_distribution<> sortRange(-100, 100);
+	for(size_t i = 0; i < NUM_X; i++) {
+		for(size_t j = 0; j < NUM_Y; j++) {
+			if(layer >= RenderLayer::MUNBER_OF_LAYERS) layer = 0;
+			sortOrder = sortRange(generator);
+			std::shared_ptr<GameObject> testObject = gameObjectManager->CreateGameObject().lock();
+			testObject->Init();
+			std::shared_ptr<Transform2D> transform = testObject->AddComponent<Transform2D>().lock();
+			transform->SetPosition(Vector2(offsetX * i, offsety * j));
+			std::shared_ptr<SpriteRenderer> spriteRenderer = testObject->AddComponent<SpriteRenderer>().lock();
+			spriteRenderer->Init("Images/Tree.png", (RenderLayer)layer, sortOrder);
+			sortOrder--;
+			layer++;
+		}
+	}
 }
 
 void TestScene::Update(const float & deltaTime) {
@@ -51,11 +80,11 @@ void TestScene::Update(const float & deltaTime) {
 
 void TestScene::Render() {
 	Engine & engine = Engine::GetInstance();
-	engine.GetGraphics()->Draw(circle, g1.lock()->GetComponent<Transform2D>().lock()->GetWorldTransform());
+	//engine.GetGraphics()->Draw(circle, g1.lock()->GetComponent<Transform2D>().lock()->GetWorldTransform());
 	engine.GetGraphics()->Draw("Delta Time = " + std::to_string(engine.GetTimer()->GetDeltaTime()), Vector2(540.0f, 650.0f), 30);
 	engine.GetGraphics()->Draw("FPS = " + std::to_string(engine.GetFPS()), Vector2(1180.0f, 650.0f), 30, RIGHT_ALIGNED);
 	engine.GetGraphics()->Draw("Total Time = " + std::to_string(engine.GetTimer()->GetTotalTime()), Vector2(100.0f, 650.0f), 30);
-	//engine.GetGraphics()->Draw("Mouse Position | X = " + std::to_string((int)mousePosition.x) + "  Y = " + std::to_string((int)mousePosition.y), Vector2(100.0f, 50.0f), 30);
+	engine.GetGraphics()->Draw("Mouse Position | X = " + std::to_string((int)mousePosition.x) + "  Y = " + std::to_string((int)mousePosition.y), Vector2(100.0f, 50.0f), 30);
 	Scene::Render();
 }
 
@@ -83,7 +112,7 @@ void TestScene::Test(const float & deltaTime) {
 	mousePosition = input->GetMousePosition();
 
 	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
-
+	gameObject->GetComponent<RigidBody2D>().lock()->SetRotation((mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition()).AngleInDegrees());
 	// Test Kinematic RigidBody Movement
 	// gameObjectManager->GetGameObject("Background").lock()->GetComponent<Transform2D>().lock()->Move(Vector2(20.0f * deltaTime, 0.0f));
 
@@ -96,7 +125,7 @@ void TestScene::Test(const float & deltaTime) {
 	if(input->GetMouseButtonDown(MouseButtons::MouseButton::Right)) physicsSystem->CreateBox(mousePosition.x, mousePosition.y, Physics::PIXELS_PER_METRE, Physics::PIXELS_PER_METRE);
 
 	// Movement Test
-	float moveAmount = 256.0f;
+	float moveAmount = gameObject->GetComponent<RigidBody2D>().lock()->GetMass() * 256.0f;
 	if(input->GetKey(KeyCodes::KeyCode::Up)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * deltaTime), ForceType::IMPULSE_FORCE);
 	if(input->GetKey(KeyCodes::KeyCode::Down)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * deltaTime), ForceType::IMPULSE_FORCE);
 	if(input->GetKey(KeyCodes::KeyCode::Left)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * deltaTime, 0.0f), ForceType::IMPULSE_FORCE);
