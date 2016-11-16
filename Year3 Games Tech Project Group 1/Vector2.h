@@ -65,6 +65,10 @@ public:
 	Vector2 RotateInDegrees(const float & angle);
 	Vector2 RotatedInDegrees(const float & angle);
 	Vector2 Flip90(const bool & clockwise);
+	Vector2 Lerp(const Vector2 & target, const float & alpha){
+		const float inverse = 1.0f - alpha;
+		return Vector2((*this * inverse) + (target * alpha));
+	}
 	Vector2 Copy();
 	std::string ToString() {
 		return "X = " + std::to_string(x) + " Y = " + std::to_string(y);

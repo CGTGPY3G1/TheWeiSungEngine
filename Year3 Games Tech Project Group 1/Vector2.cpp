@@ -141,7 +141,7 @@ float Vector2::AngleInDegrees() {
 }
 
 Vector2 Vector2::RotateInRadians(const float & angle) {
-	float cosine = cos(-angle), sine = sin(-angle);
+	float cosine = cos(angle), sine = sin(angle);
 	float rotatedX = (x * cosine) - (y * sine), rotatedY = (x * sine) + (y * cosine);
 	x = rotatedX; y = rotatedY;
 	return *this;

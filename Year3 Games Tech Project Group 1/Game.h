@@ -22,6 +22,7 @@ protected:
 	bool gameOver = false;
 	std::vector<std::shared_ptr<Scene>> scenes;
 	int activeScene = -1;
+	float accumulator = 0.0f;
 };
 
 

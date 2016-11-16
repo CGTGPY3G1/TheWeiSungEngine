@@ -12,6 +12,8 @@ public:
 	virtual ~Scene();
 	virtual void Start();
 	virtual void Reset();
+	virtual void FixedUpdate(const float & fixedDeltaTime);
+	void SyncPhysics();
 	virtual void Update(const float & deltaTime);
 	virtual void Render();
 	virtual void End();

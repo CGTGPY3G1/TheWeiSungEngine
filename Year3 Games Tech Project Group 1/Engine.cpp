@@ -27,25 +27,28 @@ void Engine::Start() {
 }
 
 void Engine::Run() {
-	if(graphics->GetWindowOpen()) {
-		timer->Update();
-		input->Update();
-		graphics->Clear();
-		float deltaTime = timer->GetDeltaTime();
-		if(running) {
-			if(game) game->Update(timer->GetDeltaTime());
-			else graphics->Draw("No Game Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
+	if(running) {
+		if(graphics->GetWindowOpen()) {
+			timer->Update();
+			input->Update();
+			graphics->Clear();
+			graphics->Update();
+			float deltaTime = timer->GetDeltaTime();
+			if(running) {
+				if(game) game->Update(timer->GetDeltaTime());
+				else graphics->Draw("No Game Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
+			}
+			graphics->Display();
+			framesThisSecond++;
+			fpsTimer += deltaTime;
+			if(fpsTimer > 1.0f) {
+				fps = framesThisSecond;
+				framesThisSecond = 0;
+				fpsTimer = 0.0f;
+			}
 		}
-		graphics->Update();
-		framesThisSecond++;
-		fpsTimer += deltaTime;
-		if(fpsTimer > 1.0f) {
-			fps = framesThisSecond; 
-			framesThisSecond = 0;
-			fpsTimer = 0.0f;
-		}
-	}
-	else running = false;
+		else running = false;
+	}	
 }
 
 void Engine::End() {

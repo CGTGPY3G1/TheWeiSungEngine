@@ -24,8 +24,16 @@ void Scene::Reset() {
 	Start();
 }
 
+void Scene::FixedUpdate(const float & fixedDeltaTime) {
+	physicsSystem->Update(fixedDeltaTime);
+}
+
+void Scene::SyncPhysics() {
+	physicsSystem->UpdateBodies();
+}
+
 void Scene::Update(const float & deltaTime) {
-	physicsSystem->Update(deltaTime);
+	
 	std::vector<std::shared_ptr<GameObject>> gameObjects = gameObjectManager->GetGameObjects();
 	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
 		(*i)->ProcessComponents(gameObjects);

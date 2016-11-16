@@ -25,6 +25,7 @@ public:
 	PhysicsSystem();
 	~PhysicsSystem();
 	void Update(const float & deltaTime);
+	void UpdateBodies();
 	b2Body * CreateBody(const Vector2 & position, const PhysicsBodyType & type);
 	void CreateBox(const float & x, const float & y, const float & width, const float & height);
 	void SetGravity(const float & x, const float & y);

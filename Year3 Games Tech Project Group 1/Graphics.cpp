@@ -33,15 +33,12 @@ void Graphics::Update() {
 			windowOpen = false;
 			break;
 		case sf::Event::Resized:
-			window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
+			// window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
 			break;
 		default:
 			break;
 		}
 	}
-
-
-	window.display();
 }
 
 void Graphics::End() {
@@ -93,7 +90,11 @@ Vector2 Graphics::GetScreenPosition() {
 }
 
 void Graphics::Clear() {
-	window.clear();
+	window.clear(sf::Color::Black);
+}
+
+void Graphics::Display() {
+	window.display();
 }
 
 void Graphics::Draw(const sf::Sprite & sprite) {
@@ -184,6 +185,39 @@ void Graphics::SetDepth(const unsigned int & depth) {
 	}
 }
 
+Vector2 Graphics::GetCameraPosition() {
+	return TypeConversion::ConvertToVector2(view.getCenter());
+}
+
+void Graphics::SetCameraPosition(const float & x, const float & y) {
+	view.setCenter(x, y);
+	window.setView(view);
+}
+
+void Graphics::SetCameraPosition(const Vector2 & position) {
+	SetCameraPosition(position.x, position.y);
+}
+
+void Graphics::MoveCamera(const float & x, const float & y) {
+	view.move(sf::Vector2f(x, y));
+	window.setView(view);
+}
+
+void Graphics::MoveCamera(const Vector2 & amount) {
+	MoveCamera(amount.x, amount.y);
+}
+
+void Graphics::SetCameraZoom(const float & zoom) {
+	const float toZoom = (zoom/zoomLevel);
+	view.zoom(toZoom);
+	zoomLevel = zoom;
+	window.setView(view);
+}
+
+float Graphics::GetCameraZoom() {
+	return zoomLevel;
+}
+
 unsigned int Graphics::GetDepth() {
 	return settings.depthBits;
 }
@@ -214,9 +248,7 @@ bool Graphics::GetFullScreen() {
 void Graphics::SetResizeable(const bool & resizeable) {
 	if(settings.resizeable != resizeable) {
 		settings.resizeable = resizeable;
-		if(!settings.fullScreen) {
-			RebuildDisplay();
-		}
+		if(!settings.fullScreen) RebuildDisplay();
 	}
 }
 
@@ -273,13 +305,14 @@ bool Graphics::GetWindowOpen() {
 }
 
 void Graphics::RebuildDisplay() {
-	window.create(sf::VideoMode((int)settings.resolution.x, (int)settings.resolution.y), settings.windowTitle,
+	window.create(sf::VideoMode((int)settings.resolution.x+0.5f, (int)settings.resolution.y+0.5f), settings.windowTitle,
 				  (settings.fullScreen ? sf::Style::Fullscreen : (settings.resizeable ? sf::Style::Default : (sf::Style::Titlebar | sf::Style::Close))),
 				  sfSettings);
 	window.setPosition(sf::Vector2i((int)settings.screenPosition.x, (int)settings.screenPosition.y));
 	view = window.getView();
-
-	if(settings.vSync) window.setVerticalSyncEnabled(true);
+	view.zoom(zoomLevel);
+	window.setView(view);
+	if(settings.vSync) window.setFramerateLimit(settings.maxFPS);
 	if(!windowOpen) windowOpen = true;
 }
 

@@ -30,6 +30,8 @@ public:
 	Vector2 GetPosition();
 	void SetPosition(const Vector2 & newPosition);
 	void SetRotation(const float & angle);
+	Vector2 GetForward();
+	Vector2 GetRight();
 	float GetRotation();
 	void SetMass(const float & newMass);
 	float GetMass();

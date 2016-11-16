@@ -9,9 +9,10 @@ public:
 	TestScene();
 	~TestScene();
 	void Start() override;
+	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Update(const float & deltaTime) override;
 	void Render() override;
-	void SetUpShapes();
+	//void SetUpShapes();
 	void Test(const float & deltaTime);
 private:
 	std::weak_ptr<GameObject> g1, g2;

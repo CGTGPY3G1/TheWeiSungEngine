@@ -20,34 +20,29 @@ void stop() {
 }
 
 void PhysicsSystem::Update(const float & deltaTime) {
-	accumulator += deltaTime;
-	bool updateBodies = false;
-	while(accumulator >= settings.timeStep) {
-		if(!updateBodies) updateBodies = true;
-		world->Step(settings.timeStep, settings.velocityIterations, settings.positionIterations);
-		accumulator -= settings.timeStep;
-	}
-	if(updateBodies) {
-		for(b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-			if(b->GetType() == b2BodyType::b2_dynamicBody) {
-				RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
-				if(rb) {
-					std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
-					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
-					t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
-					t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
-				}
+	world->Step(deltaTime, settings.velocityIterations, settings.positionIterations);
+}
+
+void PhysicsSystem::UpdateBodies() {
+	for(b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
+		if(b->GetType() == b2BodyType::b2_dynamicBody) {
+			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
+			if(rb) {
+				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
+				std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
+				t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
+				t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
 			}
-			else if(b->GetType() == b2BodyType::b2_kinematicBody) {
-				RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
-				if(rb) {
-					std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
-					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
-					b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(t->GetPosition());
-					float newAngle = t->GetRotation() * Math::DegreesToRadians();
-					b->SetTransform(newPos, newAngle);
-					b->SetMassData(r->massData);
-				}
+		}
+		else if(b->GetType() == b2BodyType::b2_kinematicBody) {
+			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
+			if(rb) {
+				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
+				std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
+				b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(t->GetPosition());
+				float newAngle = t->GetRotation() * Math::DegreesToRadians();
+				b->SetTransform(newPos, newAngle);
+				b->SetMassData(r->massData);
 			}
 		}
 	}
@@ -103,9 +98,8 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 		else {
 			b2WorldManifold worldManifold;
 			contact->GetWorldManifold(&worldManifold);
-			b2Vec2 vel1 = body1->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-			b2Vec2 vel2 = body2->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-			Vector2 relativeVelocity = TypeConversion::ConvertToVector2(vel2 - vel1);
+			Vector2 impactVelocity = rigidBody2.lock()->GetVelocity();
+			impactVelocity -= rigidBody1.lock()->GetVelocity();
 			b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
 			b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
 			Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
@@ -116,14 +110,14 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 				contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
 			}
 			{
-				CollisionData collisionData = CollisionData(gameObject2, collider2, normal, relativeVelocity);
+				CollisionData collisionData = CollisionData(gameObject2, collider2, normal, impactVelocity);
 				for(size_t i = 0; i < cps; i++) {
 					collisionData.contactPoints[i] = contactPoints[i];
 				}
 				gameObject1.lock()->OnCollisionEnter(collisionData);
 			}
 			{
-				CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -relativeVelocity);
+				CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -impactVelocity);
 				for(size_t i = 0; i < cps; i++) {
 					collisionData.contactPoints[i] = contactPoints[i];
 				}
@@ -154,9 +148,8 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 		else {
 			b2WorldManifold worldManifold;
 			contact->GetWorldManifold(&worldManifold);
-			b2Vec2 vel1 = body1->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-			b2Vec2 vel2 = body2->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-			Vector2 impactVelocity = TypeConversion::ConvertToVector2(vel1 - vel2);
+			Vector2 impactVelocity = rigidBody2.lock()->GetVelocity();
+			impactVelocity -= rigidBody1.lock()->GetVelocity();
 			b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
 			b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
 			Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();

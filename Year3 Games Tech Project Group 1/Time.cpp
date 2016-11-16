@@ -24,6 +24,10 @@ float Time::GetDeltaTime() {
 	return deltaTime;
 }
 
+float Time::GetFixedDeltaTime() {
+	return FIXED_DELTA;
+}
+
 float Time::GetTotalTime() {
 	return totalTime;
 }

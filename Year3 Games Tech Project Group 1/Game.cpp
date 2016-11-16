@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Engine.h"
 #include "Graphics.h"
+#include "Time.h"
 
 Game::Game() {
 }
@@ -26,6 +27,13 @@ void Game::Start() {
 void Game::Update(const float & deltaTime) {
 	if(running && !gameOver) {
 		if(activeScene >= 0 && activeScene < scenes.size()) {
+			float fixedDelta = Engine::GetInstance().GetTimer()->GetFixedDeltaTime();
+			accumulator += deltaTime;
+			while(accumulator >= fixedDelta) {
+				scenes[activeScene]->FixedUpdate(fixedDelta);
+				accumulator -= fixedDelta;
+			}
+			scenes[activeScene]->SyncPhysics();
 			scenes[activeScene]->Update(deltaTime);
 			scenes[activeScene]->Render();
 		}

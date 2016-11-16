@@ -16,13 +16,12 @@ enum TextAlignment {
 struct GraphicsSettings {
 	std::string windowTitle = "Unnamed Window";
 	Vector2 screenPosition = {500.0f, 20.0f}, resolution = {1280.0f, 720.0f};
-	unsigned int depthBits = 24, antialiasingLevel = 0, minorVersion = 2, majorversion = 3, maxFPS = 60;
+	unsigned int depthBits = 24, antialiasingLevel = 0, minorVersion = 2, majorversion = 3, maxFPS = 50;
 	bool fullScreen = false, resizeable = true, vSync = false;
 	 
 	bool operator == (GraphicsSettings other) {
 		return (screenPosition == screenPosition && resolution == resolution && depthBits == other.depthBits && antialiasingLevel == other.antialiasingLevel && minorVersion == other.minorVersion &&
-				majorversion == other.majorversion && maxFPS == other.maxFPS && fullScreen == other.fullScreen &&
-				resizeable == other.resizeable && vSync == other.vSync && windowTitle == other.windowTitle);
+				majorversion == other.majorversion && maxFPS == other.maxFPS && fullScreen == other.fullScreen && resizeable == other.resizeable && vSync == other.vSync && windowTitle == other.windowTitle);
 	}
 	bool operator != (GraphicsSettings other) {
 		return !((*this) == other);
@@ -45,6 +44,7 @@ public:
 	void SetScreenPosition(const float & x, const float & y);
 	Vector2 GetScreenPosition();
 	void Clear();
+	void Display();
 	void Draw(const sf::Sprite & sprite);
 	void Draw(const sf::Shape & shape);
 	void Draw(const sf::VertexArray & vertexArray);
@@ -56,10 +56,13 @@ public:
 	void DrawRect(const Vector2 & position, const Vector2 & size, const float & rotation = 0.0f, bool filled = false, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f);
 	void DrawLine(sf::Vertex line []);
 	void SetDepth(const unsigned int & depth);
-	void MoveCamera(const float & x, const float & y) {
-		view.move(sf::Vector2f(x, y));
-		window.setView(view);
-	}
+	Vector2 GetCameraPosition();
+	void SetCameraPosition(const float & x, const float & y);
+	void SetCameraPosition(const Vector2 & position);
+	void MoveCamera(const float & x, const float & y);
+	void MoveCamera(const Vector2 & amount);
+	void SetCameraZoom(const float & zoom);
+	float GetCameraZoom();
 	unsigned int GetDepth();
 	void SetAntialiasingLevel(const unsigned int & antiAliasingLevel);
 	unsigned int GetAntialiasingLevel();
@@ -79,12 +82,14 @@ public:
 private:
 	void RebuildDisplay();
 	sf::RenderWindow window;
-	sf::View view;
+	sf::View & view = sf::View();
 	sf::ContextSettings sfSettings;
 	sf::Font font;
 	GraphicsSettings settings;
 	bool windowOpen = false;
 	sf::VertexArray buffer;
+	sf::Vector2f camPos = sf::Vector2f(0.0f, 0.0f);
+	float zoomLevel = 1.0f;
 };
 
 #endif // !WS_GRAPHICS_H

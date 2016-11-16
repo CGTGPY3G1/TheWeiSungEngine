@@ -1,7 +1,7 @@
 #include "RigidBody2D.h"
 #include "Math.h"
 #include "GameObject.h"
-
+#include <SFML/Graphics/Transform.hpp>
 RigidBody2D::RigidBody2D(std::weak_ptr<GameObject> gameObject) : Component(gameObject) {
 	
 }
@@ -41,6 +41,16 @@ void RigidBody2D::SetPosition(const Vector2 & newPosition) {
 
 void RigidBody2D::SetRotation(const float & angle) {
 	body->SetTransform(body->GetPosition(), angle * Math::DegreesToRadians());
+}
+
+Vector2 RigidBody2D::GetForward() {
+	//const float* matrix = 
+	
+	return Vector2(1, 0).RotatedInRadians(body->GetAngle());
+}
+
+Vector2 RigidBody2D::GetRight() {
+	return GetForward().Flip90(true);
 }
 
 float RigidBody2D::GetRotation() {
