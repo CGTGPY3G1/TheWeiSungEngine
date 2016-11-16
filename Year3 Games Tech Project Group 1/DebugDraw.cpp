@@ -16,7 +16,7 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 		sf::Vector2f transformedVec = TypeConversion::ConvertToSFVector2f(vertices[i]);
 		polygon.setPoint(i, sf::Vector2f(std::floor(transformedVec.x), std::floor(transformedVec.y)));
 	}																								   
-	polygon.setOutlineThickness(-1.f);
+	polygon.setOutlineThickness(2.f);
 	polygon.setFillColor(sf::Color::Transparent);
 	polygon.setOutlineColor(sf::Color::Green);
 	Engine::GetInstance().GetGraphics()->Draw(polygon);
@@ -29,7 +29,7 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
 	circle.setOrigin(radius * Physics::PIXELS_PER_METRE, radius * Physics::PIXELS_PER_METRE);
 	circle.setPosition(TypeConversion::ConvertToSFVector2f(center));
 	circle.setFillColor(sf::Color::Transparent);
-	circle.setOutlineThickness(-1.f);
+	circle.setOutlineThickness(2.f);
 	circle.setOutlineColor(sf::Color::Green); 
 	Engine::GetInstance().GetGraphics()->Draw(circle);
 }
@@ -38,7 +38,7 @@ void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Ve
 	circle.setOrigin(radius * Physics::PIXELS_PER_METRE, radius * Physics::PIXELS_PER_METRE);
 	circle.setPosition(TypeConversion::ConvertToSFVector2f(center));
 	circle.setFillColor(sf::Color::Transparent);
-	circle.setOutlineThickness(1.f);
+	circle.setOutlineThickness(2.f);
 	circle.setOutlineColor(sf::Color::Green);
 
 	b2Vec2 endPoint = center + radius * axis;

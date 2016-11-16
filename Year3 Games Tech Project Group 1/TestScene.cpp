@@ -50,7 +50,7 @@ void TestScene::Start() {
 	}*/
 	std::shared_ptr<SpriteRenderer> spriteRenderer = t2->AddComponent<SpriteRenderer>().lock();
 	spriteRenderer->Init("Images/Street.png", RenderLayer::BACKGROUND_LAYER, 0);
-	spriteRenderer->GetSprite().setScale(sf::Vector2f(2, 2));
+	spriteRenderer->GetSprite().setScale(sf::Vector2f(4, 4));
 	/*Engine & engine = Engine::GetInstance();
 	Vector2 res = engine.GetGraphics()->GetScreenResolution();
 	const int NUM_X = 100, NUM_Y = 50;
@@ -92,7 +92,7 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * ((std::max<float>(forward.Dot(Vector2(-1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
 	if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(moveAmount * ((std::max<float>(forward.Dot(Vector2(1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
 	Scene::FixedUpdate(fixedDeltaTime);
-	engine.GetGraphics()->MoveCamera((gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics()->GetCameraPosition()) *  (fixedDeltaTime * 2.0f));
+	engine.GetGraphics()->MoveCamera((gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics()->GetCameraPosition()) *  (fixedDeltaTime * 1.5f));
 	const float maxVelocity = Physics::PIXELS_PER_METRE * 2.0f;
 	const float velocity = gameObject->GetComponent<RigidBody2D>().lock()->GetVelocity().Magnitude();
 	const float velocityThreshold = (maxVelocity *0.25f);
