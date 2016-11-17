@@ -18,6 +18,15 @@ namespace MouseButtons {
 	};
 }
 
+namespace ControllerButtons {
+	enum ControllerButton {
+		A = 0, B, X, Y, LB, RB, BACK, START, LS, RS, ButtonCount
+	};
+	enum ControllerAxis {
+		LeftStickH = 0, LeftStickV = 1, RT = 2, RightStickV = 3, RightStickH = 4, LT = 5, DPadH = 6, DPadV = 7, AxisCount = 8
+	};
+}
+
 class Input {
 
 public:
@@ -27,19 +36,33 @@ public:
 	bool GetKeyDown(KeyCodes::KeyCode key);
 	bool GetKeyUp(KeyCodes::KeyCode key);
 	bool GetKey(KeyCodes::KeyCode key);
-	bool GetMouseButtonDown(MouseButtons::MouseButton key);
-	bool GetMouseButtonUp(MouseButtons::MouseButton key);
-	bool GetMouseButton(MouseButtons::MouseButton key);
+	bool GetMouseButtonDown(MouseButtons::MouseButton button);
+	bool GetMouseButtonUp(MouseButtons::MouseButton button);
+	bool GetMouseButton(MouseButtons::MouseButton button);
+	bool GetControllerButtonDown(unsigned int controllerID, ControllerButtons::ControllerButton button);
+	bool GetControllerButtonUp(unsigned int controllerID, ControllerButtons::ControllerButton button);
+	bool GetControllerButton(unsigned int controllerID, ControllerButtons::ControllerButton button);
+	bool IsControllerConnected(unsigned int controllerID);
+	float GetAxis(unsigned int controllerID, ControllerButtons::ControllerAxis axis);
 	Vector2 GetMousePosition();
 	float GetMouseX();
 	float GetMouseY();
 private:
-	const int NUMBER_OF_BUTTONS = MouseButtons::MouseButton::ButtonCount, NUMBER_OF_KEYS = KeyCodes::KeyCode::KeyCount;
+	float GetAxisValue(const unsigned int controllerID, const unsigned int axisID);
+	const unsigned int NUMBER_OF_MOUSE_BUTTONS = MouseButtons::MouseButton::ButtonCount, NUMBER_OF_CONTROLLER_BUTTONS = ControllerButtons::ControllerButton::ButtonCount, 
+						NUMBER_OF_CONTROLLER_AXES = ControllerButtons::ControllerAxis::AxisCount, NUMBER_OF_KEYS = KeyCodes::KeyCode::KeyCount;
+	const unsigned int NUMBER_OF_CONTROLLERS = 8;
 	bool keyStates[KeyCodes::KeyCode::KeyCount] = {0};
 	bool keyChanged[KeyCodes::KeyCode::KeyCount] = {0};
 
-	bool buttonStates[MouseButtons::MouseButton::ButtonCount];
-	bool buttonChanged[MouseButtons::MouseButton::ButtonCount];
+	bool mouseButtonStates[MouseButtons::MouseButton::ButtonCount];
+	bool mouseButtonChanged[MouseButtons::MouseButton::ButtonCount];
+
+	bool ControllerButtonStates[8][ControllerButtons::ControllerButton::ButtonCount];
+	bool ControllerButtonChanged[8][ControllerButtons::ControllerButton::ButtonCount];
+
+	float axisStates[8][ControllerButtons::ControllerAxis::AxisCount];
+	const float ROUNDING_RANGE = 0.0001f, DEAD_ZONE = 0.2f;
 	Vector2 mousePosition;
 	std::mutex m;
 };

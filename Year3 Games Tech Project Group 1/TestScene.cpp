@@ -81,16 +81,29 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	Engine engine = Engine::GetInstance();
 	Input * input = engine.GetInput();
 	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
-	Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
-	gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
+	bool useController = input->IsControllerConnected(0);
+	
 	// Movement Test
+	
 	Vector2 forward = Vector2(1, 0).RotateInDegrees(gameObject->GetComponent<RigidBody2D>().lock()->GetRotation());
 	float moveAmount = gameObject->GetComponent<RigidBody2D>().lock()->GetMass() * Physics::PIXELS_PER_METRE * 2.0f;
-	const float threshold = 0.4f;
-	if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * ((std::max<float>(forward.Dot(Vector2(0, -1)), threshold)) + 1.0f)), ForceType::FORCE);
-	if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * ((std::max<float>(forward.Dot(Vector2(0, 1)), threshold)) + 1.0f)), ForceType::FORCE);
-	if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * ((std::max<float>(forward.Dot(Vector2(-1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
-	if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(moveAmount * ((std::max<float>(forward.Dot(Vector2(1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
+	const float threshold = 0.25f;
+
+	if(useController) {
+		Vector2 directionToMouse = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickV));
+		if(directionToMouse.SquareMagnitude() > 0.5f) gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
+		Vector2 moveDirection = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickV));
+		gameObject->GetComponent<RigidBody2D>().lock()->AddForce(moveDirection * moveAmount * ((std::max<float>(forward.Dot(moveDirection.Normalized()), threshold)) + 1.0f), ForceType::FORCE);
+	}
+	else {
+		Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
+		gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
+		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * ((std::max<float>(forward.Dot(Vector2(0, -1)), threshold)) + 1.0f)), ForceType::FORCE);
+		if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * ((std::max<float>(forward.Dot(Vector2(0, 1)), threshold)) + 1.0f)), ForceType::FORCE);
+		if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * ((std::max<float>(forward.Dot(Vector2(-1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
+		if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(moveAmount * ((std::max<float>(forward.Dot(Vector2(1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
+	}
+	
 	Scene::FixedUpdate(fixedDeltaTime);
 	engine.GetGraphics()->MoveCamera((gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics()->GetCameraPosition()) *  (fixedDeltaTime * 1.5f));
 	const float maxVelocity = Physics::PIXELS_PER_METRE * 2.0f;
@@ -114,13 +127,19 @@ void TestScene::Render() {
 	//engine.GetGraphics()->Draw(circle, g1.lock()->GetComponent<Transform2D>().lock()->GetWorldTransform());
 	//engine.GetGraphics()->Draw("Total Time = " + std::to_string(engine.GetTimer()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), 30);
 	//engine.GetGraphics()->Draw("Mouse Position | X = " + std::to_string((int)mousePosition.x) + "  Y = " + std::to_string((int)mousePosition.y), Vector2(100.0f, 50.0f), 30);
-	/*if(engine.GetInput()->GetKeyDown(KeyCodes::F)) {
-		std::string toPrint = "";
-		for(size_t i = 0; i < sf::Joystick::ButtonCount; i++) {
-			toPrint += ("Button " + std::to_string(i) + " " + std::to_string(sf::Joystick::isButtonPressed(0, i)) + "\n");
-		}
-		std::cout << toPrint;
-	}*/
+	std::string toPrint = "";
+	//for(size_t i = 0; i < sf::Joystick::ButtonCount; i++) {
+	//	if(sf::Joystick::isButtonPressed(0, i)) toPrint += ("Button " + std::to_string(i) + " is Pressed\n");
+	//}
+	//for(size_t i = 0; i < 11; i++) {
+	//	float val = sf::Joystick::getAxisPosition(0, (sf::Joystick::Axis)i) *0.01f;
+	//	if((val > 0.5f || val < -0.5f)) toPrint += ("Axis " + std::to_string(i) + " = "+ std::to_string(val) +"\n");
+	//}
+	for(size_t i = 0; i < ControllerButtons::ControllerAxis::AxisCount; i++) {
+		float val = input->GetAxis(0, (ControllerButtons::ControllerAxis)i);
+		if(val != 0) toPrint += ("Axis " + std::to_string(i) + " = " + std::to_string(val) + "\n");
+	}
+	std::cout << toPrint;
 	
 	Scene::Render();
 }
