@@ -7,9 +7,9 @@
 
 struct SpriteContainer {
 	SpriteContainer() {}
-	SpriteContainer(WSSprite sprite, const int & sortOrder) : m_sprite(sprite), m_sortOrder(sortOrder) { }
+	SpriteContainer(WSSprite sprite, const sf::RenderStates & states, const int & sortOrder) : m_sprite(sprite), m_states(states), m_sortOrder(sortOrder) { }
 	bool operator <(const SpriteContainer & other) { return m_sortOrder < other.m_sortOrder; }
-
+	sf::RenderStates m_states;
 	WSSprite m_sprite;
 	int m_sortOrder;
 };
@@ -36,7 +36,7 @@ public:
 	SpriteBatch();
 	~SpriteBatch();
 	void Draw(WSSprite & sprite, RenderLayer layer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	void Draw(WSSprite sprite, sf::Transformable transformable, RenderLayer layer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Draw(WSSprite sprite, const sf::RenderStates & states, RenderLayer layer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void Clear();
 	void Display();
 private:

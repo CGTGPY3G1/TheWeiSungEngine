@@ -13,7 +13,8 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
-	template <typename T = std::enable_if<std::is_base_of<Component, T>::value, Component>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
 	friend bool operator < (const GameObject & a, const GameObject & b);
 	friend bool operator == (const GameObject & a, const GameObject & b);
 	std::string GetName();
@@ -24,7 +25,7 @@ public:
 	unsigned int GetComponentMask();
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();
-	virtual void Init(const Vector2 & position, const float & rotation);
+	virtual void Init(const Vector2 & position, const float & rotation = 0);
 	std::weak_ptr<GameObjectManager> GetManager();
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
@@ -61,6 +62,11 @@ std::weak_ptr<T> GameObject::GetComponentInParent() {
 template<typename T>
 std::vector<std::weak_ptr<T>> GameObject::GetComponents() {
 	return HasComponent<T>() ? componentManager.GetComponents<T>() : std::vector<std::weak_ptr<T>>();
+}
+
+template<typename T>
+bool GameObject::ComponentExistsInParents() {
+	return componentManager.ComponentExistsInParents<T>();
 }
 
 template<typename T>

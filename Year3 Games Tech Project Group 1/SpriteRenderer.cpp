@@ -43,6 +43,9 @@ WSSprite & SpriteRenderer::GetSprite() {
 
 void SpriteRenderer::Init(const WSSprite & sprite, const RenderLayer & sortLayer, const int & sortOrder) {
 	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true);
+	sf::FloatRect bounds = sprite.getGlobalBounds();
+	float centreX = bounds.width / 2, centreY = bounds.height / 2;
+	this->sprite.setOrigin(centreX, centreY);
 }
 
 void SpriteRenderer::Init(const std::string path, const RenderLayer & sortLayer, const int & sortOrder) {

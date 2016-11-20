@@ -34,7 +34,7 @@ void PhysicsSystem::UpdateBodies() {
 				t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
 			}
 		}
-		else if(b->GetType() == b2BodyType::b2_kinematicBody) {
+		else if(b->GetType() == b2BodyType::b2_kinematicBody || b->GetType() == b2BodyType::b2_staticBody) {
 			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
 			if(rb) {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
@@ -211,11 +211,13 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			std::shared_ptr<CircleCollider> c = std::static_pointer_cast<CircleCollider>(data->comp.lock());
 			std::shared_ptr<RigidBody2D> r = c->GetComponent<RigidBody2D>().lock();
 			c->fixture = r->body->CreateFixture(c->fixtureDef);
+			r->body->ResetMassData();
 		}
 		else if(data->type == ComponentType::COMPONENT_POLYGON_COLLIDER_2D) {
 			std::shared_ptr<PolygonCollider> p = std::static_pointer_cast<PolygonCollider>(data->comp.lock());
 			std::shared_ptr<RigidBody2D> r = p->GetComponent<RigidBody2D>().lock();
 			p->fixture = r->body->CreateFixture(p->fixtureDef);
+			r->body->ResetMassData();
 		}
 		break;
 	}
@@ -224,15 +226,21 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 		ColliderData *data = (ColliderData*)message.data;
 		if(data->type == ComponentType::COMPONENT_BOX_COLLIDER_2D) {
 			std::shared_ptr<BoxCollider> b = std::static_pointer_cast<BoxCollider>(data->comp.lock());
-			b->GetComponent<RigidBody2D>().lock()->body->DestroyFixture(b->fixture);
+			std::shared_ptr<RigidBody2D> r = b->GetComponent<RigidBody2D>().lock();
+			r->body->DestroyFixture(b->fixture);
+			r->body->ResetMassData();
 		}
 		else if(data->type == ComponentType::COMPONENT_CIRCLE_COLLIDER) {
 			std::shared_ptr<CircleCollider> c = std::static_pointer_cast<CircleCollider>(data->comp.lock());
-			c->GetComponent<RigidBody2D>().lock()->body->DestroyFixture(c->fixture);
+			std::shared_ptr<RigidBody2D> r = c->GetComponent<RigidBody2D>().lock();
+			r->body->DestroyFixture(c->fixture);
+			r->body->ResetMassData();
 		}
 		else if(data->type == ComponentType::COMPONENT_POLYGON_COLLIDER_2D) {
 			std::shared_ptr<PolygonCollider> p = std::static_pointer_cast<PolygonCollider>(data->comp.lock());
-			p->GetComponent<RigidBody2D>().lock()->body->DestroyFixture(p->fixture);
+			std::shared_ptr<RigidBody2D> r = p->GetComponent<RigidBody2D>().lock();
+			r->body->DestroyFixture(p->fixture);
+			r->body->ResetMassData();
 		}
 		break;
 	}

@@ -21,6 +21,8 @@ template<> std::weak_ptr<Transform2D> ComponentManager::AddComponent() {
 	return t;
 }
 
+
+
 template<> std::weak_ptr<RigidBody2D> ComponentManager::AddComponent() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(!g->HasComponent<RigidBody2D>()) g->componentMask |= TypeInfo::GetTypeID<RigidBody2D>();

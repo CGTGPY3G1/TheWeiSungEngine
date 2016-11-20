@@ -13,6 +13,7 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
 	void Start();
 	void Update();
 	void Update(double deltaTime);
@@ -53,7 +54,7 @@ std::weak_ptr<T> ComponentManager::GetComponentInParent() {
 	while(parent) {
 		std::weak_ptr<T> comp = parent->GetComponent<T>();
 		if(!comp.expired()) return comp;
-		parent = parent->GetParent();
+		parent = parent->GetParent().lock();
 	}
 	return std::weak_ptr<T>();
 }
@@ -68,5 +69,23 @@ std::vector<std::weak_ptr<T>> ComponentManager::GetComponents() {
 		}
 	}
 	return toReturn;
+}
+
+template<typename T>
+bool ComponentManager::ComponentExistsInParents() {	
+	std::shared_ptr<Transform2D> parent;
+	ComponentType transformType = TypeInfo::GetTypeID<Transform2D>();
+	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+		if(transformType == (*i)->Type()) {
+			parent = std::static_pointer_cast<Transform2D>(*i)->GetParent().lock();
+			break;
+		}
+	}
+	bool found = false;
+	while(parent && !found) {
+		found = parent->GetGameObject().lock()->HasComponent<T>();
+		parent = parent->GetParent().lock();
+	}
+	return found;
 }
 #endif // !WS_COMPONENT_MANAGER_H

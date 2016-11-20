@@ -5,7 +5,7 @@ Transform2D::Transform2D() : Component(), sf::Transformable() {
 	SetEnabled(true);
 }
 
-Transform2D::Transform2D(std::weak_ptr<GameObject> gameObject) : Component(gameObject) {
+Transform2D::Transform2D(std::weak_ptr<GameObject> gameObject) : Component(gameObject), sf::Transformable() {
 	SetEnabled(true);
 }
 
@@ -14,28 +14,39 @@ Transform2D::~Transform2D() {
 }
 
 Vector2 Transform2D::GetPosition() {
-	if(dirty) CalculateWorldTransform();
-	return Vector2(world.getPosition());
+	return GetWorldTransform()*sf::Vector2f();
+}
+
+Vector2 Transform2D::GetLocalPosition() {
+	return getPosition();
 }
 
 void Transform2D::SetPosition(const Vector2 & newPosition) {
-	setPosition(sf::Vector2f(newPosition.x, newPosition.y));
+	if(!parent.expired()) {
+		Vector2 newPositionVal = parent.lock()->TransformToLocalPoint(newPosition);
+		setPosition(newPositionVal);
+	}
+		
+	else
+		setPosition(newPosition.x, newPosition.y);
 	SetDirty();
 }
 
 float Transform2D::GetRotation() {
 	if(dirty) CalculateWorldTransform();
-	return world.getRotation();
+	return worldRotation;
+}
+
+float Transform2D::GetLocalRotation() {
+	return getRotation();
 }
 
 void Transform2D::SetRotation(const float & newRotation) {
-	setRotation(newRotation);
-	SetDirty();
+	Rotate(newRotation - GetRotation());
 }
 
 Vector2 Transform2D::GetScale() {
-	if(dirty) CalculateWorldTransform();
-	return Vector2(world.getScale());
+	return getScale();
 }
 
 void Transform2D::SetScale(const Vector2 & newScale) {
@@ -45,20 +56,41 @@ void Transform2D::SetScale(const Vector2 & newScale) {
 
 Vector2 Transform2D::GetForward() {
 	if(dirty) CalculateWorldTransform();
-	return Vector2(1, 0).RotateInDegrees(GetRotation());
+	const float* matrix = GetWorldTransform().getMatrix();
+	return Vector2(matrix[0], matrix[1]).Normalized();
 }
 
 Vector2 Transform2D::GetRight() {
-	return GetForward().Flip90(true);
+	if(dirty) CalculateWorldTransform();
+	const float* matrix = GetWorldTransform().getMatrix();
+	return Vector2(matrix[4], matrix[5]).Normalized();
+}
+
+Vector2 Transform2D::TransformToWorldPoint(const Vector2 & point) {
+	return GetLocalToWorldTransform().transformPoint(point.x, point.y);
+}
+
+Vector2 Transform2D::TransformToLocalPoint(const Vector2 & point) {
+	return GetWorldToLocalTransform().transformPoint(point.x, point.y);
+}
+
+Vector2 Transform2D::TransformToWorldDirection(const Vector2 & direction) {
+	const float* matrix = GetLocalToWorldTransform().getMatrix();
+	return Vector2(matrix[0] * direction.x + matrix[1] * direction.y, matrix[4] * direction.x + matrix[5] * direction.y).Normalize();
+}
+
+Vector2 Transform2D::TransformToLocalDirection(const Vector2 & direction) {
+	const float* matrix = GetWorldToLocalTransform().getMatrix();
+	return Vector2(matrix[0] * direction.x + matrix[1] * direction.y, matrix[4] * direction.x + matrix[5] * direction.y).Normalize();
 }
 
 void Transform2D::Move(Vector2 toMove) {
-	move(TypeConversion::ConvertToSFVector2f(toMove.RotatedInDegrees(getRotation())));
+	move(TypeConversion::ConvertToSFVector2f(toMove));
 	SetDirty();
 }
 
 void Transform2D::Translate(const Vector2 & translation) {
-	sf::Vector2f newTranslation = this->getTransform().transformPoint(translation.x, translation.y);
+	sf::Vector2f newTranslation = this->GetWorldToLocalTransform().transformPoint(translation.x, translation.y);
 	setPosition(newTranslation);
 	SetDirty();
 }
@@ -68,18 +100,28 @@ void Transform2D::Rotate(const float & angle) {
 	SetDirty();
 }
 
+void Transform2D::Scale(Vector2 toScale) {
+	scale(TypeConversion::ConvertToSFVector2f(toScale));
+	SetDirty();
+}
+
 const sf::Transform & Transform2D::GetLocalTransform() {
 	return getTransform();
 }
 
 const sf::Transform & Transform2D::GetWorldTransform() {
 	if(dirty) CalculateWorldTransform();
-	return world.getTransform();
+	return world;
 }
 
-const sf::Transformable & Transform2D::GetWorldTransformable() {
+const sf::Transform & Transform2D::GetWorldToLocalTransform() {
 	if(dirty) CalculateWorldTransform();
-	return world;
+	return world2Local;
+}
+
+const sf::Transform & Transform2D::GetLocalToWorldTransform() {
+	if(dirty) CalculateWorldTransform();
+	return local2World;
 }
 
 int Transform2D::GetChildCount() {
@@ -92,6 +134,7 @@ std::weak_ptr<Transform2D> Transform2D::GetChild(const unsigned int & index) {
 
 void Transform2D::AddChild(std::weak_ptr<Transform2D> child) {
 	children.push_back(child);
+	SetDirty();
 }
 
 std::weak_ptr<Transform2D> Transform2D::GetParent() {
@@ -99,11 +142,17 @@ std::weak_ptr<Transform2D> Transform2D::GetParent() {
 }
 
 void Transform2D::SetParent(std::weak_ptr<Transform2D> newParent) {
+	Vector2 oldPosition = GetPosition();
 	parent = newParent;
 	if(!parent.expired()) {
 		std::shared_ptr<GameObject> g = gameObject.lock();
-		parent.lock()->AddChild(g->GetComponent<Transform2D>());
+		std::shared_ptr<Transform2D> p = parent.lock();
+		SetPosition(oldPosition);
+		SetRotation(getRotation() - p->GetRotation());
+		Scale(p->GetScale());
+		p->AddChild(GetComponent<Transform2D>());
 	}
+	SetDirty();
 }
 
 //void Transform2D::HandleMessage(const Message<Vector2> & message) {
@@ -125,16 +174,20 @@ void Transform2D::SetParent(std::weak_ptr<Transform2D> newParent) {
 //}
 
 void Transform2D::CalculateWorldTransform() {
-	if(!parent.expired()) {
-		std::shared_ptr<Transform2D> p = parent.lock();
-		world = Transformable(p->world);
-		world.move(getPosition());
-		world.rotate(getRotation());
-		world.scale(getScale());
+	sf::Transform transform = sf::Transform::Identity;
+	std::shared_ptr<Transform2D> node = parent.lock();
+	worldRotation = getRotation();
+	if(node) {
+		sf::Transform t = node->GetWorldTransform();
+		transform *= t * transform;
+		worldRotation += node->GetRotation();
 	}
-	else {
-		world = Transformable(*this);
-	}
+	
+	world = transform * getTransform();
+	//sf::Transform tt = transform.getInverse();
+	
+	world2Local = world.getInverse();
+	local2World = world2Local.getInverse();
 	dirty = false;
 }
 

@@ -20,22 +20,40 @@ void TestScene::Start() {
 	Scene::Start();
 	//SetUpShapes();
 	std::shared_ptr<GameObject> u = gameObjectManager->CreateGameObject("Player").lock();
+	std::shared_ptr<GameObject> child = gameObjectManager->CreateGameObject("Child").lock();
 	std::shared_ptr<GameObject> v = gameObjectManager->CreateGameObject("Background").lock();
 	u->Init();
 	v->Init();
+	child->Init();
 	g1 = u;
 	g2 = v;
 	std::shared_ptr<Transform2D> t1 = u->AddComponent<Transform2D>().lock(); 
 	std::shared_ptr<Transform2D> t2 = v->AddComponent<Transform2D>().lock();
-	
-	t1->SetPosition(Vector2(640.0f, 360.0f));
+	std::shared_ptr<Transform2D> childTransform = child->GetComponent<Transform2D>().lock();
+
+	t1->SetPosition(Vector2(100.0f, 100.0f));
+	//childTransform->Rotate(90.0f);
+	childTransform->SetParent(t1);
+	//childTransform->SetPosition(Vector2(200.0f, 200.0f));
+	std::shared_ptr<SpriteRenderer> childSprite = childTransform->AddComponent<SpriteRenderer>().lock();
+	childSprite->Init("Images/Ball.png", RenderLayer::FOREGROUND_LAYER, 85);
+
 	std::shared_ptr<RigidBody2D> r = t1->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody, 1.0f, 0.5f, 1.0f);
 	r->SetMass(50);
+
 	std::shared_ptr<CircleCollider> c = t1->AddComponent<CircleCollider>().lock();
 	c->Init(Vector2(), 20.0f, false);
+
 	std::shared_ptr<CircleCollider> playerSensor = t1->AddComponent<CircleCollider>().lock();
 	playerSensor->Init(Vector2(), 200.0f, true);
+
+	std::shared_ptr<RigidBody2D> chlldRB = child->AddComponent<RigidBody2D>().lock();
+	chlldRB->Init(b2BodyType::b2_kinematicBody, 1.0f, 0.5f, 1.0f);
+
+	std::shared_ptr<BoxCollider> c2 = child->AddComponent<BoxCollider>().lock();
+	c2->Init(Vector2(), Vector2(40.0f, 40.0f), false);
+
 	std::shared_ptr<SpriteRenderer> sr = u->AddComponent<SpriteRenderer>().lock();
 	sr->Init("Images/Ball.png", RenderLayer::FOREGROUND_LAYER, 85);
 	t2->SetPosition(Vector2(640.0f, 360.0f));
@@ -81,7 +99,7 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	Engine engine = Engine::GetInstance();
 	Input * input = engine.GetInput();
 	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
-	bool useController = input->IsControllerConnected(0);
+	bool useController = false; // input->IsControllerConnected(0);
 	
 	// Movement Test
 	
@@ -95,7 +113,7 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 		Vector2 moveDirection = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickV));
 		gameObject->GetComponent<RigidBody2D>().lock()->AddForce(moveDirection * moveAmount * ((std::max<float>(forward.Dot(moveDirection.Normalized()), threshold)) + 1.0f), ForceType::FORCE);
 	}
-	else {
+	else{
 		Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
 		gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
 		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * ((std::max<float>(forward.Dot(Vector2(0, -1)), threshold)) + 1.0f)), ForceType::FORCE);

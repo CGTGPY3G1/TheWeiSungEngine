@@ -15,19 +15,28 @@ public:
 	~Transform2D();
 	const ComponentType Type() const override { return COMPONENT_TRANSFORM_2D; }
 	Vector2 GetPosition();
+	Vector2 GetLocalPosition();
 	void SetPosition(const Vector2 & newPosition);
 	float GetRotation();
+	float GetLocalRotation();
 	void SetRotation(const float & newRotation);
 	Vector2 GetScale();
 	void SetScale(const Vector2 & newScale);
 	Vector2 GetForward();
 	Vector2 GetRight();
+	Vector2 TransformToWorldPoint(const Vector2 & point);
+	Vector2 TransformToLocalPoint(const Vector2 & point);
+	Vector2 TransformToWorldDirection(const Vector2 & direction);
+	Vector2 TransformToLocalDirection(const Vector2 & direction);
 	void Move(Vector2 toMove);
 	void Translate(const Vector2 & translation);
 	void Rotate(const float & angle);
+	void Scale(Vector2 scale);
 	const sf::Transform & GetLocalTransform();
 	const sf::Transform & GetWorldTransform();
-	const sf::Transformable & GetWorldTransformable();
+	const sf::Transform & GetWorldToLocalTransform();
+	const sf::Transform & GetLocalToWorldTransform();
+
 	int GetChildCount();
 	std::weak_ptr<Transform2D> GetChild(const unsigned int & index);
 	void AddChild(std::weak_ptr<Transform2D> child);
@@ -39,9 +48,12 @@ protected:
 	bool dirty = true;
 	void CalculateWorldTransform();
 	void SetDirty();
-	sf::Transformable world;
+	sf::Transform world;
+	sf::Transform world2Local, local2World;
+	float worldRotation;
 	std::weak_ptr<Transform2D> parent;
 	std::vector<std::weak_ptr<Transform2D>> children;
 };
 
 #endif // !WS_TRANSFORM_2D_H
+

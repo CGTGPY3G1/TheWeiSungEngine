@@ -6,7 +6,11 @@
 #include "Engine.h"
 #include <Xinput.h>
 #pragma comment(lib,"Xinput9_1_0.lib")
-
+//#ifdef MSC_VER < 1700 //pre 2012
+//#pragma comment(lib,"Xinput.lib")
+//#else
+//#pragma comment(lib,"Xinput9_1_0.lib")
+//#endif
 Input::Input() {
 	const bool FALSE_BOOL = false;
 	for(unsigned int i = 0; i < NUMBER_OF_KEYS; i++) {

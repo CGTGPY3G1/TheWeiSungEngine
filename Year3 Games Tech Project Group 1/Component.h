@@ -44,7 +44,9 @@ public:
 	std::weak_ptr<GameObject> GetGameObject();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
 	virtual void Start();
 	virtual void End();
 	virtual void OnEnable();
@@ -80,10 +82,19 @@ template<typename T> std::weak_ptr<T> Component::GetComponent() {
 	return std::weak_ptr<T>();
 }
 
+template<typename T>
+std::weak_ptr<T> Component::GetComponentInParent() {
+	return gameObject.lock()->GetComponentInParent<T>();
+}
+
 template<typename T> std::vector<std::weak_ptr<T>> Component::GetComponents() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(g) return g->GetComponents<T>();
 	return std::vector<std::weak_ptr<T>>();
+}
+template<typename T>
+bool Component::ComponentExistsInParents() {
+	return gameObject.lock()->ComponentExistsInParents<T>();
 }
 #endif // !WS_COMPONENT_H
 

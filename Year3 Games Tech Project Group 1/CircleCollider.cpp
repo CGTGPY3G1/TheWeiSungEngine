@@ -17,7 +17,7 @@ void CircleCollider::Init(const Vector2 & position, const float & radius, const 
 	fixtureDef->restitution = restitution;
 	fixtureDef->density = density;
 	shape = new b2CircleShape();
-	shape->m_p.Set(position.x * Physics::METRES_PER_PIXEL, position.y * Physics::METRES_PER_PIXEL);
+	std::shared_ptr<RigidBody2D> r = GetComponent<RigidBody2D>().lock();
 	shape->m_radius = radius* Physics::METRES_PER_PIXEL;
 	fixtureDef->shape = shape;
 	colliderData = new ColliderData();
