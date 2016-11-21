@@ -8,7 +8,9 @@
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
-	world->SetDebugDraw(Engine::GetInstance().GetDebugDraw());
+	DebugDraw * debugDraw = Engine::GetInstance().GetDebugDraw();
+	debugDraw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_centerOfMassBit);
+	world->SetDebugDraw(debugDraw);
 	world->SetContactListener(this);
 }
 

@@ -17,8 +17,10 @@ void DebugDraw::DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2C
 		polygon.setPoint(i, sf::Vector2f(std::floor(transformedVec.x), std::floor(transformedVec.y)));
 	}																								   
 	polygon.setOutlineThickness(2.f);
-	polygon.setFillColor(sf::Color::Transparent);
-	polygon.setOutlineColor(sf::Color::Green);
+	sf::Color fillColour = DebugDraw::GLColorToSFML(color);
+	fillColour.a = 100;
+	polygon.setFillColor(fillColour);
+	polygon.setOutlineColor(DebugDraw::GLColorToSFML(color));
 	Engine::GetInstance().GetGraphics()->Draw(polygon);
 }
 void DebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) {
@@ -28,18 +30,22 @@ void DebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& 
 	sf::CircleShape circle(radius * Physics::PIXELS_PER_METRE);
 	circle.setOrigin(radius * Physics::PIXELS_PER_METRE, radius * Physics::PIXELS_PER_METRE);
 	circle.setPosition(TypeConversion::ConvertToSFVector2f(center));
-	circle.setFillColor(sf::Color::Transparent);
+	sf::Color fillColour = DebugDraw::GLColorToSFML(color); 
+	fillColour.a = 100;
+	circle.setFillColor(fillColour);
 	circle.setOutlineThickness(2.f);
-	circle.setOutlineColor(sf::Color::Green); 
+	circle.setOutlineColor(DebugDraw::GLColorToSFML(color));
 	Engine::GetInstance().GetGraphics()->Draw(circle);
 }
 void DebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color) { 
 	sf::CircleShape circle(radius * Physics::PIXELS_PER_METRE);
 	circle.setOrigin(radius * Physics::PIXELS_PER_METRE, radius * Physics::PIXELS_PER_METRE);
 	circle.setPosition(TypeConversion::ConvertToSFVector2f(center));
-	circle.setFillColor(sf::Color::Transparent);
+	sf::Color fillColour = DebugDraw::GLColorToSFML(color);
+	fillColour.a = 100;
+	circle.setFillColor(fillColour);
 	circle.setOutlineThickness(2.f);
-	circle.setOutlineColor(sf::Color::Green);
+	circle.setOutlineColor(DebugDraw::GLColorToSFML(color));
 
 	b2Vec2 endPoint = center + radius * axis;
 	sf::Vertex line[2] = {
@@ -73,7 +79,8 @@ void DebugDraw::DrawTransform(const b2Transform& xf) {
 }
 
 void DebugDraw::DrawPoint(const b2Vec2 & p, float32 size, const b2Color & color) {
-	Engine::GetInstance().GetGraphics()->DrawRect(TypeConversion::ConvertToVector2(p), Vector2(size, size), 0, true, color.r, color.b, color.g, color.a);
+	sf::Color colour = DebugDraw::GLColorToSFML(color);
+	Engine::GetInstance().GetGraphics()->DrawRect(TypeConversion::ConvertToVector2(p), Vector2(size, size), 0, true, colour.r, colour.b, colour.g, colour.a);
 }
 
 

@@ -15,7 +15,7 @@ class DebugDraw : public b2Draw {
 public:
 	DebugDraw();
 	static sf::Color GLColorToSFML(const b2Color &color, sf::Uint8 alpha = 255) {
-		return sf::Color(static_cast<sf::Uint8>(color.r * 255), static_cast<sf::Uint8>(color.g * 255), static_cast<sf::Uint8>(color.b * 255), alpha);
+		return sf::Color(static_cast<sf::Uint8>(color.g * 255), static_cast<sf::Uint8>(color.r * 255), static_cast<sf::Uint8>(color.b * 255), alpha);
 	}
 	static sf::Vector2f B2VecToSFVec(const b2Vec2 &vector, bool scaleToPixels = true) {
 		return sf::Vector2f(vector.x * Physics::PIXELS_PER_METRE, vector.y  * Physics::PIXELS_PER_METRE);

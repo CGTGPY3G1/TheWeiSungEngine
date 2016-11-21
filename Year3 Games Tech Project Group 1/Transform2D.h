@@ -21,6 +21,7 @@ public:
 	float GetLocalRotation();
 	void SetRotation(const float & newRotation);
 	Vector2 GetScale();
+	Vector2 GetLocalScale();
 	void SetScale(const Vector2 & newScale);
 	Vector2 GetForward();
 	Vector2 GetRight();
@@ -50,6 +51,7 @@ protected:
 	void SetDirty();
 	sf::Transform world;
 	sf::Transform world2Local, local2World;
+	Vector2 worldScale = Vector2(1, 1);
 	float worldRotation;
 	std::weak_ptr<Transform2D> parent;
 	std::vector<std::weak_ptr<Transform2D>> children;
