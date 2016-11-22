@@ -25,6 +25,9 @@ public:
 	float GetHeight();
 	void Init(const WSSprite & sprite, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void Init(const std::string path, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void UpdateOrigin();
+	//void Init(const WSSprite & sprite, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	//void Init(const std::string path, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void SetSprite(const WSSprite & sprite);
 	void SetTextureRect(const int & x, const int & y, const int & width, const int & height);
 	void LoadSprite(const std::string path);

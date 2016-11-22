@@ -8,8 +8,7 @@
 #include "PhysicsSystem.h"
 #include <random>
 #include <algorithm>
-sf::RectangleShape rect;
-sf::CircleShape circle;
+
 TestScene::TestScene() : Scene() {
 }
 
@@ -20,20 +19,65 @@ std::weak_ptr<GameObject> TestScene::CreateBuilding(const int & buildingNumber, 
 	if(buildingNumber < 1 || buildingNumber > 3) std::weak_ptr<GameObject>();
 	std::shared_ptr<GameObject> building = gameObjectManager->CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
-	building->AddComponent<SpriteRenderer>().lock()->Init("Images/Building" + std::to_string(buildingNumber) + ".png", RenderLayer::MIDGROUND_LAYER);
+	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
+	sprite->Init("Images/Buildings.png", RenderLayer::MIDGROUND_LAYER);
 	std::shared_ptr<RigidBody2D> r = building->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_kinematicBody);
+	const float gridSize = 32.0f;
 	switch(buildingNumber) {
 	case 1:
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(64.0f, 64.0f), false);
+		sprite->SetTextureRect(gridSize * 3, gridSize * 5, gridSize * 2, gridSize * 2);
 		break;
 	case 2:
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(192.0f, 160.0f), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 6, gridSize * 5), false);
+		sprite->SetTextureRect(0, 0, gridSize * 6, gridSize * 5);
 		break;
 	case 3:
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-240.0, 0.0f), Vector2(72.0f, 124.0f), false);
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(50, -300.0f), Vector2(168.0f, 74.0f), false);
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(50, 300.0f), Vector2(168.0f, 74.0f), false);
+		sprite->SetTextureRect(gridSize * 6, 0, gridSize * 6, gridSize * 7);
+		break;
+	case 4:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4, gridSize * 3), false);
+		sprite->SetTextureRect(gridSize * 8, gridSize * 7, gridSize * 4, gridSize * 3);
+		break;
+	case 5:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 7, gridSize * 9), false);
+		sprite->SetTextureRect(gridSize * 12, 0, gridSize * 7, gridSize * 9);
+		break;
+	case 6:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4, gridSize * 7), false);
+		sprite->SetTextureRect(gridSize * 19, 0, gridSize * 4, gridSize * 7);
+		break;
+	case 7:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 8, gridSize * 4), false);
+		sprite->SetTextureRect(0, gridSize * 7, gridSize * 8, gridSize * 4);
+		break;
+	case 8:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, -20.0f), Vector2(gridSize * 3 + 14, gridSize * 3 - 10), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-270.0f, 0.0f), Vector2(gridSize * 0.75f, gridSize * 3), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(270.0f, 00.0f), Vector2(gridSize * 0.75f, gridSize * 3), false);
+		sprite->SetTextureRect(gridSize * 12, gridSize * 9, gridSize * 5, gridSize * 3);
+		break;
+	case 9:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(gridSize * 2.0f, gridSize * 1.5f), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-Physics::PIXELS_PER_METRE * 2.5f, 0.0f), Vector2(gridSize * 3, gridSize * 3), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(Physics::PIXELS_PER_METRE * 2.5f, 0.0f), Vector2(gridSize * 3, gridSize * 3), false);
+		sprite->SetTextureRect(gridSize * 17, gridSize * 9, gridSize * 8, gridSize * 3);
+		break;
+	case 10:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 3, gridSize * 2), false);
+		sprite->SetTextureRect(0, gridSize * 5, gridSize * 3, gridSize * 2);
+		break;
+	case 11:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(gridSize * 2.0f + 26.0f, gridSize * 2.0f + 26.0f), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * 4.8f, -gridSize * 4.8f), Vector2(18, 18), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * 4.8f, gridSize * 4.8f), Vector2(18, 18), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * 4.8f, gridSize * 4.8f), Vector2(18, 18), false);
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * 4.8f, -gridSize * 4.8f), Vector2(18, 18), false);
+		sprite->SetTextureRect(gridSize * 8, gridSize * 10, gridSize * 3, gridSize * 3);
 		break;
 	default:
 		break;
@@ -43,7 +87,7 @@ std::weak_ptr<GameObject> TestScene::CreateBuilding(const int & buildingNumber, 
 
 void TestScene::Start() {
 	Scene::Start();
-	Engine::GetInstance().GetInput()->SetControllerActive(0, true);
+	//Engine::GetInstance().GetInput()->SetControllerActive(0, true);
 	std::shared_ptr<GameObject> player = gameObjectManager->CreateGameObject("Player").lock();
 	player->Init(Vector2(50.0f, -400.0f));
 	std::shared_ptr<Transform2D> t1 = player->GetComponent<Transform2D>().lock();
@@ -89,6 +133,26 @@ void TestScene::Start() {
 		}
 	}
 	CreateBuilding(3, Vector2(ppm * 4, ppm * -8 + offset), Vector2(4, 4));
+	CreateBuilding(3, Vector2(ppm * 29, 0), Vector2(4, 4), 90.0f);
+	CreateBuilding(5, Vector2(ppm * 14, ppm * 7), Vector2(4, 4), 90.0f);
+	CreateBuilding(6, Vector2(ppm * 15 + offset, ppm * -7 - offset), Vector2(4, 4));
+	CreateBuilding(10, Vector2(ppm * 18 + offset, ppm * -5 - offset), Vector2(4, 4), 90.0f);
+	CreateBuilding(10, Vector2(ppm * 18 + offset, ppm * -9 - offset), Vector2(4, 4), 90.0f);
+	CreateBuilding(1, Vector2(ppm * 27, ppm * -10 - offset), Vector2(4, 4));
+	CreateBuilding(1, Vector2(ppm * 27, ppm * 10 + offset), Vector2(4, 4));
+	CreateBuilding(10, Vector2(ppm * 30 + offset, ppm * -10 - offset), Vector2(4, 4));
+	CreateBuilding(10, Vector2(ppm * 30 + offset, ppm * 10 + offset), Vector2(4, 4));
+	CreateBuilding(1, Vector2(ppm * -13, ppm * 10 + offset), Vector2(4, 4));
+	CreateBuilding(1, Vector2(ppm * -16, ppm * 10 + offset), Vector2(4, 4));
+	CreateBuilding(6, Vector2(ppm * -19, ppm * 2 - offset), Vector2(4, 4), 90.0f);
+	CreateBuilding(11, Vector2(ppm * -13, ppm * 2 - offset), Vector2(4, 4));
+	CreateBuilding(10, Vector2(ppm * -14 + offset, ppm * -7 - offset), Vector2(4, 4));
+	CreateBuilding(4, Vector2(ppm * -14 + offset, ppm * -10), Vector2(4, 4));
+	CreateBuilding(2, Vector2(ppm * -30 + offset, ppm * -9), Vector2(4, 4));
+	CreateBuilding(8, Vector2(ppm * -23 - offset, ppm * -9), Vector2(4, 4), -90.0f);
+	CreateBuilding(10, Vector2(ppm * -26 + offset, ppm * 10 + offset), Vector2(4, 4));
+	CreateBuilding(4, Vector2(ppm * -31 + offset, ppm * 10), Vector2(4, 4));
+	CreateBuilding(9, Vector2(ppm * -31 + offset, ppm * 4), Vector2(4, 4), 90.0f);
 }
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {

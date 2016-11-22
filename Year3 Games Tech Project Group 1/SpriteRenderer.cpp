@@ -86,12 +86,19 @@ void SpriteRenderer::Init(const std::string path, const RenderLayer & sortLayer,
 	sprite.setOrigin(centreX, centreY);
 }
 
+void SpriteRenderer::UpdateOrigin() {
+	sf::FloatRect bounds = sprite.getGlobalBounds();
+	float centreX = bounds.width / 2, centreY = bounds.height / 2;
+	sprite.setOrigin(centreX, centreY);
+}
+
 void SpriteRenderer::SetSprite(const WSSprite & sprite) {
 	this->sprite = sprite;
 }
 
 void SpriteRenderer::SetTextureRect(const int & x, const int & y, const int & width, const int & height) {
 	sprite.setTextureRect(sf::IntRect(x, y, width, height));
+	UpdateOrigin();
 }
 
 void SpriteRenderer::LoadSprite(const std::string path) {
