@@ -153,6 +153,15 @@ void TestScene::Start() {
 	CreateBuilding(10, Vector2(ppm * -26 + offset, ppm * 10 + offset), Vector2(4, 4));
 	CreateBuilding(4, Vector2(ppm * -31 + offset, ppm * 10), Vector2(4, 4));
 	CreateBuilding(9, Vector2(ppm * -31 + offset, ppm * 4), Vector2(4, 4), 90.0f);
+
+	std::shared_ptr<GameObject> boundaries = gameObjectManager->CreateGameObject("Boundaries").lock();
+	boundaries->Init();
+	std::shared_ptr<RigidBody2D> rb = boundaries->AddComponent<RigidBody2D>().lock();
+	rb->Init(b2BodyType::b2_kinematicBody);
+	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(0, -3008), Vector2(11520, ppm * 5), false);
+	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(-5696, 8), Vector2(ppm * 5, 6016), false);
+	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(0, 3008), Vector2(11520, ppm * 5), false);
+	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(5696, 0), Vector2(ppm * 5, 6016), false);
 }
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {
