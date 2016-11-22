@@ -43,6 +43,7 @@ std::weak_ptr<GameObject> TestScene::CreateBuilding(const int & buildingNumber, 
 
 void TestScene::Start() {
 	Scene::Start();
+	Engine::GetInstance().GetInput()->SetControllerActive(0, true);
 	std::shared_ptr<GameObject> player = gameObjectManager->CreateGameObject("Player").lock();
 	player->Init(Vector2(50.0f, -400.0f));
 	std::shared_ptr<Transform2D> t1 = player->GetComponent<Transform2D>().lock();
@@ -50,11 +51,13 @@ void TestScene::Start() {
 	r->Init(b2BodyType::b2_dynamicBody, 1.0f, 0.5f, 1.0f);
 	r->SetMass(50);
 	std::shared_ptr<CircleCollider> c = t1->AddComponent<CircleCollider>().lock();
-	c->Init(Vector2(), 20.0f, false);
+	c->Init(Vector2(0.0f, 0.0f), 14.0f, false);
 	std::shared_ptr<CircleCollider> playerSensor = t1->AddComponent<CircleCollider>().lock();
 	playerSensor->Init(Vector2(), 200.0f, true);
+	std::shared_ptr<PolygonCollider> body = t1->AddComponent<PolygonCollider>().lock();
+	body->Init(Vector2(), {Vector2(-7, -28), Vector2(-14, 0), Vector2(-7, 28), Vector2(-5, 29), Vector2(1, 28), Vector2(8, 0), Vector2(1, -28), Vector2(-5, -29)});
 	std::shared_ptr<SpriteRenderer> sr = player->AddComponent<SpriteRenderer>().lock();
-	sr->Init("Images/Ball.png", RenderLayer::FOREGROUND_LAYER, 85);
+	sr->Init("Images/Player.png", RenderLayer::FOREGROUND_LAYER, 85);
 	//std::shared_ptr<GameObject> child = gameObjectManager->CreateGameObject("Child").lock();
 	//child->Init();
 	//std::shared_ptr<Transform2D> childTransform = child->GetComponent<Transform2D>().lock();	
@@ -92,22 +95,24 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	Engine engine = Engine::GetInstance();
 	Input * input = engine.GetInput();
 	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
-	bool useController = false; // input->IsControllerConnected(0);
+	bool useController = input->GetControllerActive(0);
 
 	// Movement Test
-	Vector2 forward = Vector2(1, 0).RotateInDegrees(gameObject->GetComponent<RigidBody2D>().lock()->GetRotation());
+	Vector2 forward = gameObject->GetComponent<RigidBody2D>().lock()->GetForward();
+	const float forwardAngle = forward.AngleInDegrees();
 	float moveAmount = gameObject->GetComponent<RigidBody2D>().lock()->GetMass() * Physics::PIXELS_PER_METRE * 2.0f;
-	if(input->GetKey(KeyCodes::KeyCode::LShift)) moveAmount *= 1.5f;
+	if(input->GetKey(KeyCodes::KeyCode::LShift) || (useController && input->GetControllerButton(0, ControllerButtons::ControllerButton::LS))) moveAmount *= 1.5f;
 	const float threshold = 0.25f;
 	if(useController) {
 		Vector2 directionToMouse = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickV));
-		if(directionToMouse.SquareMagnitude() > 0.5f) gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
+		if(directionToMouse.SquareMagnitude() > 0.5f) gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
 		Vector2 moveDirection = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickV));
 		gameObject->GetComponent<RigidBody2D>().lock()->AddForce(moveDirection * moveAmount * ((std::max<float>(forward.Dot(moveDirection.Normalized()), threshold)) + 1.0f), ForceType::FORCE);
 	}
 	else {
 		Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
-		gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(directionToMouse.AngleInDegrees());
+		
+		gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
 		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * ((std::max<float>(forward.Dot(Vector2(0, -1)), threshold)) + 1.0f)), ForceType::FORCE);
 		if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * ((std::max<float>(forward.Dot(Vector2(0, 1)), threshold)) + 1.0f)), ForceType::FORCE);
 		if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * ((std::max<float>(forward.Dot(Vector2(-1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
@@ -129,7 +134,10 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 
 void TestScene::Update(const float & deltaTime) {
 	Scene::Update(deltaTime);
-	if(Engine::GetInstance().GetInput()->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
+	Input * input = Engine::GetInstance().GetInput();
+	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
+	if(input->GetKeyDown(KeyCodes::KeyCode::G))input->SetControllerActive(0, !input->GetControllerActive(0));
+	
 	Test(deltaTime);
 }
 

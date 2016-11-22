@@ -53,7 +53,8 @@ public:
 	bool operator == (const Vector2 & other);
 	float Dot(const Vector2 & other);
 	float Dot(const float & x, const float & y);
-
+	float Cross(const Vector2 & other);
+	float Cross(const float & x, const float & y);
 	Vector2 Normalize();
 	Vector2 Normalized();
 	float SquareMagnitude();
@@ -65,6 +66,11 @@ public:
 	Vector2 RotateInDegrees(const float & angle);
 	Vector2 RotatedInDegrees(const float & angle);
 	Vector2 Flip90(const bool & clockwise);
+	float AngleToPointInDegrees(const Vector2 & point);
+	float AngleToPointInRadians(const Vector2 & point);
+	Vector2 RotateToPoint(const Vector2 & point);
+	Vector2 RotateToInDegrees(const float & angle);
+	Vector2 RotateToInRadians(const float & angle);
 	Vector2 Lerp(const Vector2 & target, const float & alpha){
 		const float inverse = 1.0f - alpha;
 		return Vector2((*this * inverse) + (target * alpha));

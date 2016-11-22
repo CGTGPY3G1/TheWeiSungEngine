@@ -25,10 +25,12 @@ void RigidBody2D::AddForceAtPoint(const Vector2 & force, const Vector2 & point, 
 }
 
 void RigidBody2D::AddTorque(const float & force, const ForceType & forceType) {
-	if(forceType == IMPULSE_FORCE)
-		body->ApplyAngularImpulse(force, true);
-	else
-		body->ApplyTorque(force, true);
+	if(forceType == IMPULSE_FORCE) body->ApplyAngularImpulse(force, true);
+	else body->ApplyTorque(force, true);
+}
+
+void RigidBody2D::SetAngularVelocity(const float & velocity) {
+	body->SetAngularVelocity(velocity);
 }
 
 Vector2 RigidBody2D::GetPosition() {

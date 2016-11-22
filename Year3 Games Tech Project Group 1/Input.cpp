@@ -23,6 +23,7 @@ Input::Input() {
 		mouseButtonChanged[i] = FALSE_BOOL;
 	}
 	for(unsigned int i = 0; i < NUMBER_OF_CONTROLLERS; i++) {
+		usingController[i] = false;
 		for(unsigned int j = 0; j < NUMBER_OF_CONTROLLER_BUTTONS; j++) {
 			ControllerButtonStates[i][j] = FALSE_BOOL;
 			ControllerButtonChanged[i][j] = FALSE_BOOL;
@@ -147,6 +148,14 @@ float Input::GetMouseX() {
 float Input::GetMouseY() {
 	std::lock_guard<std::mutex> lock(m);
 	return mousePosition.y;
+}
+
+void Input::SetControllerActive(const unsigned int controllerID, const bool & useController) {
+	if(IsControllerConnected(controllerID)) usingController[controllerID] = useController;
+}
+
+bool Input::GetControllerActive(const unsigned int controllerID) {
+	return usingController[controllerID];
 }
 
 float Input::GetAxisValue(const unsigned int controllerID, const unsigned int axisID) {

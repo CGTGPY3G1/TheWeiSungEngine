@@ -47,6 +47,8 @@ public:
 	Vector2 GetMousePosition();
 	float GetMouseX();
 	float GetMouseY();
+	void SetControllerActive(const unsigned int controllerID, const bool & useController);
+	bool GetControllerActive(const unsigned int controllerID);
 private:
 	float GetAxisValue(const unsigned int controllerID, const unsigned int axisID);
 	const unsigned int NUMBER_OF_MOUSE_BUTTONS = MouseButtons::MouseButton::ButtonCount, NUMBER_OF_CONTROLLER_BUTTONS = ControllerButtons::ControllerButton::ButtonCount, 
@@ -65,6 +67,7 @@ private:
 	const float ROUNDING_RANGE = 0.0001f, DEAD_ZONE = 0.2f;
 	Vector2 mousePosition;
 	std::mutex m;
+	bool usingController[8];
 };
 
 
