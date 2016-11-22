@@ -3,7 +3,7 @@
 #define WS_COMPONENT_MANAGER_H
 #include "TypeInfo.h"
 #include "CollisionHandler.h"
-class GameObject;
+//class GameObject;
 class ComponentManager : public CollisionHandler {
 public:
 	ComponentManager();
@@ -30,12 +30,34 @@ private:
 	std::weak_ptr<GameObject> gameObject;
 };
 
+template<typename T> std::weak_ptr<T> ComponentManager::AddComponent() {
+	std::shared_ptr<GameObject> g = gameObject.lock();
+	if(!g->HasComponent<T>()) g->componentMask |= TypeInfo::GetTypeID<T>();
+	std::shared_ptr<T> t = std::make_shared<T>(gameObject);
+	if(TypeInfo::IsScriptable<T>()) {
+		std::shared_ptr<ScriptableComponent> sc = std::dynamic_pointer_cast<ScriptableComponent>(t);
+		scriptableComponents.push_back(sc);
+	}
+	else components.push_back(t);
+	return t;
+}
+
 template<typename T>
 std::weak_ptr<T> ComponentManager::GetComponent() {
 	ComponentType type = TypeInfo::GetTypeID<T>();
-	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
-		if(type == (*i)->Type()) {
-			return std::static_pointer_cast<T>(*i);
+	if(TypeInfo::IsScriptable<T>()) {
+		for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+			if(type == (*i)->Type()) {
+				std::weak_ptr<T> toReturn = std::dynamic_pointer_cast<T>(*i);
+				return toReturn.expired() ? std::weak_ptr<T>() : toReturn;
+			}
+		}
+	}
+	else {
+		for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+			if(type == (*i)->Type()) {
+				return std::static_pointer_cast<T>(*i);
+			}
 		}
 	}
 	return std::weak_ptr<T>();

@@ -25,7 +25,7 @@ public:
 	bool operator == (Scene other);
 protected:
 	unsigned int sceneID;
-	bool drawColliders = true;
+	bool drawColliders = false;
 	PhysicsSystem * physicsSystem;
 	std::shared_ptr<GameObjectManager> gameObjectManager;
 	std::shared_ptr<AssetManager> assetManager;

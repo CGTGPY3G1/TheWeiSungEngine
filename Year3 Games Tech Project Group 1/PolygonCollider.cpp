@@ -18,9 +18,10 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	b2Vec2 cVert = TypeConversion::ConvertToB2Vector2(offset);
 	b2Vec2 * vertices = new b2Vec2[noOfVerts];
 	size_t index = 0;
+	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
 	for(std::initializer_list<Vector2>::iterator it = verts.begin(); it != verts.end(); ++it, ++index) {
 		cVert = TypeConversion::ConvertToB2Vector2((*it));
-		vertices[index].Set(cVert.x, cVert.y);
+		vertices[index].Set(cVert.x * scale.x, cVert.y * scale.y);
 	}
 	shape->Set(vertices, noOfVerts);
 	SetOffset(offset);

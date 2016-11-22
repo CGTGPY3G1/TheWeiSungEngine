@@ -38,10 +38,10 @@ void GameObject::Init() {
 	Init(Vector2(), 0);
 }
 
-void GameObject::Init(const Vector2 & position, const float & rotation) {
+void GameObject::Init(const Vector2 & position, const float & rotation, const Vector2 & scale) {
 	componentManager = ComponentManager(GetWeak());
 	std::shared_ptr<Transform2D> transform = componentManager.AddComponent<Transform2D>().lock();
-	transform->SetPosition(position); transform->SetRotation(rotation);
+	transform->SetPosition(position); transform->SetRotation(rotation); transform->SetScale(scale);
 }
 
 std::weak_ptr<GameObjectManager> GameObject::GetManager() {

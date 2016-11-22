@@ -37,8 +37,39 @@ void SpriteRenderer::SetPixelsPeMetre(const float & PPM) {
 	pixelsPerMeter = PPM;
 }
 
+void SpriteRenderer::SetColour(const float & r, const float & g, const float & b, const float & a) {
+	sprite.setColor(sf::Color(r * 255, g * 255, b * 255, a * 255));
+}
+
 WSSprite & SpriteRenderer::GetSprite() {
 	return sprite;
+}
+
+Vector2 SpriteRenderer::GetSize() {
+	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
+	sf::FloatRect bounds = sprite.getGlobalBounds();
+	return Vector2(bounds.width * scale.x, bounds.height * scale.y);
+}
+
+void SpriteRenderer::SetSize(const Vector2 & size) {
+	SetSize(size.x, size.y);
+}
+
+void SpriteRenderer::SetSize(const float & width, const float & height) {
+	Vector2 oldSize = GetSize();
+	sprite.setScale(width / oldSize.x, height / oldSize.y);
+}
+
+float SpriteRenderer::GetWidth() {
+	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
+	sf::FloatRect bounds = sprite.getGlobalBounds();
+	return bounds.width * scale.x;
+}
+
+float SpriteRenderer::GetHeight() {
+	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
+	sf::FloatRect bounds = sprite.getGlobalBounds();
+	return bounds.height * scale.y;
 }
 
 void SpriteRenderer::Init(const WSSprite & sprite, const RenderLayer & sortLayer, const int & sortOrder) {
@@ -57,6 +88,10 @@ void SpriteRenderer::Init(const std::string path, const RenderLayer & sortLayer,
 
 void SpriteRenderer::SetSprite(const WSSprite & sprite) {
 	this->sprite = sprite;
+}
+
+void SpriteRenderer::SetTextureRect(const int & x, const int & y, const int & width, const int & height) {
+	sprite.setTextureRect(sf::IntRect(x, y, width, height));
 }
 
 void SpriteRenderer::LoadSprite(const std::string path) {

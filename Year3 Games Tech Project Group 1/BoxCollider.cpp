@@ -17,8 +17,8 @@ void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool 
 	fixtureDef->restitution = restitution;
 	fixtureDef->density = density;
 	shape = new b2PolygonShape();
-	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL, (size.y / 2) * Physics::METRES_PER_PIXEL);
-	
+	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
+	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL * scale.x, (size.y / 2) * Physics::METRES_PER_PIXEL * scale.y);
 	SetOffset(offset);
 	fixtureDef->shape = shape;
 	colliderData = new ColliderData();

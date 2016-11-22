@@ -16,10 +16,17 @@ public:
 	void SetSortLayer(const RenderLayer & newLayer);
 	float GetPixelsPeMetre();
 	void SetPixelsPeMetre(const float & PPM);
+	void SetColour(const float & r, const float & g, const float & b, const float & a);
 	WSSprite & GetSprite();
+	Vector2 GetSize();
+	void SetSize(const Vector2 & size);
+	void SetSize(const float & width, const float & height);
+	float GetWidth();
+	float GetHeight();
 	void Init(const WSSprite & sprite, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void Init(const std::string path, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void SetSprite(const WSSprite & sprite);
+	void SetTextureRect(const int & x, const int & y, const int & width, const int & height);
 	void LoadSprite(const std::string path);
 private:
 	WSSprite sprite;

@@ -6,6 +6,7 @@
 
 class ScriptableComponent : public Component, public CollisionHandler {
 public:
+	ScriptableComponent();
 	ScriptableComponent(std::weak_ptr<GameObject> gameObject);
 	virtual ~ScriptableComponent() {}
 	const ComponentType Type() const override { return COMPONENT_SCRIPTABLE; }

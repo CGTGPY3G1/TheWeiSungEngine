@@ -44,8 +44,6 @@ void RigidBody2D::SetRotation(const float & angle) {
 }
 
 Vector2 RigidBody2D::GetForward() {
-	//const float* matrix = 
-	
 	return Vector2(1, 0).RotatedInRadians(body->GetAngle());
 }
 
@@ -76,7 +74,7 @@ void RigidBody2D::SetVelocity(const Vector2 & newVelocity) {
 }
 
 float RigidBody2D::GetSpeed() {
-	return body->GetLinearVelocity().Length();
+	return body->GetLinearVelocity().Length() * Physics::PIXELS_PER_METRE;
 }
 
 void RigidBody2D::Init(const b2BodyType & type, const float & mass, const float & angularDampening, const float & linearDampening) {

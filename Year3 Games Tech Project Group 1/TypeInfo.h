@@ -33,7 +33,7 @@ public:
 	template<> const static bool AllowMultiple<CircleCollider>() { return true; }
 	template<> const static bool AllowMultiple<PolygonCollider>() { return true; }
 
-	template <typename T> const static bool IsUpdateAbleComponent() { return false; }; // to be used for scriptable components
+	template <typename T> const static bool IsScriptable() { return false; }; // to be used for scriptable components
 
 	template <typename T> const static bool IsCollider() { return false; };
 	template<> const static bool IsCollider<BoxCollider>() { return true; }
