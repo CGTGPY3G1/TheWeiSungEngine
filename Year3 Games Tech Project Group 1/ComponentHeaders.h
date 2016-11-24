@@ -8,6 +8,8 @@
 #include "BoxCollider.h"
 #include "CircleCollider.h"
 #include "PolygonCollider.h"
+#include "WheelJoint.h"
 #include "ScriptableComponent.h"
-//#include ""
-#endif
+#include "RevoluteJoint.h"
+
+#endif !WS_COMPENENT_HEADERS_H

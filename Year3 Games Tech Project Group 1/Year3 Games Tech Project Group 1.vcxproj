@@ -153,7 +153,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="ComponentData.h" />
+    <ClInclude Include="Joint.h" />
     <ClInclude Include="Rect.h" />
+    <ClInclude Include="RevoluteJoint.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="CircleCollider.h" />
@@ -190,6 +193,7 @@
     <ClInclude Include="TypeInfo.h" />
     <ClInclude Include="ScriptableComponent.h" />
     <ClInclude Include="Vector2.h" />
+    <ClInclude Include="WheelJoint.h" />
     <ClInclude Include="WSSprite.h" />
   </ItemGroup>
   <ItemGroup>
@@ -210,11 +214,13 @@
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Joint.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PolygonCollider.cpp" />
+    <ClCompile Include="RevoluteJoint.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -226,6 +232,7 @@
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform2D.cpp" />
     <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="WheelJoint.cpp" />
     <ClCompile Include="WSSprite.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

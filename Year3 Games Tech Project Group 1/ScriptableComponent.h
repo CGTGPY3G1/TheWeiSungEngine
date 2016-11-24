@@ -9,7 +9,6 @@ public:
 	ScriptableComponent();
 	ScriptableComponent(std::weak_ptr<GameObject> gameObject);
 	virtual ~ScriptableComponent() {}
-	const ComponentType Type() const override { return COMPONENT_SCRIPTABLE; }
 	virtual void Update() {}
 	virtual void FixedUpdate() {}
 	virtual void LateUpdate() {}

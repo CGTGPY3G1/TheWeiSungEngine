@@ -19,6 +19,7 @@ public:
 	void Update(double deltaTime);
 	void FixedUpdate(double fixedDeltaTime);
 	void LateUpdate();
+	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;

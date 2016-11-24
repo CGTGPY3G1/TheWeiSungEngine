@@ -33,7 +33,7 @@ void Graphics::Update() {
 			windowOpen = false;
 			break;
 		case sf::Event::Resized:
-			// window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
+			 window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
 			break;
 		default:
 			break;

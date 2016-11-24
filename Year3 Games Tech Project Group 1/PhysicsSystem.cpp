@@ -5,6 +5,7 @@
 #include "Math.h"
 #include "Vector2.h"
 #include "GameObject.h"
+#include "ComponentData.h"
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
@@ -44,7 +45,6 @@ void PhysicsSystem::UpdateBodies() {
 				b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(t->GetPosition());
 				float newAngle = t->GetRotation() * Math::DegreesToRadians();
 				b->SetTransform(newPos, newAngle);
-				b->SetMassData(r->massData);
 			}
 		}
 	}
@@ -82,8 +82,8 @@ void PhysicsSystem::SetGravity(const float & x, const float & y) {
 void PhysicsSystem::BeginContact(b2Contact* contact) {
 	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();	
 	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
-	ColliderData * colliderData1 = (ColliderData *)fixture1->GetUserData();
-	ColliderData * colliderData2 = (ColliderData *)fixture2->GetUserData();
+	ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
+	ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
 	if(colliderData1 && colliderData2) {
 		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
 		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
@@ -132,8 +132,8 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 void PhysicsSystem::EndContact(b2Contact* contact) {
 	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
 	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
-	ColliderData * colliderData1 = (ColliderData *)fixture1->GetUserData();
-	ColliderData * colliderData2 = (ColliderData *)fixture2->GetUserData();
+	ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
+	ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
 	if(colliderData1 && colliderData2) {
 		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
 		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
@@ -152,28 +152,13 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 			contact->GetWorldManifold(&worldManifold);
 			Vector2 impactVelocity = rigidBody2.lock()->GetVelocity();
 			impactVelocity -= rigidBody1.lock()->GetVelocity();
-			b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
-			b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
-			Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
-
-			const size_t cps = 2;
-			ContactPoint contactPoints[2];
-			for(size_t i = 0; i < cps; i++) {
-				contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
-				contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
-			}
+			Vector2 normal = Vector2::Up;
 			{
 				CollisionData collisionData(gameObject2, collider2, normal, impactVelocity);
-				for(size_t i = 0; i < cps; i++) {
-					collisionData.contactPoints[i] = contactPoints[i];
-				}
 				gameObject1.lock()->OnCollisionExit(collisionData);
 			}
 			{
 				CollisionData collisionData(gameObject1, collider1, -normal, -impactVelocity);
-				for(size_t i = 0; i < cps; i++) {
-					collisionData.contactPoints[i] = contactPoints[i];
-				}
 				gameObject2.lock()->OnCollisionExit(collisionData);
 			}
 		}
@@ -202,7 +187,7 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 	}
 	case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:
 	{
-		ColliderData *data = (ColliderData*)message.data;
+		ComponentData *data = (ComponentData*)message.data;
 		if(data->type == ComponentType::COMPONENT_BOX_COLLIDER_2D) {
 			std::shared_ptr<BoxCollider> b = std::static_pointer_cast<BoxCollider>(data->comp.lock());
 			std::shared_ptr<RigidBody2D> r = b->GetComponent<RigidBody2D>().lock();
@@ -225,7 +210,7 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 	}
 	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
 	{
-		ColliderData *data = (ColliderData*)message.data;
+		ComponentData *data = (ComponentData*)message.data;
 		if(data->type == ComponentType::COMPONENT_BOX_COLLIDER_2D) {
 			std::shared_ptr<BoxCollider> b = std::static_pointer_cast<BoxCollider>(data->comp.lock());
 			std::shared_ptr<RigidBody2D> r = b->GetComponent<RigidBody2D>().lock();
@@ -243,6 +228,32 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			std::shared_ptr<RigidBody2D> r = p->GetComponent<RigidBody2D>().lock();
 			r->body->DestroyFixture(p->fixture);
 			r->body->ResetMassData();
+		}
+		break;
+	}
+	case MessageType::MESSAGE_TYPE_REGISTER_JOINT:
+	{
+		ComponentData *data = (ComponentData*)message.data;
+		if(data->type == ComponentType::COMPONENT_WHEEL_JOINT) {
+			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
+			wj->joint = world->CreateJoint(wj->jointDef);
+		}
+		if(data->type == ComponentType::COMPONENT_REVOLUTE_JOINT) {
+			std::shared_ptr<RevoluteJoint> rj = std::static_pointer_cast<RevoluteJoint>(data->comp.lock());
+			rj->joint = world->CreateJoint(rj->jointDef);
+		}
+		break;
+	}
+	case MessageType::MESSAGE_TYPE_UNREGISTER_JOINT:
+	{
+		ComponentData *data = (ComponentData*)message.data;
+		if(data->type == ComponentType::COMPONENT_WHEEL_JOINT) {
+			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
+			world->DestroyJoint(wj->joint);
+		}
+		if(data->type == ComponentType::COMPONENT_REVOLUTE_JOINT) {
+			std::shared_ptr<RevoluteJoint> rj = std::static_pointer_cast<RevoluteJoint>(data->comp.lock());
+			world->DestroyJoint(rj->joint);
 		}
 		break;
 	}

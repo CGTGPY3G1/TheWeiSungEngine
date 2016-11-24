@@ -1,6 +1,8 @@
 #include "PolygonCollider.h"
 #include "TypeConversion.h"
 #include "GameObject.h"
+#include "ComponentData.h"
+
 PolygonCollider::PolygonCollider() : Collider() {
 }
 
@@ -31,13 +33,14 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	fixtureDef->restitution = restitution;
 	fixtureDef->density = density;
 	fixtureDef->shape = shape;
-	colliderData = new ColliderData();
-	colliderData->comp = GetWeak();
-	colliderData->type = Type();
-	fixtureDef->userData = colliderData;
-	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
+	componentData = new ComponentData();
+	componentData->comp = GetWeak();
+	componentData->type = Type();
+	fixtureDef->userData = componentData;
+	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
 	gameObject.lock()->HandleMessage(m);
 	SetEnabled(true);
+	Collider::UpdateCollisionFilter();
 }
 
 Vector2 PolygonCollider::GetOffset() {

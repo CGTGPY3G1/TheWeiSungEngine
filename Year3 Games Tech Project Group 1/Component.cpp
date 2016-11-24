@@ -1,6 +1,6 @@
 #include "Component.h"
 #include "GameObject.h"
-
+#include "ComponentData.h"
 int IDManager::compCount = 0;
 
 int IDManager::getNewCompID() { return ++compCount; }
@@ -15,6 +15,7 @@ Component::Component(std::weak_ptr<GameObject> gameObject) {
 }
 
 Component::~Component() {
+
 }
 
 void Component::SetEnabled(const bool & enabled) {
@@ -64,6 +65,13 @@ void Component::OnEnable() {
 }
 
 void Component::OnDisable() {
+}
+
+void Component::Destroy() {
+	if(componentData != nullptr) {
+		delete componentData;
+		componentData = nullptr;
+	}
 }
 
 void Component::Init(const bool & enabled, const std::string & name) {

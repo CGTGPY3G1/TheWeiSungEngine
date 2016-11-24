@@ -1,5 +1,7 @@
 #include "CircleCollider.h"
 #include "GameObject.h"
+#include "ComponentData.h"
+
 CircleCollider::CircleCollider() : Collider() {
 }
 
@@ -22,13 +24,14 @@ void CircleCollider::Init(const Vector2 & position, const float & radius, const 
 	shape->m_radius = radius * Physics::METRES_PER_PIXEL * std::max<float>(scale.x, scale.y);
 	SetOffset(position);
 	fixtureDef->shape = shape;
-	colliderData = new ColliderData();
-	colliderData->comp = GetWeak();
-	colliderData->type = Type();
-	fixtureDef->userData = colliderData;
-	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
+	componentData = new ComponentData();
+	componentData->comp = GetWeak();
+	componentData->type = Type();
+	fixtureDef->userData = componentData;
+	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
 	gameObject.lock()->HandleMessage(m);
 	SetEnabled(true);
+	Collider::UpdateCollisionFilter();
 }
 
 Vector2 CircleCollider::GetOffset() {

@@ -48,6 +48,44 @@ void ComponentManager::LateUpdate() {
 	}
 }
 
+void ComponentManager::HandleMessage(const Message & message) {
+	switch(message.scope) {
+	case MessageScope::MESSAGE_SCOPE_COMPONENTS:
+		switch(message.type) {
+		case MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY:
+		case MessageType::MESSAGE_TYPE_UPDATE_COLLISION_FILTER:
+		case MessageType::MESSAGE_TYPE_UPDATE_COLLISION_MASK:
+		{
+			for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+				if(TypeInfo::IsCollider((*i)->Type())) {
+					std::shared_ptr<Collider> collider = std::dynamic_pointer_cast<Collider>(*i);
+					if(collider) {
+						if(message.type == MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY) {
+							int data = *((int *)message.data);
+							collider->SetCollisionCategory(data);
+						}
+						else if(message.type == MessageType::MESSAGE_TYPE_UPDATE_COLLISION_FILTER) {
+							std::pair<int, int> data = *((std::pair<int, int>*)message.data);
+							collider->SetCollisionFilter(data.first, data.second);
+						}
+						else if(message.type == MessageType::MESSAGE_TYPE_UPDATE_COLLISION_MASK) {
+							int data = *((int *)message.data);
+							collider->SetCollisionMask(data);
+						}
+					}
+				}
+			}
+		}	
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void ComponentManager::OnCollisionEnter(const CollisionData & data) {
 }
 

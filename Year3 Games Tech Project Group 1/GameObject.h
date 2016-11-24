@@ -4,10 +4,18 @@
 #include "ComponentManager.h"
 #include <string>
 
+enum CollisionCategory {
+	CATEGORY_ALL = 0x0001,
+	CATEGORY_WHEEL = 0x0002,
+	CATEGORY_CAR = 0x0004,
+	CATEGORY_AI_CHARACTER = 0x0008,
+	ENEMY_PLAYER = 0x0010,
+};
 class GameObject : public std::enable_shared_from_this<GameObject>, public CollisionHandler {
 public:
 	friend class GameObjectManager;
 	friend class ComponentManager;
+	friend class PhysicsSystem;
 	GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & objectID, const std::string & goName = "New GameObject");
 	~GameObject();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
@@ -19,6 +27,8 @@ public:
 	friend bool operator == (const GameObject & a, const GameObject & b);
 	std::string GetName();
 	void SetName(std::string name);
+	std::string GetTag();
+	void SetTag(std::string tag);
 	template <typename T> bool HasComponent();
 	bool HasComponents(const unsigned int & mask);
 	unsigned int GetObjectID();
@@ -32,12 +42,19 @@ public:
 	void OnCollisionExit(const CollisionData & data) override;
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
+	void SetCollisionFilter(const int & collisionCategory, const int & collisionMask);
+	void SetCollisionCategory(const int & collisionCategory);
+	int GetCollisionCategory();
+	void SetCollisionMask(const int & collisionMask);
+	int GetCollisionMask();
+	const bool CollidesWith(const int & collisionMask);
 protected:	
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;
 	unsigned int componentMask = 0;
+	int collisionCategory = CATEGORY_ALL, collisionMask = 0xFFFF;
 	ComponentManager componentManager;
-	std::string name;
+	std::string name, tag = "default";
 	std::weak_ptr<GameObjectManager> manager;
 };
 

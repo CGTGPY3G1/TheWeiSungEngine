@@ -59,8 +59,27 @@ float RigidBody2D::GetRotation() {
 
 void RigidBody2D::SetMass(const float & newMass) {
 	body->GetMassData(massData);
-	massData->mass = newMass;
+	float fixtureCount = 0;
+	for(b2Fixture * f = body->GetFixtureList(); f; f = f->GetNext()) {
+		f->SetDensity(1.0f);
+		fixtureCount++;
+	}
+	if(fixtureCount > 0) {
+		body->ResetMassData();
+		body->GetMassData(massData);
+		float mass = newMass / massData->mass;
+		mass /= fixtureCount;
+		for(b2Fixture * f = body->GetFixtureList(); f; f = f->GetNext()) {
+			f->SetDensity(mass);
+		}	
+	}
+	else {
+		body->GetMassData(massData);
+		massData->mass = newMass;
+	}
+	massData->center = body->GetLocalCenter();
 	body->SetMassData(massData);
+	body->ResetMassData();
 }
 
 float RigidBody2D::GetMass() {
@@ -79,12 +98,11 @@ float RigidBody2D::GetSpeed() {
 	return body->GetLinearVelocity().Length() * Physics::PIXELS_PER_METRE;
 }
 
-void RigidBody2D::Init(const b2BodyType & type, const float & mass, const float & angularDampening, const float & linearDampening) {
+void RigidBody2D::Init(const b2BodyType & type,const float & angularDampening, const float & linearDampening) {
 	bodyDef = new b2BodyDef();
 	this->bodyDef->type = type;
 	this->bodyDef->angularDamping = angularDampening;
 	this->bodyDef->linearDamping = linearDampening;
-	
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	std::shared_ptr<Transform2D> t = g->GetComponent<Transform2D>().lock();
 	bodyDef->position = TypeConversion::ConvertToB2Vector2(t->GetPosition());
@@ -94,8 +112,15 @@ void RigidBody2D::Init(const b2BodyType & type, const float & mass, const float 
 	bodyDef->userData = rigidBodyData;
 	bodyDef->allowSleep = false;
 	massData = new b2MassData();
-	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY, MessageDataType::MESSAGE_RIGIDBODY_DATA_TYPE, rigidBodyData);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY, rigidBodyData);
 	g->HandleMessage(m);
-	SetMass(mass);
 	SetEnabled(true);
+}
+
+b2Body * RigidBody2D::GetBody() {
+	return body;
+}
+
+b2BodyDef * RigidBody2D::GetBodyDef() {
+	return bodyDef;
 }

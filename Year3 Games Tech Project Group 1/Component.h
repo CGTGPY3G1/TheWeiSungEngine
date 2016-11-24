@@ -1,5 +1,15 @@
+#pragma once
 #ifndef WS_COMPONENT_H
 #define WS_COMPONENT_H
+
+#include <memory>
+#include <vector>
+#include <string>
+#include "Message.h"
+#include "Vector2.h"
+#include <bitset>
+#include <type_traits>
+
 enum ComponentType : unsigned int {
 	COMPONENT_NULL = 0,
 	COMPONENT_TRANSFORM_2D = 1 << 0,
@@ -8,16 +18,12 @@ enum ComponentType : unsigned int {
 	COMPONENT_CIRCLE_COLLIDER = 1 << 3,
 	COMPONENT_BOX_COLLIDER_2D = 1 << 4,
 	COMPONENT_POLYGON_COLLIDER_2D = 1 << 5,
-	COMPONENT_SCRIPTABLE = 1 << 6
+	COMPONENT_WHEEL_JOINT = 1 << 6,
+	COMPONENT_REVOLUTE_JOINT = 1 << 7
 };
 
 #define NUMBER_OF_COMPONENTS = 6
-#include <memory>
-#include <vector>
-#include <string>
-#include "Message.h"
-#include "Vector2.h"
-#include <type_traits>
+
 class IDManager {
 public:
 	~IDManager() {}
@@ -26,7 +32,7 @@ private:
 	static int compCount;
 };
 
-struct CollisionData;
+struct ComponentData;
 class GameObject;
 class Component : public std::enable_shared_from_this<Component> {
 public:
@@ -51,6 +57,7 @@ public:
 	virtual void End();
 	virtual void OnEnable();
 	virtual void OnDisable();
+	virtual void Destroy();
 	virtual void HandleMessage(const Message & message) {};
 	bool operator < (const Component & other) {
 		return ownerID < other.ownerID && compID < other.compID;
@@ -61,6 +68,7 @@ public:
 	bool operator == (const Component & other) {
 		return ownerID == other.ownerID && compID == other.compID;
 	}
+
 protected:
 	std::weak_ptr<Component> GetWeak() { return shared_from_this(); }
 	bool enabled = false;
@@ -68,6 +76,7 @@ protected:
 	unsigned int ownerID, compID;
 	void Init(const bool & enabled, const std::string & name);
 	std::weak_ptr<GameObject> gameObject;
+	ComponentData * componentData;
 };
 
 template<typename T> std::weak_ptr<T> Component::AddComponent() {

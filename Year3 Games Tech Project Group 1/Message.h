@@ -3,10 +3,12 @@
 #define WS_MESSAGE_H
 
 enum MessageScope {
+	MESSAGE_SCOPE_NULL = -1,
 	MESSAGE_SCOPE_GLOBAL = 0,
 	MESSAGE_SCOPE_GAMEOBJECT,
 	MESSAGE_SCOPE_GAMEOBJECT_AND_ANCESTORS,
 	MESSAGE_SCOPE_GAMEOBJECT_AND_CHILDREN,
+	MESSAGE_SCOPE_COMPONENTS,
 	MESSAGE_SCOPE_PHYSICS_SYSTEM
 };
 
@@ -20,7 +22,12 @@ enum MessageType {
 	MESSAGE_TYPE_REGISTER_RIGIDBODY,
 	MESSAGE_TYPE_UNREGISTER_RIGIDBODY,
 	MESSAGE_TYPE_REGISTER_COLLIDER,
-	MESSAGE_TYPE_UNREGISTER_COLLIDER
+	MESSAGE_TYPE_UNREGISTER_COLLIDER,
+	MESSAGE_TYPE_REGISTER_JOINT,
+	MESSAGE_TYPE_UNREGISTER_JOINT,
+	MESSAGE_TYPE_UPDATE_COLLISION_FILTER,
+	MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY,
+	MESSAGE_TYPE_UPDATE_COLLISION_MASK
 };
 
 enum MessageDataType {
@@ -33,10 +40,10 @@ enum MessageDataType {
 class Message {
 public:
 	Message() {}
-	Message(const MessageType & messageType) : type(messageType) {}
-	Message(const MessageType & messageType, const MessageDataType & messageDataType, void * messageData) : type(messageType), dataType(messageDataType), data(messageData) {}
-	MessageType	type = MESSAGE_TYPE_VOID;
-	MessageDataType dataType = MESSAGE_NULL_DATA_TYPE;
+	Message(const MessageScope & messageScope) : scope(messageScope) {}
+	Message(const MessageScope & messageScope, const MessageType & messageType, void * messageData) : scope(messageScope), type(messageType), data(messageData) {}
+	MessageScope scope = MESSAGE_SCOPE_GLOBAL;
+	MessageType type = MESSAGE_TYPE_VOID;
 	void * data;
 };
 

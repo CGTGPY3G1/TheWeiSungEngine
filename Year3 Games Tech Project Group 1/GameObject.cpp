@@ -17,6 +17,14 @@ void GameObject::SetName(std::string name) {
 	this->name = name;
 }
 
+std::string GameObject::GetTag() {
+	return tag;
+}
+
+void GameObject::SetTag(std::string tag) {
+	this->tag = tag;
+}
+
 bool GameObject::HasComponents(const unsigned int & mask) {
 	if(componentMask == 0 || mask == 0) return false;
 	return (componentMask & mask) == mask;
@@ -49,11 +57,8 @@ std::weak_ptr<GameObjectManager> GameObject::GetManager() {
 }
 
 void GameObject::HandleMessage(const Message & message) {
-	switch(message.type) {
-	case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:
-	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
-	case MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY:
-	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
+	switch(message.scope) {
+	case MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM:
 		manager.lock()->GetScene().lock()->GetPhysicsSystem()->HandleMessage(message);
 		break;
 	default:
@@ -79,6 +84,39 @@ void GameObject::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
 void GameObject::OnSensorExit(const std::weak_ptr<Collider> & collider) {
 	std::cout << GetName() + " Stopped Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorExit(collider);
+}
+
+void GameObject::SetCollisionFilter(const int & collisionCategory, const int & collisionMask) {
+	this->collisionCategory = collisionCategory; this->collisionMask = collisionMask;
+	std::pair<int, int> *data = new std::pair<int, int>(collisionCategory, collisionMask);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_FILTER, data);
+	delete data;
+}
+
+void GameObject::SetCollisionCategory(const int & collisionCategory) {
+	this->collisionCategory = collisionCategory;
+	int * data = new int(collisionCategory);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY, data);
+	delete data;
+}
+
+int GameObject::GetCollisionCategory() {
+	return collisionCategory;
+}
+
+void GameObject::SetCollisionMask(const int & collisionMask) {
+	this->collisionMask = collisionMask;
+	int * data = new int(collisionMask);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY, data);
+	delete data;
+}
+
+int GameObject::GetCollisionMask() {
+	return collisionMask;
+}
+
+const bool GameObject::CollidesWith(const int & collisionMask) {
+	return (this->collisionMask & collisionMask) == collisionMask;
 }
 
 bool operator<(const GameObject & a, const GameObject & b) {

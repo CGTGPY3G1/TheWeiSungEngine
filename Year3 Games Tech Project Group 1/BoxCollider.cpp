@@ -1,5 +1,7 @@
 #include "BoxCollider.h"
 #include "GameObject.h"
+#include "ComponentData.h"
+
 BoxCollider::BoxCollider() : Collider() {
 }
 
@@ -21,13 +23,14 @@ void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool 
 	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL * scale.x, (size.y / 2) * Physics::METRES_PER_PIXEL * scale.y);
 	SetOffset(offset);
 	fixtureDef->shape = shape;
-	colliderData = new ColliderData();
-	colliderData->comp = GetWeak();
-	colliderData->type = Type();
-	fixtureDef->userData = colliderData;
-	Message m = Message(MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, MessageDataType::MESSAGE_COLLIDER_DATA_TYPE, colliderData);
+	componentData = new ComponentData();
+	componentData->comp = GetWeak();
+	componentData->type = Type();
+	fixtureDef->userData = componentData;
+	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
 	gameObject.lock()->HandleMessage(m);
 	SetEnabled(true);
+	Collider::UpdateCollisionFilter();
 }
 
 void BoxCollider::SetOffset(const Vector2 & newOffset) {

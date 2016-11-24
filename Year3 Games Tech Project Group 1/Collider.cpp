@@ -1,7 +1,7 @@
 #include "Collider.h"
 #include "GameObject.h"
 #include "RigidBody2D.h"
-
+#include "ComponentData.h"
 Collider::Collider() : Component(){
 }
 
@@ -14,8 +14,6 @@ Collider::Collider(std::weak_ptr<GameObject> gameObject) : Component(gameObject)
 }
 
 Collider::~Collider() {
-	if(colliderData) delete colliderData;
-	colliderData = NULL;
 }
 
 bool Collider::IsSensor() {
@@ -24,4 +22,36 @@ bool Collider::IsSensor() {
 
 void Collider::SetSensor(const bool & sensor) {
 	fixture->SetSensor(sensor);
+}
+
+void Collider::SetCollisionFilter(const int & collisionCategory, const int & collisionMask) {
+	b2Filter filter = fixture->GetFilterData();
+	filter.categoryBits = collisionCategory;
+	filter.maskBits = collisionMask;
+	fixture->SetFilterData(filter);
+}
+
+void Collider::SetCollisionCategory(const int & collisionCategory) {
+	b2Filter filter = fixture->GetFilterData();
+	filter.categoryBits = collisionCategory;
+	fixture->SetFilterData(filter);
+}
+
+int Collider::GetCollisionCategory() {
+	return fixture->GetFilterData().categoryBits;
+}
+
+void Collider::SetCollisionMask(const int & collisionMask) {
+	b2Filter filter = fixture->GetFilterData();
+	filter.maskBits = collisionMask;
+	fixture->SetFilterData(filter);
+}
+
+int Collider::GetCollisionMask() {
+	return fixture->GetFilterData().maskBits;
+}
+
+void Collider::UpdateCollisionFilter() {
+	std::shared_ptr<GameObject> g = gameObject.lock();
+	SetCollisionFilter(g->GetCollisionCategory(), g->GetCollisionMask());
 }
