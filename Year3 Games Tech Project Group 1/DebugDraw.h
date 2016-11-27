@@ -11,7 +11,7 @@ namespace sfdd {
 	const float SCALE = 32.f;
 }
 
-class DebugDraw : public b2Draw {
+class DebugDraw : public b2Draw, public std::enable_shared_from_this<DebugDraw>{
 public:
 	DebugDraw();
 	static sf::Color GLColorToSFML(const b2Color &color, sf::Uint8 alpha = 255) {

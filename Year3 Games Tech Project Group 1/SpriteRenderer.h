@@ -4,6 +4,9 @@
 #include"Component.h"
 #include "WSSprite.h"
 #include "RenderLayer.h"
+
+enum PivotPoint { TopLeft, Top, TopRight, Left, Centre, Right, BottomLeft, Bottom, BottomRight };
+
 class SpriteRenderer : public Component {
 public:
 	SpriteRenderer();
@@ -23,8 +26,10 @@ public:
 	void SetSize(const float & width, const float & height);
 	float GetWidth();
 	float GetHeight();
-	void Init(const WSSprite & sprite, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	void Init(const std::string path, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	PivotPoint GetPivot();
+	void SetPivot(PivotPoint pivot);
+	void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void UpdateOrigin();
 	//void Init(const WSSprite & sprite, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	//void Init(const std::string path, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
@@ -36,6 +41,8 @@ private:
 	int sortOrder;
 	RenderLayer sortLayer;
 	float pixelsPerMeter;
+	bool pivotDirty = false;
+	PivotPoint pivot = PivotPoint::TopLeft;
 };
 
 #endif // !WS_SPRITE_RENDERER_H

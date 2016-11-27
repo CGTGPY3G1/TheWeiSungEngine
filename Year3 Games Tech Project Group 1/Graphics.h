@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include "Vector2.h"
 #include <cstdarg>
-
+#include <memory>
 enum TextAlignment {
 	LEFT_ALIGNED = 0,
 	CENTRE_ALIGNED,
@@ -28,7 +28,7 @@ struct GraphicsSettings {
 	}
 };
 
-class Graphics {
+class Graphics : public std::enable_shared_from_this<Graphics> {
 public:
 	friend class sf::Text;
 	Graphics();
@@ -81,6 +81,7 @@ public:
 	bool GetWindowOpen();
 private:
 	void RebuildDisplay();
+	std::weak_ptr<Graphics> GetWeak() { return shared_from_this(); }
 	sf::RenderWindow window;
 	sf::View & view = sf::View();
 	sf::ContextSettings sfSettings;

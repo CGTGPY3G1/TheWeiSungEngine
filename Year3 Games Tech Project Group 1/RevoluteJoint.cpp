@@ -18,7 +18,7 @@ void RevoluteJoint::Init(const std::weak_ptr<RigidBody2D>& attatchedBody, const 
 	b2RevoluteJointDef * revoluteJointDef = new b2RevoluteJointDef();
 	b2Body * otherBody = attatchedBody.lock()->GetBody(); 
 	
-	revoluteJointDef->Initialize(m_Body->GetBody(), otherBody, otherBody->GetWorldCenter() - TypeConversion::ConvertToB2Vector2(anchorPoint));
+	revoluteJointDef->Initialize(m_Body->GetBody(), otherBody, otherBody->GetWorldCenter() + TypeConversion::ConvertToB2Vector2(anchorPoint));
 	//Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
 	//Vector2 anchor = m_Body->GetPosition() + anchorPoint;
 	//anchor -= m_Body->GetPosition();

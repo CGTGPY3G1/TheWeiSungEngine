@@ -19,17 +19,17 @@ public:
 	void Close();
 	bool IsRunning();
 	void SetGame(std::shared_ptr<Game> newGame);
-	Graphics * GetGraphics();
+	std::weak_ptr<Graphics> GetGraphics();
 	DebugDraw * GetDebugDraw();
-	Input * GetInput();
-	Time * GetTimer();
+	std::weak_ptr<Input> GetInput();
+	std::weak_ptr<Time> GetTimer();
 	unsigned int GetFPS();
 
 private:
 	Engine();
-	Graphics * graphics;
-	Input * input;
-	Time * timer;
+	std::shared_ptr<Graphics> graphics;
+	std::shared_ptr<Input> input;
+	std::shared_ptr<Time> timer;
 	std::shared_ptr<Game> game;
 	DebugDraw * debugDraw;
 	bool running;

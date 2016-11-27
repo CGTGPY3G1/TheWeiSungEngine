@@ -6,6 +6,7 @@
 #include "Vector2.h"
 #include "GameObject.h"
 #include "ComponentData.h"
+#include "CollisionData.h"
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);

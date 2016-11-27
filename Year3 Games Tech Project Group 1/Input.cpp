@@ -77,7 +77,7 @@ void Input::Update() {
 		}
 	}
 	
-	Graphics * g = Engine::GetInstance().GetGraphics();
+	std::shared_ptr<Graphics> g = Engine::GetInstance().GetGraphics().lock();
 	Vector2 newMousePosition = TypeConversion::ConvertToVector2(g->GetWindow().mapPixelToCoords(sf::Mouse::getPosition(g->GetWindow())));
 	mousePosition.x = (float)newMousePosition.x; mousePosition.y = (float)newMousePosition.y;
 }

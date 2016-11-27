@@ -15,6 +15,7 @@ public:
 	template<> const static ComponentType GetTypeID<PolygonCollider>() { return COMPONENT_POLYGON_COLLIDER_2D; }
 	template<> const static ComponentType GetTypeID<WheelJoint>() { return COMPONENT_WHEEL_JOINT; }
 	template<> const static ComponentType GetTypeID<RevoluteJoint>() { return COMPONENT_REVOLUTE_JOINT; }
+	template<> const static ComponentType GetTypeID<CharacterMovementScript>() { return COMPONENT_CHARACTER_MOVEMENT; }
 
 	template <typename T> const static bool IsComponent() { return false; };
 	template<> const static bool IsComponent<Component>() { return true; }
@@ -26,11 +27,10 @@ public:
 	template<> const static bool IsComponent<PolygonCollider>() { return true; }
 	template<> const static bool IsComponent<WheelJoint>() { return true; }
 	template<> const static bool IsComponent<RevoluteJoint>() { return true; }
+	template<> const static bool IsComponent<CharacterMovementScript>() { return true; }
 
 	template <typename T> const static bool AllowMultiple() { return false; };
-	template<> const static bool AllowMultiple<Transform2D>() { return false; }
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
-	template<> const static bool AllowMultiple<RigidBody2D>() { return false; }
 	template<> const static bool AllowMultiple<BoxCollider>() { return true; }
 	template<> const static bool AllowMultiple<CircleCollider>() { return true; }
 	template<> const static bool AllowMultiple<PolygonCollider>() { return true; }
@@ -38,6 +38,8 @@ public:
 	template<> const static bool AllowMultiple<RevoluteJoint>() { return true; }
 
 	template <typename T> const static bool IsScriptable() { return false; }; // to be used for scriptable components
+	template<> const static bool IsScriptable<CharacterMovementScript>() { return true; }
+
 
 	template <typename T> const static bool IsCollider() { return false; };
 	template<> const static bool IsCollider<BoxCollider>() { return true; }

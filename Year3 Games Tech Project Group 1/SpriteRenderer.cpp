@@ -72,24 +72,56 @@ float SpriteRenderer::GetHeight() {
 	return bounds.height * scale.y;
 }
 
-void SpriteRenderer::Init(const WSSprite & sprite, const RenderLayer & sortLayer, const int & sortOrder) {
-	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true);
-	sf::FloatRect bounds = sprite.getGlobalBounds();
-	float centreX = bounds.width / 2, centreY = bounds.height / 2;
-	this->sprite.setOrigin(centreX, centreY);
+PivotPoint SpriteRenderer::GetPivot() {
+	return pivot;
 }
 
-void SpriteRenderer::Init(const std::string path, const RenderLayer & sortLayer, const int & sortOrder) {
-	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true);
-	sf::FloatRect bounds = sprite.getGlobalBounds();
-	float centreX = bounds.width / 2, centreY = bounds.height / 2;
-	sprite.setOrigin(centreX, centreY);
+void SpriteRenderer::SetPivot(PivotPoint pivot) {
+		this->pivot = pivot;
+		sf::FloatRect bounds = sprite.getGlobalBounds();
+		switch(pivot) {
+		case TopLeft:
+			sprite.setOrigin(0.0f, 0.0f);
+			break;
+		case Top:
+			sprite.setOrigin(bounds.width / 2, 0.0f);
+			break;
+		case TopRight:
+			sprite.setOrigin(bounds.width, 0.0f);
+			break;
+		case Left:
+			sprite.setOrigin(0.0f, bounds.height / 2);
+			break;
+		case Centre:
+			sprite.setOrigin(bounds.width / 2, bounds.height / 2);
+			break;
+		case Right:
+			sprite.setOrigin(bounds.width, bounds.height / 2);
+			break;
+		case BottomLeft:
+			sprite.setOrigin(0.0f, bounds.height);
+			break;
+		case Bottom:
+			sprite.setOrigin(bounds.width / 2, bounds.height);
+			break;
+		case BottomRight:
+			sprite.setOrigin(bounds.width, bounds.height);
+			break;
+		default:
+			break;
+		}
+}
+
+void SpriteRenderer::Init(const WSSprite & sprite, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
+}
+
+void SpriteRenderer::Init(const std::string & path, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
 }
 
 void SpriteRenderer::UpdateOrigin() {
-	sf::FloatRect bounds = sprite.getGlobalBounds();
-	float centreX = bounds.width / 2, centreY = bounds.height / 2;
-	sprite.setOrigin(centreX, centreY);
+	SetPivot(pivot);
 }
 
 void SpriteRenderer::SetSprite(const WSSprite & sprite) {

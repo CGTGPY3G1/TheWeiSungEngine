@@ -20,7 +20,7 @@ std::weak_ptr<GameObject> TestScene::CreateBuilding(const int & buildingNumber, 
 	std::shared_ptr<GameObject> building = gameObjectManager->CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
-	sprite->Init("Images/Buildings.png", RenderLayer::FOREGROUND_LAYER, 5000);
+	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000);
 	std::shared_ptr<RigidBody2D> r = building->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_kinematicBody);
 	const float gridSize = 32.0f;
@@ -100,7 +100,9 @@ void TestScene::Start() {
 	std::shared_ptr<PolygonCollider> body = t1->AddComponent<PolygonCollider>().lock();
 	body->Init(Vector2(), {Vector2(-7.0f, -28.0f), Vector2(-14.0f, 0.0f), Vector2(-7.0f, 28.0f), Vector2(-5.0f, 29.0f), Vector2(1.0f, 28.0f), Vector2(8.0f, 0.0f), Vector2(1.0f, -28.0f), Vector2(-5.0f, -29.0f)});
 	std::shared_ptr<SpriteRenderer> sr = player->AddComponent<SpriteRenderer>().lock();
-	sr->Init("Images/Player.png", RenderLayer::FOREGROUND_LAYER, 85);
+	player->AddComponent<CharacterMovementScript>().lock()->Start();
+
+	sr->Init("Images/Player.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 85);
 	r->SetMass(50);
 
 	std::shared_ptr<GameObject> car = gameObjectManager->CreateGameObject("Car").lock();
@@ -110,6 +112,8 @@ void TestScene::Start() {
 	std::shared_ptr<RigidBody2D> carRB = car->AddComponent<RigidBody2D>().lock();
 	carRB->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	car->AddComponent<BoxCollider>().lock()->Init(Vector2(30.0f, 0.0f), Vector2(140.0f, 80.0f), false, 100.0f);
+	carRB->SetMass(1500.0f);
+	
 	std::shared_ptr<GameObject> leftWheel = gameObjectManager->CreateGameObject("LeftWheel").lock();
 	leftWheel->Init();
 	std::shared_ptr<Transform2D> leftWheelTransform = leftWheel->GetComponent<Transform2D>().lock();
@@ -117,10 +121,9 @@ void TestScene::Start() {
 	std::shared_ptr<RigidBody2D> leftWheelRB = leftWheel->AddComponent<RigidBody2D>().lock();
 	leftWheelRB->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	std::shared_ptr<RevoluteJoint> leftWheelJoint = leftWheel->AddComponent<RevoluteJoint>().lock();
-	leftWheelJoint->Init(carRB, Vector2(0.0f, 0.0f), Vector2::Right);
+	leftWheelJoint->Init(carRB, Vector2(-50.0f, 0.0f), Vector2::Right);
 	leftWheel->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(10.0f, 5.0f), false, 5.0f);
-	carRB->SetMass(1500.0f);
-	std::cout << "mass = " << std::to_string(carRB->GetMass());
+	
 	std::shared_ptr<GameObject> rightWheel = gameObjectManager->CreateGameObject("RighttWheel").lock();
 	rightWheel->Init();
 	std::shared_ptr<Transform2D> rightWheelTransform = rightWheel->GetComponent<Transform2D>().lock();
@@ -128,7 +131,7 @@ void TestScene::Start() {
 	std::shared_ptr<RigidBody2D> rightWheelRB = rightWheel->AddComponent<RigidBody2D>().lock();
 	rightWheelRB->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	std::shared_ptr<RevoluteJoint> rightWheelJoint = rightWheel->AddComponent<RevoluteJoint>().lock();
-	rightWheelJoint->Init(carRB, Vector2(0.0f, 0.0f), Vector2::Right);
+	rightWheelJoint->Init(carRB, Vector2(-50.0f, 0.0f), Vector2::Right);
 	rightWheel->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(10.0f, 5.0f), false, 5.0f);
 
 	std::shared_ptr<GameObject> backLeftWheel = gameObjectManager->CreateGameObject("BackLeftWheel").lock();
@@ -138,7 +141,7 @@ void TestScene::Start() {
 	std::shared_ptr<RigidBody2D> backLeftWheelRB = backLeftWheel->AddComponent<RigidBody2D>().lock();
 	backLeftWheelRB->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	std::shared_ptr<RevoluteJoint> backLeftWheelJoint = backLeftWheel->AddComponent<RevoluteJoint>().lock();
-	backLeftWheelJoint->Init(carRB, Vector2(0.0f, 0.0f), Vector2::Right);
+	backLeftWheelJoint->Init(carRB, Vector2(-50.0f, 0.0f), Vector2::Right);
 	backLeftWheel->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(10.0f, 5.0f), false, 5.0f);
 
 	std::shared_ptr<GameObject> backRightWheel = gameObjectManager->CreateGameObject("BackRightWheel").lock();
@@ -148,18 +151,15 @@ void TestScene::Start() {
 	std::shared_ptr<RigidBody2D> backRightWheelRB = backRightWheel->AddComponent<RigidBody2D>().lock();
 	backRightWheelRB->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	std::shared_ptr<RevoluteJoint> backRightWheelJoint = backRightWheel->AddComponent<RevoluteJoint>().lock();
-	backRightWheelJoint->Init(carRB->GetComponent<RigidBody2D>(), Vector2(0.0f,0.0f), Vector2::Right);
+	backRightWheelJoint->Init(carRB, Vector2(-50.0f,0.0f), Vector2::Right);
 	backRightWheel->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(10.0f, 5.0f), false, 5.0f);
-
-	//std::shared_ptr<WheelJoint> wheelJoint2 = player->AddComponent<WheelJoint>().lock();
-	//wheelJoint2->Init(player->GetComponent<RigidBody2D>(), child->GetComponent<RigidBody2D>(), Vector2(100.0f, -350.0f));
 	
 	Vector2 scale = Vector2(4.0f, 4.0f);
 	std::shared_ptr<GameObject> background = gameObjectManager->CreateGameObject("Background").lock();
 	background->Init();
 	std::shared_ptr<Transform2D> t2 = background->AddComponent<Transform2D>().lock();
 	std::shared_ptr<SpriteRenderer> spriteRenderer = t2->AddComponent<SpriteRenderer>().lock();
-	spriteRenderer->Init("Images/Street.png", RenderLayer::BACKGROUND_LAYER, 0);
+	spriteRenderer->Init("Images/Street.png", PivotPoint::Centre, RenderLayer::BACKGROUND_LAYER, 0);
 	spriteRenderer->GetSprite().setScale(sf::Vector2f(scale));
 	const float ppm = Physics::PIXELS_PER_METRE, offset = ppm / 2.0f;
 	
@@ -201,14 +201,15 @@ void TestScene::Start() {
 	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(-5696, 8), Vector2(ppm * 5, 6016), false);
 	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(0, 3008), Vector2(11520, ppm * 5), false);
 	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(5696, 0), Vector2(ppm * 5, 6016), false);
+
 }
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	Engine engine = Engine::GetInstance();
-	Input * input = engine.GetInput();
+	std::shared_ptr<Input> input = engine.GetInput().lock();
 	std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();
 	bool useController = input->GetControllerActive(0);
-
+	
 	// Movement Test
 	Vector2 forward = gameObject->GetComponent<RigidBody2D>().lock()->GetForward();
 	const float forwardAngle = forward.AngleInDegrees();
@@ -225,17 +226,26 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 		Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
 		
 		gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
-		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, -moveAmount * ((std::max<float>(forward.Dot(Vector2(0, -1)), threshold)) + 1.0f)), ForceType::FORCE);
-		if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(0.0f, moveAmount * ((std::max<float>(forward.Dot(Vector2(0, 1)), threshold)) + 1.0f)), ForceType::FORCE);
-		if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(-moveAmount * ((std::max<float>(forward.Dot(Vector2(-1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
-		if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<RigidBody2D>().lock()->AddForce(Vector2(moveAmount * ((std::max<float>(forward.Dot(Vector2(1, 0)), threshold)) + 1.0f), 0.0f), ForceType::FORCE);
+		if(oldInputStyle) {
+			if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, -moveAmount));
+			if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, moveAmount));
+			if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(-moveAmount, 0.0f));
+			if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(moveAmount, 0.0f));
+		}
+		else {
+			if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(moveAmount, 0.0f), false);
+			if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(-moveAmount, 0.0f), false);
+			if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, -moveAmount), false);
+			if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, moveAmount), false);
+		}
+		
 	}
-	engine.GetGraphics()->MoveCamera((gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics()->GetCameraPosition()) *  (fixedDeltaTime * 1.5f));
+	engine.GetGraphics().lock()->MoveCamera((gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics().lock()->GetCameraPosition()) *  (fixedDeltaTime * 1.5f));
 	const float maxVelocity = Physics::PIXELS_PER_METRE * 2.0f;
 	const float speed = gameObject->GetComponent<RigidBody2D>().lock()->GetSpeed();
-	float oldZoom = engine.GetGraphics()->GetCameraZoom();
+	float oldZoom = engine.GetGraphics().lock()->GetCameraZoom();
 	float newZoom = (speed / maxVelocity) * 0.4f;
-	engine.GetGraphics()->SetCameraZoom(std::max<float>(1.0f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.0f + newZoom) * fixedDeltaTime))));
+	engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.0f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.0f + newZoom) * fixedDeltaTime))));
 	/*if(input->GetKey(KeyCodes::KeyCode::Space)) {
 		std::shared_ptr<GameObject> child = gameObjectManager->GetGameObject("Child").lock();
 		std::cout << child->GetComponent<Transform2D>().lock()->GetForward() << std::endl;
@@ -245,10 +255,10 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 
 void TestScene::Update(const float & deltaTime) {
 	Scene::Update(deltaTime);
-	Input * input = Engine::GetInstance().GetInput();
+	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
 	if(input->GetKeyDown(KeyCodes::KeyCode::G))input->SetControllerActive(0, !input->GetControllerActive(0));
-	
+	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
 	Test(deltaTime);
 }
 
@@ -298,7 +308,7 @@ void TestScene::Render() {
 
 void TestScene::Test(const float & deltaTime) {
 	Engine engine = Engine::GetInstance();
-	Input * input = engine.GetInput();
+	std::shared_ptr<Input> input = engine.GetInput().lock();
 	mousePosition = input->GetMousePosition();
 
 	//std::shared_ptr<GameObject> gameObject = gameObjectManager->GetGameObject("Player").lock();

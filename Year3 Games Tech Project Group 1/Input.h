@@ -27,7 +27,7 @@ namespace ControllerButtons {
 	};
 }
 
-class Input {
+class Input : public std::enable_shared_from_this<Input> {
 
 public:
 	Input();
@@ -68,6 +68,8 @@ private:
 	Vector2 mousePosition;
 	std::mutex m;
 	bool usingController[8];
+
+	std::weak_ptr<Input> GetWeak() { return shared_from_this(); }
 };
 
 

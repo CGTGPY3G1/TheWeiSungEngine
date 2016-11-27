@@ -1,5 +1,5 @@
 #include "ScriptableComponent.h"
-
+#include "ComponentHeaders.h"
 ScriptableComponent::ScriptableComponent() {
 }
 

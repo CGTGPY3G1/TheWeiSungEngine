@@ -11,5 +11,6 @@
 #include "WheelJoint.h"
 #include "ScriptableComponent.h"
 #include "RevoluteJoint.h"
+#include "CharacterMovementScript.h"
 
 #endif !WS_COMPENENT_HEADERS_H

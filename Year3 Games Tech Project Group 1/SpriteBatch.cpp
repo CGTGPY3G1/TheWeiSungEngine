@@ -25,7 +25,7 @@ void SpriteBatch::Clear() {
 }
 
 void SpriteBatch::Display() {
-	Graphics * graphics = Engine::GetInstance().GetGraphics();
+	std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
 	Sort();
 	for(size_t i = 0; i < layers.size(); i++) {
 		Batch batch = layers[i];
