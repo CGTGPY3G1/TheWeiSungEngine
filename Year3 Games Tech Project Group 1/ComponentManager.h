@@ -85,12 +85,11 @@ std::weak_ptr<T> ComponentManager::GetComponentInParent() {
 template<typename T>
 std::vector<std::weak_ptr<T>> ComponentManager::GetComponents() {
 	std::vector<std::weak_ptr<T>> toReturn = std::vector<std::weak_ptr<T>>();
-	if(TypeInfo::IsComponent<T>()) {
-		ComponentType type = TypeInfo::GetTypeID<T>();
-		for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
-			if(type == (*i)->Type()) toReturn.push_back(std::static_pointer_cast<T>(*i));
-		}
+	ComponentType type = TypeInfo::GetTypeID<T>();
+	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+		if(type == (*i)->Type()) toReturn.push_back(std::static_pointer_cast<T>(*i));
 	}
+
 	return toReturn;
 }
 

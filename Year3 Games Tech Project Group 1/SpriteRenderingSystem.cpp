@@ -9,8 +9,8 @@ SpriteRenderingSystem::~SpriteRenderingSystem() {
 }
 
 void SpriteRenderingSystem::ProcessComponents(std::vector<std::shared_ptr<GameObject>> & gameObjects) {
-	unsigned int mask = GetComponentMask();
-	unsigned int noOfObjects = gameObjects.size();
+	const unsigned int mask = GetComponentMask();
+	const size_t noOfObjects = gameObjects.size();
 	spriteBatch.Clear();
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<GameObject> go = gameObjects[i];

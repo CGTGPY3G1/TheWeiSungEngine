@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="CameraFollowScript.h" />
     <ClInclude Include="CharacterMovementScript.h" />
     <ClInclude Include="ComponentData.h" />
     <ClInclude Include="Joint.h" />
@@ -203,6 +204,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
+    <ClCompile Include="CameraFollowScript.cpp" />
     <ClCompile Include="CharacterMovementScript.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />

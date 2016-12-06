@@ -28,8 +28,13 @@ public:
 	float GetHeight();
 	PivotPoint GetPivot();
 	void SetPivot(PivotPoint pivot);
+	void SetPivotManually(const float & x, const float & y);
+	void SetPivotManually(const Vector2 & pivotPoint);
 	void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	
+	void Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void UpdateOrigin();
 	//void Init(const WSSprite & sprite, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	//void Init(const std::string path, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);

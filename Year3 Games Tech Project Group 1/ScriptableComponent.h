@@ -9,8 +9,8 @@ public:
 	ScriptableComponent();
 	ScriptableComponent(std::weak_ptr<GameObject> gameObject);
 	virtual ~ScriptableComponent() {}
-	virtual void Update() {}
-	virtual void FixedUpdate() {}
+	virtual void Update(const float & deltaTime) {}
+	virtual void FixedUpdate(const float & fixedDeltaTime) {}
 	virtual void LateUpdate() {}
 	void OnCollisionEnter(const CollisionData & data) override {}
 	void OnCollisionExit(const CollisionData & data) override {}

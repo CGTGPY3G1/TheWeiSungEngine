@@ -16,7 +16,6 @@ void SpriteBatch::Draw(WSSprite sprite, const sf::RenderStates & states, RenderL
 	int layerIndex = (unsigned int)layer;
 	if(layerIndex >= layers.size()) layers.resize((unsigned int)(layer + 1));
 	SpriteContainer s(sprite, states, sortOrder);
-	//s.m_tranform = transform * sf::Transform::Identity;
 	layers[layerIndex].sprites.push_back(s);
 }
 

@@ -12,5 +12,5 @@
 #include "ScriptableComponent.h"
 #include "RevoluteJoint.h"
 #include "CharacterMovementScript.h"
-
+#include "CameraFollowScript.h"
 #endif !WS_COMPENENT_HEADERS_H

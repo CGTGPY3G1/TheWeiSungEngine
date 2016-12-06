@@ -1,5 +1,6 @@
 #include "RevoluteJoint.h"
 #include <Box2D\Dynamics\Joints\b2RevoluteJoint.h>
+#include <Box2D\Dynamics\Joints\b2PrismaticJoint.h>
 #include "GameObject.h"
 #include "ComponentData.h"
 #include "ComponentHeaders.h"
@@ -18,12 +19,11 @@ void RevoluteJoint::Init(const std::weak_ptr<RigidBody2D>& attatchedBody, const 
 	b2RevoluteJointDef * revoluteJointDef = new b2RevoluteJointDef();
 	b2Body * otherBody = attatchedBody.lock()->GetBody(); 
 	
-	revoluteJointDef->Initialize(m_Body->GetBody(), otherBody, otherBody->GetWorldCenter() + TypeConversion::ConvertToB2Vector2(anchorPoint));
+	revoluteJointDef->Initialize(otherBody, m_Body->GetBody(), m_Body->GetBody()->GetWorldCenter());
 	//Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
 	//Vector2 anchor = m_Body->GetPosition() + anchorPoint;
 	//anchor -= m_Body->GetPosition();
 	//b2Vec2 newAnchor =  revoluteJointDef->bodyB->GetLocalCenter();
-	//revoluteJointDef->localAnchorA.Set(newAnchor.x, newAnchor.y);
 	revoluteJointDef->enableLimit = true;
 	revoluteJointDef->lowerAngle = 0; revoluteJointDef->upperAngle = 0;
 	revoluteJointDef->enableMotor = enableMotor;

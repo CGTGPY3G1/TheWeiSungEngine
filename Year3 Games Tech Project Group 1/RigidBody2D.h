@@ -28,6 +28,8 @@ public:
 	void AddForceAtPoint(const Vector2 & force, const Vector2 & point, const ForceType & forceType = FORCE);
 	void AddTorque(const float & force, const ForceType & forceType = FORCE);
 	void SetAngularVelocity(const float & velocity);
+	float GetAngularVelocity();
+	float GetInertia();
 	Vector2 GetPosition();
 	void SetPosition(const Vector2 & newPosition);
 	void SetRotation(const float & angle);

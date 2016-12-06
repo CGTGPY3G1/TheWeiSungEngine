@@ -8,7 +8,8 @@ class TestScene : public Scene {
 public:
 	TestScene();
 	~TestScene();
-	std::weak_ptr<GameObject> CreateBuilding(const int & buildingNumber, const Vector2 & position = Vector2(), const Vector2 & scale = Vector2(), const float & rotation = 0);
+	std::weak_ptr<GameObject> CreateBuilding(const int & buildingNumber, const Vector2 & position = Vector2(), const Vector2 & scale = Vector2(1.0f, 1.0f), const float & rotation = 0.0f);
+	std::weak_ptr<GameObject> CreateCharacter(const std::string & name, const int & characterType, const Vector2 & position = Vector2(), const Vector2 & scale = Vector2(1.0f, 1.0f), const float & rotation = 0.0f);
 	void Start() override;
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Update(const float & deltaTime) override;

@@ -33,6 +33,14 @@ void RigidBody2D::SetAngularVelocity(const float & velocity) {
 	body->SetAngularVelocity(velocity);
 }
 
+float RigidBody2D::GetAngularVelocity() {
+	return body ? body->GetAngularVelocity() : 0.0f;
+}
+
+float RigidBody2D::GetInertia() {
+	return body ? body->GetInertia() : 0.0f;
+}
+
 Vector2 RigidBody2D::GetPosition() {
 	return Vector2(TypeConversion::ConvertToVector2(body->GetPosition()));
 }
@@ -46,11 +54,13 @@ void RigidBody2D::SetRotation(const float & angle) {
 }
 
 Vector2 RigidBody2D::GetForward() {
-	return Vector2(1, 0).RotatedInRadians(body->GetAngle());
+	b2Vec2 forward = body->GetWorldVector(b2Vec2(1, 0));
+	return Vector2(forward.x, forward.y);
 }
 
 Vector2 RigidBody2D::GetRight() {
-	return GetForward().Flip90(true);
+	b2Vec2 right = body->GetWorldVector(b2Vec2(0, 1));
+	return Vector2(right.x, right.y);
 }
 
 float RigidBody2D::GetRotation() {

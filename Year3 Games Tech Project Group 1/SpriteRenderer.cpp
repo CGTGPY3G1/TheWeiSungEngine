@@ -112,12 +112,28 @@ void SpriteRenderer::SetPivot(PivotPoint pivot) {
 		}
 }
 
+void SpriteRenderer::SetPivotManually(const float & x, const float & y) {
+	sprite.setOrigin(x, y);
+}
+
+void SpriteRenderer::SetPivotManually(const Vector2 & pivotPoint) {
+	SetPivotManually(pivotPoint.x, pivotPoint.y);
+}
+
 void SpriteRenderer::Init(const WSSprite & sprite, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
 	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
 }
 
+void SpriteRenderer::Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
+}
+
 void SpriteRenderer::Init(const std::string & path, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
 	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
+}
+
+void SpriteRenderer::Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
 }
 
 void SpriteRenderer::UpdateOrigin() {
