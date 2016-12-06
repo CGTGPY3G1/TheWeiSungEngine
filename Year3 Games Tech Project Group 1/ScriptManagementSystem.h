@@ -1,0 +1,20 @@
+#pragma once
+#ifndef WS_SCRIPT_MAMAGEMENT_SYSTEM_H
+#define WS_SCRIPT_MAMAGEMENT_SYSTEM_H
+#include <vector>
+#include <memory>
+class ScriptableComponent;
+class GameObject;
+class ScriptManagementSystem {
+public:
+	ScriptManagementSystem();
+	~ScriptManagementSystem();
+	void UnloadScripts();
+	void LoadScripts(std::vector<std::shared_ptr<GameObject>> & gameObjects);
+	void FixedUpdate(const float & fixedDeltaTime);
+	void Update(const float & deltaTime);
+	void LateUpdate();
+private:
+	std::vector<std::shared_ptr<ScriptableComponent>> scripts;
+};
+#endif // !WS_SCRIPT_MAMAGEMENT_SYSTEM_H

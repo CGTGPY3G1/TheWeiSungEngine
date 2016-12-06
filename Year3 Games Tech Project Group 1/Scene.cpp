@@ -3,6 +3,8 @@
 #include "PhysicsSystem.h"
 #include "TypeInfo.h"
 #include "SpriteRenderingSystem.h"
+#include "ScriptManagementSystem.h"
+
 Scene::Scene() {
 	static unsigned int id = 0;
 	sceneID = ++id;
@@ -15,6 +17,7 @@ Scene::~Scene() {
 void Scene::Start() {
 	gameObjectManager = std::make_shared<GameObjectManager>(GetWeak());
 	assetManager = std::make_shared<AssetManager>();
+	scriptManagementSystem = std::make_shared<ScriptManagementSystem>();
 	physicsSystem = new PhysicsSystem();
 	systems.push_back(std::make_shared<SpriteRenderingSystem>());
 }
@@ -26,6 +29,7 @@ void Scene::Reset() {
 
 void Scene::FixedUpdate(const float & fixedDeltaTime) {
 	physicsSystem->Update(fixedDeltaTime);
+	scriptManagementSystem->FixedUpdate(fixedDeltaTime);
 }
 
 void Scene::SyncPhysics() {
@@ -33,8 +37,9 @@ void Scene::SyncPhysics() {
 }
 
 void Scene::Update(const float & deltaTime) {
-	
 	std::vector<std::shared_ptr<GameObject>> gameObjects = gameObjectManager->GetGameObjects();
+	scriptManagementSystem->LoadScripts(gameObjects);
+	scriptManagementSystem->Update(deltaTime);
 	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
 		(*i)->ProcessComponents(gameObjects);
 	}
@@ -42,6 +47,7 @@ void Scene::Update(const float & deltaTime) {
 
 void Scene::Render() {
 	if(physicsSystem && drawColliders) physicsSystem->Draw();
+	scriptManagementSystem->LateUpdate();
 }
 
 void Scene::End() {

@@ -9,6 +9,10 @@ GameObject::GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const
 GameObject::~GameObject() {
 }
 
+std::vector<std::shared_ptr<ScriptableComponent>> GameObject::GetScriptableComponents() {
+	return componentManager.GetScriptableComponents();
+}
+
 std::string GameObject::GetName() {
 	return name;
 }

@@ -159,6 +159,7 @@
     <ClInclude Include="Joint.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="RevoluteJoint.h" />
+    <ClInclude Include="ScriptManagementSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="CircleCollider.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ScriptableComponent.cpp" />
+    <ClCompile Include="ScriptManagementSystem.cpp" />
     <ClCompile Include="SpriteBatch.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="SpriteRenderingSystem.cpp" />

@@ -265,15 +265,15 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	float oldZoom = engine.GetGraphics().lock()->GetCameraZoom();
 	float newZoom = (speed / maxVelocity) * 0.4f;
 	engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.0f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.0f + newZoom) * fixedDeltaTime))));
-	/*if(input->GetKey(KeyCodes::KeyCode::Space)) {
-		std::shared_ptr<GameObject> child = gameObjectManager->GetGameObject("Child").lock();
-		std::cout << child->GetComponent<Transform2D>().lock()->GetForward() << std::endl;
-	}*/
 
 	std::shared_ptr<GameObject> blw = gameObjectManager->GetGameObject("BackLeftWheel").lock();
 	std::shared_ptr<GameObject> brw = gameObjectManager->GetGameObject("BackRightWheel").lock();
 	std::shared_ptr<RigidBody2D> blwRB = blw->GetComponent<RigidBody2D>().lock();
 	std::shared_ptr<RigidBody2D> brwRB = brw->GetComponent<RigidBody2D>().lock();
+	std::shared_ptr<GameObject> flw = gameObjectManager->GetGameObject("LeftWheel").lock();
+	std::shared_ptr<WheelJoint> flwJ = flw->GetComponent<WheelJoint>().lock();
+	std::shared_ptr<GameObject> frw = gameObjectManager->GetGameObject("RightWheel").lock();
+	std::shared_ptr<WheelJoint> frwJ = frw->GetComponent<WheelJoint>().lock();
 	if(input->GetKey(KeyCodes::KeyCode::Space)) {
 		blwRB->AddForce(blwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
 		brwRB->AddForce(brwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
@@ -283,16 +283,18 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	float turnSpeedPerSec = 180.0f;
 	float turnPerTimeStep = turnSpeedPerSec / fixedDeltaTime;
 	float desiredAngle = 0;
+	float massScale = carRB->GetMass() * carRB->GetSpeed() * Physics::METRES_PER_PIXEL;
 	if(input->GetKey(KeyCodes::KeyCode::Left)) {
-		carRB->AddTorque(-lockAngle * std::min(carRB->GetSpeed()* Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+		//carRB->AddTorque(-lockAngle * std::min(carRB->GetSpeed()* Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+		carRB->AddForceAtPoint(-carRB->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+		carRB->AddForceAtPoint(-carRB->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
 	}
 	else if(input->GetKey(KeyCodes::KeyCode::Right)) {
-		carRB->AddTorque(lockAngle * std::min(carRB->GetSpeed() * Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+		//carRB->AddTorque(lockAngle * std::min(carRB->GetSpeed() * Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+		carRB->AddForceAtPoint(carRB->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+		carRB->AddForceAtPoint(carRB->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
 	}
-	std::shared_ptr<GameObject> flw = gameObjectManager->GetGameObject("LeftWheel").lock();
-	std::shared_ptr<WheelJoint> flwJ = flw->GetComponent<WheelJoint>().lock();
-	std::shared_ptr<GameObject> frw = gameObjectManager->GetGameObject("RightWheel").lock();
-	std::shared_ptr<WheelJoint> frwJ = frw->GetComponent<WheelJoint>().lock();
+	
 
 	Vector2 lateralImpulse = GetLateralVelocity(carRB) * carRB->GetMass();
 	carRB->AddForce(-lateralImpulse * fixedDeltaTime, ForceType::IMPULSE_FORCE);

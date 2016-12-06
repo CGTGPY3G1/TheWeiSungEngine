@@ -14,6 +14,7 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
+	std::vector<std::shared_ptr<ScriptableComponent>> GetScriptableComponents();
 	void Start();
 	void Update();
 	void Update(double deltaTime);

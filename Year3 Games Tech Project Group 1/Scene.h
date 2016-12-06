@@ -5,6 +5,7 @@
 #include "AssetManager.h"
 class GameObjectManager;
 class PhysicsSystem;
+class ScriptManagementSystem;
 class System;
 class Scene : public std::enable_shared_from_this<Scene> {
 public:
@@ -27,6 +28,7 @@ protected:
 	unsigned int sceneID;
 	bool drawColliders = false;
 	PhysicsSystem * physicsSystem;
+	std::shared_ptr<ScriptManagementSystem> scriptManagementSystem;
 	std::shared_ptr<GameObjectManager> gameObjectManager;
 	std::shared_ptr<AssetManager> assetManager;
 	std::weak_ptr<Scene> GetWeak() { return shared_from_this(); }

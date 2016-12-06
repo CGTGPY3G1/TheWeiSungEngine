@@ -13,6 +13,10 @@ ComponentManager::~ComponentManager() {
 
 }
 
+std::vector<std::shared_ptr<ScriptableComponent>> ComponentManager::GetScriptableComponents() {
+	return scriptableComponents;
+}
+
 void ComponentManager::Start() {
 }
 

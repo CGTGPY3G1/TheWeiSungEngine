@@ -22,6 +22,7 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	std::vector<std::shared_ptr<ScriptableComponent>> GetScriptableComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
 	friend bool operator < (const GameObject & a, const GameObject & b);
 	friend bool operator == (const GameObject & a, const GameObject & b);

@@ -192,6 +192,9 @@
     <ClInclude Include="CameraFollowScript.h">
       <Filter>Header Files\Engine\Components</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptManagementSystem.h">
+      <Filter>Header Files\Engine\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -304,6 +307,9 @@
     </ClCompile>
     <ClCompile Include="CameraFollowScript.cpp">
       <Filter>Source Files\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptManagementSystem.cpp">
+      <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
