@@ -1,0 +1,69 @@
+#pragma once
+#ifndef WS_CIV_WAYPOINT_SCRIPT_H
+#define WS_CIV_WAYPOINT_SCRIPT_H
+#include "ScriptableComponent.h"
+#include "Random.h"
+class Navigator {
+public:
+	Navigator() {}
+	Navigator(const float & left, const float & top, const float & right, const float & bottom) {
+		points[0][0] = Vector2(left, top);
+		points[0][1] = Vector2(left, bottom);
+		points[1][0] = Vector2(right, top);
+		points[1][1] = Vector2(right, bottom);
+	}
+	~Navigator() {}
+
+	Vector2 GetNextLocation(const Vector2 & currentLocation) {
+		int x = 0, y = 0;
+		float closestDistance = 1000000.0f;
+		for(size_t i = 0; i < 2; i++) {
+			for(size_t j = 0; j < 2; j++) {
+				float distance = (points[i][j] - currentLocation).Magnitude();
+				if(distance < closestDistance) {
+					x = i, y = j;
+					closestDistance = distance;
+				}
+			}
+		}
+
+		bool switchVal = Random::RandomBool();
+		if(x == 0) {
+			if(switchVal) x = 1;
+		}
+		else if(x == 1) {
+			if(switchVal) x = 0;
+		}
+		else if(y == 0) {
+			if(!switchVal) y = 1;
+		}
+		else if(y == 1) {
+			if(!switchVal) y = 0;
+		}
+		return points[x][y];
+	}
+private:
+	Vector2 points[2][2];
+};
+class CharacterMovementScript;
+class RigidBody2D;
+class CivWaypointScript : public ScriptableComponent {
+public:
+	CivWaypointScript();
+	CivWaypointScript(std::weak_ptr<GameObject> gameObject);
+	~CivWaypointScript();
+	const ComponentType Type() const override { return COMPONENT_CIV_WAYPOINT; }
+	void Start() override;
+	void FixedUpdate(const float & fixedDeltaTime) override;
+	void SetTarget(const Vector2 & target);
+	void SetExtents(const float & left, const float & top, const float & right, const float & bottom);
+private:
+	std::weak_ptr<RigidBody2D> myRigidBody;
+	std::weak_ptr<CharacterMovementScript> movementScript;
+	Vector2 target;
+	Navigator navigator;
+	float retargetTimer = 0.0f;
+};
+
+
+#endif // !WS_CIV_WAYPOINT_SCRIPT_H

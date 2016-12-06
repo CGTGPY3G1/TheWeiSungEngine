@@ -13,4 +13,5 @@
 #include "RevoluteJoint.h"
 #include "CharacterMovementScript.h"
 #include "CameraFollowScript.h"
+#include "CivWaypointScript.h"
 #endif !WS_COMPENENT_HEADERS_H

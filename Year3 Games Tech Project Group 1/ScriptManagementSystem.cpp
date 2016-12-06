@@ -12,6 +12,7 @@ void ScriptManagementSystem::UnloadScripts() {
 }
 
 void ScriptManagementSystem::LoadScripts(std::vector<std::shared_ptr<GameObject>>& gameObjects) {
+	UnloadScripts();
 	const size_t noOfObjects = gameObjects.size();
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<GameObject> go = gameObjects[i];

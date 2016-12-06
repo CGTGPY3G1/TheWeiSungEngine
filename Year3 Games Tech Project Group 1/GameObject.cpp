@@ -71,22 +71,22 @@ void GameObject::HandleMessage(const Message & message) {
 }
 
 void GameObject::OnCollisionEnter(const CollisionData & data) {
-	std::cout << GetName() + " Started Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	//std::cout << GetName() + " Started Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
 	componentManager.OnCollisionEnter(data);
 }
 
 void GameObject::OnCollisionExit(const CollisionData & data) {
-	std::cout << GetName() + " Stopped Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
+	//std::cout << GetName() + " Stopped Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
 	componentManager.OnCollisionExit(data);
 }
 
 void GameObject::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
-	std::cout << GetName() + " Started Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
+	//std::cout << GetName() + " Started Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorEnter(collider);
 }
 
 void GameObject::OnSensorExit(const std::weak_ptr<Collider> & collider) {
-	std::cout << GetName() + " Stopped Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
+	//std::cout << GetName() + " Stopped Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorExit(collider);
 }
 
