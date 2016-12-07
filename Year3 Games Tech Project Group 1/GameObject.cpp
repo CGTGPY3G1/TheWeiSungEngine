@@ -29,6 +29,14 @@ void GameObject::SetTag(std::string tag) {
 	this->tag = tag;
 }
 
+bool GameObject::GetEnabled() {
+	return enabled;
+}
+
+void GameObject::SetEnabled(const bool & enabled) {
+	this->enabled = enabled;
+}
+
 bool GameObject::HasComponents(const unsigned int & mask) {
 	if(componentMask == 0 || mask == 0) return false;
 	return (componentMask & mask) == mask;

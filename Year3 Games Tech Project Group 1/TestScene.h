@@ -20,6 +20,7 @@ private:
 	std::weak_ptr<GameObject> g1, g2;
 	Vector2 mousePosition;
 	bool oldInputStyle = true;
+	bool driving = false;
 };
 
 

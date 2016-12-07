@@ -17,8 +17,10 @@ void ScriptManagementSystem::LoadScripts(std::vector<std::shared_ptr<GameObject>
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<GameObject> go = gameObjects[i];
 		if(go) {		
-			std::vector<std::shared_ptr<ScriptableComponent>> newScripts = go->GetScriptableComponents();
-			if(!newScripts.empty()) scripts.insert(scripts.end(), newScripts.begin(), newScripts.end());
+			if(go->GetEnabled()) {
+				std::vector<std::shared_ptr<ScriptableComponent>> newScripts = go->GetScriptableComponents();
+				if(!newScripts.empty()) scripts.insert(scripts.end(), newScripts.begin(), newScripts.end());
+			}		
 		}
 	}
 }

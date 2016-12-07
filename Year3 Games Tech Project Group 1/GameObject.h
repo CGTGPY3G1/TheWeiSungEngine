@@ -30,6 +30,8 @@ public:
 	void SetName(std::string name);
 	std::string GetTag();
 	void SetTag(std::string tag);
+	bool GetEnabled();
+	void SetEnabled(const bool & enabled);
 	template <typename T> bool HasComponent();
 	bool HasComponents(const unsigned int & mask);
 	unsigned int GetObjectID();
@@ -53,6 +55,7 @@ protected:
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;
 	unsigned int componentMask = 0;
+	bool enabled = true;
 	int collisionCategory = CATEGORY_ALL, collisionMask = 0xFFFF;
 	ComponentManager componentManager;
 	std::string name, tag = "default";

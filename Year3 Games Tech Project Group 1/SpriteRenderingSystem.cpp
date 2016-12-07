@@ -15,13 +15,15 @@ void SpriteRenderingSystem::ProcessComponents(std::vector<std::shared_ptr<GameOb
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<GameObject> go = gameObjects[i];
 		if(go) {
-			if(go->HasComponents(mask)) {
-				std::shared_ptr<Transform2D> transform = go->GetComponent<Transform2D>().lock();
-				std::vector<std::weak_ptr<SpriteRenderer>> spriteRenderers = go->GetComponents<SpriteRenderer>();
-				for(std::vector<std::weak_ptr<SpriteRenderer>>::iterator i = spriteRenderers.begin(); i != spriteRenderers.end(); ++i) {
-					std::shared_ptr<SpriteRenderer> renderer = (*i).lock();
-					if(renderer && renderer->GetEnabled()) spriteBatch.Draw(renderer->GetSprite(), transform->GetWorldTransform(), renderer->GetSortLayer(), renderer->GetSortOrder());
-				}			
+			if(go->GetEnabled()) {
+				if(go->HasComponents(mask)) {
+					std::shared_ptr<Transform2D> transform = go->GetComponent<Transform2D>().lock();
+					std::vector<std::weak_ptr<SpriteRenderer>> spriteRenderers = go->GetComponents<SpriteRenderer>();
+					for(std::vector<std::weak_ptr<SpriteRenderer>>::iterator i = spriteRenderers.begin(); i != spriteRenderers.end(); ++i) {
+						std::shared_ptr<SpriteRenderer> renderer = (*i).lock();
+						if(renderer && renderer->GetEnabled()) spriteBatch.Draw(renderer->GetSprite(), transform->GetWorldTransform(), renderer->GetSortLayer(), renderer->GetSortOrder());
+					}
+				}
 			}
 		}
 	}

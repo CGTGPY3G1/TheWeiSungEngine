@@ -28,17 +28,13 @@ public:
 		}
 
 		bool switchVal = Random::RandomBool();
-		if(x == 0) {
-			if(switchVal) x = 1;
+		if(switchVal) {
+			if(x == 1) x = 0;
+			else x = 1;
 		}
-		else if(x == 1) {
-			if(switchVal) x = 0;
-		}
-		else if(y == 0) {
-			if(!switchVal) y = 1;
-		}
-		else if(y == 1) {
-			if(!switchVal) y = 0;
+		else {
+			if(y == 1) y = 0;
+			else y = 1;
 		}
 		return points[x][y];
 	}

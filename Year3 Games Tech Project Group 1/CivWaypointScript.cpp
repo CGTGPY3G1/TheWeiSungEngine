@@ -26,10 +26,10 @@ void CivWaypointScript::FixedUpdate(const float & fixedDeltaTime) {
 		Vector2 direction = (target - position).Normalized();
 		rigidBody->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(direction) * 0.1f));
 
-		movementScript.lock()->MoveUsingPhysics(direction * Physics::PIXELS_PER_METRE);
+		movementScript.lock()->MoveUsingPhysics(direction * Physics::PIXELS_PER_METRE * 2.0f);
 		retargetTimer -= fixedDeltaTime;
 		if(retargetTimer <= 0.0f) {
-			if((target - position).SquareMagnitude() < 50.0f) {
+			if((target - position).Magnitude() < 64.0f) {
 				SetTarget(navigator.GetNextLocation(position));
 				retargetTimer = 4.0f;
 			}
@@ -41,7 +41,7 @@ void CivWaypointScript::SetTarget(const Vector2 & target) {
 	const float drift = 8.0f;
 	const float offsetX = Random::RandomFloat(0.0f, drift * 2.0f) - drift;
 	const float offsetY = Random::RandomFloat(0.0f, drift * 2.0f) - drift;
-	this->target.Set(target.x + offsetX, target.y + offsetY);
+	this->target = Vector2(target.x + offsetX, target.y + offsetY);
 }
 
 void CivWaypointScript::SetExtents(const float & left, const float & top, const float & right, const float & bottom) {
