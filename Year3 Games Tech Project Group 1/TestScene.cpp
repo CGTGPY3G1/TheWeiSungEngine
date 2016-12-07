@@ -273,31 +273,39 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 		std::shared_ptr<WheelJoint> flwJ = flw->GetComponent<WheelJoint>().lock();
 		std::shared_ptr<GameObject> frw = gameObjectManager->GetGameObject("RightWheel").lock();
 		std::shared_ptr<WheelJoint> frwJ = frw->GetComponent<WheelJoint>().lock();
-		if(input->GetKey(KeyCodes::KeyCode::W) || input->GetKey(KeyCodes::KeyCode::Up)) {
-			blwRB->AddForce(blwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
-			brwRB->AddForce(brwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
-		}
-		else if(input->GetKey(KeyCodes::KeyCode::S) || input->GetKey(KeyCodes::KeyCode::Down)) {
-			blwRB->AddForce(-blwRB->GetForward() * 2000.0f, ForceType::IMPULSE_FORCE);
-			brwRB->AddForce(-brwRB->GetForward() * 2000.0f, ForceType::IMPULSE_FORCE);
-		}
-
 		float lockAngle = 60.0f;
 		float turnSpeedPerSec = 180.0f;
 		float turnPerTimeStep = turnSpeedPerSec / fixedDeltaTime;
 		float desiredAngle = 0;
 		float massScale = rb->GetMass() * rb->GetSpeed() * Physics::METRES_PER_PIXEL;
-		if(input->GetKey(KeyCodes::KeyCode::A) || input->GetKey(KeyCodes::KeyCode::Left)) {
-			//carRB->AddTorque(-lockAngle * std::min(carRB->GetSpeed()* Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
-			rb->AddForceAtPoint(-rb->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
-			rb->AddForceAtPoint(-rb->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+		if(useController) {
+			float forceScale = 7000.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::RT);
+			forceScale -=  2000.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::LT);
+			blwRB->AddForce(blwRB->GetForward() * forceScale, ForceType::IMPULSE_FORCE);
+			brwRB->AddForce(brwRB->GetForward() * forceScale, ForceType::IMPULSE_FORCE);
+			rb->AddForceAtPoint(rb->GetRight() * input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH) * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+			rb->AddForceAtPoint(rb->GetRight() * input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH) * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
 		}
-		else if(input->GetKey(KeyCodes::KeyCode::D) || input->GetKey(KeyCodes::KeyCode::Right)) {
-			//carRB->AddTorque(lockAngle * std::min(carRB->GetSpeed() * Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
-			rb->AddForceAtPoint(rb->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
-			rb->AddForceAtPoint(rb->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
-		}
-
+		else {
+			if(input->GetKey(KeyCodes::KeyCode::W) || input->GetKey(KeyCodes::KeyCode::Up)) {
+				blwRB->AddForce(blwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
+				brwRB->AddForce(brwRB->GetForward() * 7000.0f, ForceType::IMPULSE_FORCE);
+			}
+			else if(input->GetKey(KeyCodes::KeyCode::S) || input->GetKey(KeyCodes::KeyCode::Down)) {
+				blwRB->AddForce(-blwRB->GetForward() * 2000.0f, ForceType::IMPULSE_FORCE);
+				brwRB->AddForce(-brwRB->GetForward() * 2000.0f, ForceType::IMPULSE_FORCE);
+			}
+			if(input->GetKey(KeyCodes::KeyCode::A) || input->GetKey(KeyCodes::KeyCode::Left)) {
+				//carRB->AddTorque(-lockAngle * std::min(carRB->GetSpeed()* Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+				rb->AddForceAtPoint(-rb->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+				rb->AddForceAtPoint(-rb->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+			}
+			else if(input->GetKey(KeyCodes::KeyCode::D) || input->GetKey(KeyCodes::KeyCode::Right)) {
+				//carRB->AddTorque(lockAngle * std::min(carRB->GetSpeed() * Physics::METRES_PER_PIXEL, 1.0f), ForceType::IMPULSE_FORCE);
+				rb->AddForceAtPoint(rb->GetRight() * massScale, flw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+				rb->AddForceAtPoint(rb->GetRight() * massScale, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
+			}
+		}	
 
 		Vector2 lateralImpulse = GetLateralVelocity(rb) * rb->GetMass();
 		rb->AddForce(-lateralImpulse * fixedDeltaTime, ForceType::IMPULSE_FORCE);
@@ -349,15 +357,15 @@ void TestScene::Update(const float & deltaTime) {
 	std::shared_ptr<GameObject> player = gameObjectManager->GetGameObject("Player").lock();
 	std::shared_ptr<GameObject> car = gameObjectManager->GetGameObject("Car").lock();
 	if(!driving) {
-		if((car->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetPosition()).Magnitude() < Physics::PIXELS_PER_METRE * 2.0f) {
-			if(input->GetKeyDown(KeyCodes::KeyCode::E)) {
+		if((car->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetPosition() + player->GetComponent<Transform2D>().lock()->GetForward() * Physics::PIXELS_PER_METRE).Magnitude() < Physics::PIXELS_PER_METRE * 2.0f) {
+			if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 				driving = true;
 				player->SetEnabled(false);
 			}
 		}
 	}
 	else {
-		if(input->GetKeyDown(KeyCodes::KeyCode::E)) {
+		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 			std::shared_ptr<Transform2D> carTransform = car->GetComponent<Transform2D>().lock();
 			driving = false;
 			player->GetComponent<RigidBody2D>().lock()->SetPosition(carTransform->GetPosition() + (-carTransform->GetRight() * Physics::PIXELS_PER_METRE) + (carTransform->GetForward() * Physics::PIXELS_PER_METRE));
