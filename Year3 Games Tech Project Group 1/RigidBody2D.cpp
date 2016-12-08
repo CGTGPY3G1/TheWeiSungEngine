@@ -41,6 +41,12 @@ float RigidBody2D::GetInertia() {
 	return body ? body->GetInertia() : 0.0f;
 }
 
+void RigidBody2D::OffsetCentre(const Vector2 & offset) {
+	body->GetMassData(massData);
+	massData->center = TypeConversion::ConvertToB2Vector2(offset);
+	body->SetMassData(massData);
+}
+
 Vector2 RigidBody2D::GetPosition() {
 	return Vector2(TypeConversion::ConvertToVector2(body->GetPosition()));
 }
@@ -125,6 +131,7 @@ void RigidBody2D::Init(const b2BodyType & type,const float & angularDampening, c
 	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY, rigidBodyData);
 	g->HandleMessage(m);
 	SetEnabled(true);
+	
 }
 
 b2Body * RigidBody2D::GetBody() {

@@ -30,6 +30,7 @@ public:
 	void SetAngularVelocity(const float & velocity);
 	float GetAngularVelocity();
 	float GetInertia();
+	void OffsetCentre(const Vector2 & offset);
 	Vector2 GetPosition();
 	void SetPosition(const Vector2 & newPosition);
 	void SetRotation(const float & angle);
