@@ -17,8 +17,6 @@ public:
 	void SetSortOrder(const int & newOrder);
 	RenderLayer GetSortLayer();
 	void SetSortLayer(const RenderLayer & newLayer);
-	float GetPixelsPeMetre();
-	void SetPixelsPeMetre(const float & PPM);
 	void SetColour(const float & r, const float & g, const float & b, const float & a);
 	WSSprite & GetSprite();
 	Vector2 GetSize();
@@ -41,12 +39,14 @@ public:
 	void SetSprite(const WSSprite & sprite);
 	void SetTextureRect(const int & x, const int & y, const int & width, const int & height);
 	void LoadSprite(const std::string path);
+	sf::Shader * GetShader();
+	void SetShader(const std::string & frag, const std::string & vert);
+	void SetShader(std::shared_ptr<sf::Shader> shader);
 private:
 	WSSprite sprite;
+	std::shared_ptr<sf::Shader> shader;
 	int sortOrder;
 	RenderLayer sortLayer;
-	float pixelsPerMeter;
-	bool pivotDirty = false;
 	PivotPoint pivot = PivotPoint::TopLeft;
 };
 

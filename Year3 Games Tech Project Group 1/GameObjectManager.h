@@ -17,6 +17,7 @@ public:
 	std::weak_ptr<GameObject> GetGameObject(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithName(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithComponent(const unsigned int & componentMask);
+	void DeleteGameObject(const unsigned int & id);
 	std::weak_ptr<Scene> GetScene();
 private:
 	std::weak_ptr<Scene> scene;

@@ -49,8 +49,7 @@ protected:
 	bool dirty = true;
 	void CalculateWorldTransform();
 	void SetDirty();
-	sf::Transform world;
-	sf::Transform world2Local, local2World;
+	sf::Transform world, world2Local, local2World;
 	Vector2 worldScale = Vector2(1, 1);
 	float worldRotation;
 	std::weak_ptr<Transform2D> parent;

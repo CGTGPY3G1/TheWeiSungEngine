@@ -19,6 +19,14 @@ TestScene::~TestScene() {
 std::weak_ptr<GameObject> TestScene::CreateCharacter(const std::string & name, const int & characterType, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	std::shared_ptr<GameObject> character = gameObjectManager->CreateGameObject(name).lock();
 	character->Init(position, rotation, scale);
+	if(characterType != 0) {
+		int mask = character->GetCollisionMask();
+		mask ^= CollisionCategory::CATEGORY_AI_CHARACTER;
+		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
+	}
+	else {
+		character->SetCollisionCategory(CollisionCategory::CATEGORY_PLAYER);
+	}
 	std::shared_ptr<RigidBody2D> r = character->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody, 0.5f, 1.0f);
 	std::shared_ptr<CircleCollider> c = character->AddComponent<CircleCollider>().lock();
@@ -30,6 +38,7 @@ std::weak_ptr<GameObject> TestScene::CreateCharacter(const std::string & name, c
 	sr->SetTextureRect(64 * characterType, 0, 64, 64);
 	r->SetMass(10);
 	character->AddComponent<CharacterMovementScript>().lock()->Start();
+	
 	return character;
 }
 
@@ -105,13 +114,64 @@ std::weak_ptr<GameObject> TestScene::CreateBuilding(const int & buildingNumber, 
 
 void TestScene::Start() {
 	Scene::Start();
-	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, true);
+	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, false);
 	std::shared_ptr<GameObject> player = CreateCharacter("Player", 0, Vector2(700.0f, 0.0f)).lock();
 	std::shared_ptr<CircleCollider> playerSensor = player->AddComponent<CircleCollider>().lock();
 	playerSensor->Init(Vector2(), 200.0f, true);
 
+
+	static const std::string vertShader = "";
+	/*	\
+		"void main(){"\
+		"   gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;"\
+		"   gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;"\
+		"   gl_FrontColor = gl_Color;}";*/
+
+
+	/*static const std::string fragShader = \
+		"uniform sampler2D currentTexture;"\
+		"uniform sampler2D distortionMapTexture;"\
+		"uniform float time;"\
+		"uniform float distortionFactor;"\
+		"uniform float riseFactor;"\
+		"void main() {"\
+		"vec2 distortionMapCoordinate = gl_TexCoord[0].st;"\
+		"distortionMapCoordinate.t -= time * riseFactor;"\
+		"vec4 distortionMapValue = texture2D(distortionMapTexture, distortionMapCoordinate);"\
+		"vec2 distortionPositionOffset = distortionMapValue.xy;"\
+		"distortionPositionOffset -= vec2(0.5, 0.5);"\
+		"distortionPositionOffset *= 2.;"\
+		"distortionPositionOffset *= distortionFactor;"\
+		"vec2 distortionUnused = distortionMapValue.zw;"\
+		"distortionPositionOffset *= (1. - gl_TexCoord[0].t);"\
+		"vec2 distortedTextureCoordinate = gl_TexCoord[0].st + distortionPositionOffset;"\
+		"gl_FragColor = gl_Color * texture2D(currentTexture, distortedTextureCoordinate);}";*/
+
+	/*static const std::string fragShader = \
+		"uniform sampler2D texture;"\
+		"uniform float blur_radius;"\
+		"void main() {"\
+		"vec2 offx = vec2(blur_radius, 0.0);"\
+		"vec2 offy = vec2(0.0, blur_radius);"\
+		"vec4 pixel = texture2D(texture, gl_TexCoord[0].xy)               * 4.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy - offx)        * 2.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy + offx)        * 2.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy - offy)        * 2.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy + offy)        * 2.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy - offx - offy) * 1.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy - offx + offy) * 1.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy + offx - offy) * 1.0 +"\
+		"texture2D(texture, gl_TexCoord[0].xy + offx + offy) * 1.0;"\
+		"gl_FragColor = gl_Color * (pixel / 16.0);}";
+	
+
+	std::shared_ptr<sf::Shader> shader = std::make_shared<sf::Shader>();
+	shader->loadFromMemory(fragShader, sf::Shader::Fragment);*/
+	
 	std::shared_ptr<GameObject> car = gameObjectManager->CreateGameObject("Car").lock();
 	car->Init();
+	
+	
 	std::shared_ptr<Transform2D> carTransform = car->GetComponent<Transform2D>().lock();
 	carTransform->SetPosition(Vector2(600.0f, -300.0f));
 	std::shared_ptr<RigidBody2D> carRB = car->AddComponent<RigidBody2D>().lock();
@@ -125,6 +185,9 @@ void TestScene::Start() {
 	carSprite->Init("Images/Car.png", PivotPoint::Left, RenderLayer::MIDGROUND_LAYER);
 	carSprite->SetPivotManually(34.0f, carSprite->GetHeight() / 2.0f);
 
+	/*car->GetComponent<SpriteRenderer>().lock()->SetShader(shader);
+	car->GetComponent<SpriteRenderer>().lock()->GetShader()->setUniform("texture", sf::Shader::CurrentTexture);*/
+	
 	Vector2 wheelAnchor = Vector2();
 
 	std::shared_ptr<GameObject> leftWheel = gameObjectManager->CreateGameObject("LeftWheel").lock();
@@ -216,7 +279,7 @@ void TestScene::Start() {
 	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(1408 * scale.x, 0), Vector2(ppm * 5, 1504 * scale.y), false);
 	const float left = -38.5f * scale.x * 32.0f, top = - 17.5f * scale.y * 32.0f;
 	const float right = -left, bottom = -top;
-	for(size_t i = 0; i < 40; i++) {
+	for(size_t i = 0; i < 250; i++) {
 		std::shared_ptr<GameObject> tg = CreateCharacter("Civ", 1, Vector2(Random::RandomFloat(left, right), top)).lock();
 		std::shared_ptr<CivWaypointScript> cs = tg->AddComponent<CivWaypointScript>().lock();
 		cs->Start();
@@ -307,6 +370,7 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 				rb->AddForceAtPoint(rb->GetRight() * massScale * dot, frw->GetComponent<Transform2D>().lock()->GetPosition(), ForceType::IMPULSE_FORCE);
 			}
 		}	
+		//rb->GetComponent<SpriteRenderer>().lock()->GetShader()->setUniform("blur_radius", rb->GetSpeed() / 30000.0f);
 		Vector2 lateralImpulse = GetLateralVelocity(rb) * rb->GetMass();
 		rb->AddForce(-lateralImpulse * fixedDeltaTime * 2.0f, ForceType::IMPULSE_FORCE);
 		rb->AddTorque(0.1f * rb->GetInertia() * -rb->GetAngularVelocity(), ForceType::IMPULSE_FORCE);
@@ -357,7 +421,7 @@ void TestScene::Update(const float & deltaTime) {
 	std::shared_ptr<GameObject> player = gameObjectManager->GetGameObject("Player").lock();
 	std::shared_ptr<GameObject> car = gameObjectManager->GetGameObject("Car").lock();
 	if(!driving) {
-		if((car->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetPosition() + player->GetComponent<Transform2D>().lock()->GetForward() * Physics::PIXELS_PER_METRE).Magnitude() < Physics::PIXELS_PER_METRE * 2.0f) {
+		if((car->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetForward() * Physics::PIXELS_PER_METRE).Magnitude() < Physics::PIXELS_PER_METRE * 2.0f) {
 			if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 				driving = true;
 				player->SetEnabled(false);
@@ -368,7 +432,7 @@ void TestScene::Update(const float & deltaTime) {
 		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 			std::shared_ptr<Transform2D> carTransform = car->GetComponent<Transform2D>().lock();
 			driving = false;
-			player->GetComponent<RigidBody2D>().lock()->SetPosition(carTransform->GetPosition() + (-carTransform->GetRight() * Physics::PIXELS_PER_METRE) + (carTransform->GetForward() * Physics::PIXELS_PER_METRE));
+			player->GetComponent<RigidBody2D>().lock()->SetPosition(carTransform->GetPosition() + (carTransform->GetRight() * Physics::PIXELS_PER_METRE) + (carTransform->GetForward() * Physics::PIXELS_PER_METRE));
 			player->SetEnabled(true);
 		}
 	}
@@ -376,8 +440,8 @@ void TestScene::Update(const float & deltaTime) {
 }
 
 void TestScene::Render() {
-	//Engine engine = Engine::GetInstance();
-	//engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), 30);
+	/*Engine engine = Engine::GetInstance();
+	engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), 30);*/
 	Scene::Render();
 }
 

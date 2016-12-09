@@ -102,6 +102,7 @@ void GameObject::SetCollisionFilter(const int & collisionCategory, const int & c
 	this->collisionCategory = collisionCategory; this->collisionMask = collisionMask;
 	std::pair<int, int> *data = new std::pair<int, int>(collisionCategory, collisionMask);
 	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_FILTER, data);
+	componentManager.HandleMessage(m);
 	delete data;
 }
 
@@ -109,6 +110,7 @@ void GameObject::SetCollisionCategory(const int & collisionCategory) {
 	this->collisionCategory = collisionCategory;
 	int * data = new int(collisionCategory);
 	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY, data);
+	componentManager.HandleMessage(m);
 	delete data;
 }
 
@@ -119,7 +121,8 @@ int GameObject::GetCollisionCategory() {
 void GameObject::SetCollisionMask(const int & collisionMask) {
 	this->collisionMask = collisionMask;
 	int * data = new int(collisionMask);
-	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_CATEGORY, data);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_MASK, data);
+	componentManager.HandleMessage(m);
 	delete data;
 }
 

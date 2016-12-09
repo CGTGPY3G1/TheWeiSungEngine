@@ -29,14 +29,6 @@ void SpriteRenderer::SetSortLayer(const RenderLayer & newLayer) {
 	sortLayer = newLayer;
 }
 
-float SpriteRenderer::GetPixelsPeMetre() {
-	return pixelsPerMeter;
-}
-
-void SpriteRenderer::SetPixelsPeMetre(const float & PPM) {
-	pixelsPerMeter = PPM;
-}
-
 void SpriteRenderer::SetColour(const float & r, const float & g, const float & b, const float & a) {
 	sprite.setColor(sf::Color(r * 255, g * 255, b * 255, a * 255));
 }
@@ -151,4 +143,25 @@ void SpriteRenderer::SetTextureRect(const int & x, const int & y, const int & wi
 
 void SpriteRenderer::LoadSprite(const std::string path) {
 	sprite = WSSprite(gameObject.lock()->GetManager().lock()->GetScene().lock()->GetAssetManager().lock()->GetTexture(path));
+}
+
+sf::Shader * SpriteRenderer::GetShader() {
+	return shader.get();
+}
+
+void SpriteRenderer::SetShader(const std::string & vert, const std::string & frag) {
+	bool useFrag = !frag.empty(), useVert = !vert.empty();
+	if(useFrag && useVert) {
+		if(!this->shader->loadFromFile(vert, frag)) std::cout << "Couldn't Load Shader\n";
+	}
+	else if(useFrag) {
+		if(!this->shader->loadFromFile(vert, sf::Shader::Vertex)) std::cout << "Couldn't Load Shader\n";
+	}
+	else if(useVert) {
+		if(!this->shader->loadFromFile(frag, sf::Shader::Fragment)) std::cout << "Couldn't Load Shader\n";
+	}
+}
+
+void SpriteRenderer::SetShader(std::shared_ptr<sf::Shader> shader) {
+	this->shader = shader;
 }

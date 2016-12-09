@@ -5,11 +5,11 @@
 #include <string>
 
 enum CollisionCategory {
-	CATEGORY_ALL = 0x0001,
-	CATEGORY_WHEEL = 0x0002,
-	CATEGORY_CAR = 0x0004,
-	CATEGORY_AI_CHARACTER = 0x0008,
-	ENEMY_PLAYER = 0x0010,
+	CATEGORY_ALL = 1 << 1,
+	CATEGORY_WHEEL = 1 << 2,
+	CATEGORY_CAR = 1 << 3,
+	CATEGORY_AI_CHARACTER = 1 << 4,
+	CATEGORY_PLAYER = 1 << 5,
 };
 class GameObject : public std::enable_shared_from_this<GameObject>, public CollisionHandler {
 public:

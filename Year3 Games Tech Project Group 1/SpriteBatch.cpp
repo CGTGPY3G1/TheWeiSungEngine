@@ -29,8 +29,8 @@ void SpriteBatch::Display() {
 	for(size_t i = 0; i < layers.size(); i++) {
 		Batch batch = layers[i];
 		for(std::vector<SpriteContainer>::iterator i = batch.sprites.begin(); i != batch.sprites.end(); ++i) {
-			sf::Transform t = (*i).m_states.transform;
-			graphics->GetWindow().draw((*i).m_sprite, t);
+			//sf::Transform t = (*i).m_states.transform;
+			graphics->GetWindow().draw((*i).m_sprite, (*i).m_states);
 		}
 	}
 }

@@ -50,6 +50,11 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::GetGameObjectsWithCo
 	return toReturn;
 }
 
+void GameObjectManager::DeleteGameObject(const unsigned int & id) {
+	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasGameObjectID(id));
+	if(it != gameObjects.end()) gameObjects.erase(it);
+}
+
 std::weak_ptr<Scene> GameObjectManager::GetScene() {
 	return scene;
 }
