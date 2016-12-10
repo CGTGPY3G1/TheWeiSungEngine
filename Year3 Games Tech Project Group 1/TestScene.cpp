@@ -279,7 +279,7 @@ void TestScene::Start() {
 	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(1408 * scale.x, 0), Vector2(ppm * 5, 1504 * scale.y), false);
 	const float left = -38.5f * scale.x * 32.0f, top = - 17.5f * scale.y * 32.0f;
 	const float right = -left, bottom = -top;
-	for(size_t i = 0; i < 250; i++) {
+	for(size_t i = 0; i < 50; i++) {
 		std::shared_ptr<GameObject> tg = CreateCharacter("Civ", 1, Vector2(Random::RandomFloat(left, right), top)).lock();
 		std::shared_ptr<CivWaypointScript> cs = tg->AddComponent<CivWaypointScript>().lock();
 		cs->Start();
