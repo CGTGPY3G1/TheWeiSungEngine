@@ -13,6 +13,7 @@ public:
 	void LoadScripts(std::vector<std::shared_ptr<GameObject>> & gameObjects);
 	void FixedUpdate(const float & fixedDeltaTime);
 	void Update(const float & deltaTime);
+	void Render();
 	void LateUpdate();
 private:
 	std::vector<std::shared_ptr<ScriptableComponent>> scripts;

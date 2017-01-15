@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="cereal_init">
+  <PropertyGroup Label="Default initializers for properties">
+    <Linkage-cereal Condition="'$(Linkage-cereal)' == ''">dynamic</Linkage-cereal>
+    <CallingConvention-cereal Condition="'$(CallingConvention-cereal)' == ''">cdecl</CallingConvention-cereal>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\default-propertiesui.xml" />
+  </ItemGroup>
+  <UsingTask TaskName="cereal_Contains" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Text Output="false" ParameterType="System.String" />
+      <Library Output="false" Required="true" ParameterType="System.String" />
+      <Value Output="false" Required="true" ParameterType="System.String" />
+      <Result Output="true" ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Code>Result = ((Text ?? "").Split(';').Contains(Library) ) ? Value : String.Empty;</Code>
+    </Task>
+  </UsingTask>
+  <Target Name="cereal_init">
+    <cereal_Contains Text="Linkage-dynamic" Library="cereal" Value="dynamic" Condition="'$(Linkage-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="Linkage-static" Library="cereal" Value="static" Condition="'$(Linkage-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="Linkage-ltcg" Library="cereal" Value="ltcg" Condition="'$(Linkage-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="Linkage-sxs" Library="cereal" Value="sxs" Condition="'$(Linkage-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="Linkage-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="CallingConvention-cdecl" Library="cereal" Value="cdecl" Condition="'$(CallingConvention-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="CallingConvention-stdcall" Library="cereal" Value="stdcall" Condition="'$(CallingConvention-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="CallingConvention-fastcall" Library="cereal" Value="fastcall" Condition="'$(CallingConvention-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="CallingConvention-thiscall" Library="cereal" Value="thiscall" Condition="'$(CallingConvention-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-cereal" />
+    </cereal_Contains>
+    <cereal_Contains Text="CallingConvention-clrcall" Library="cereal" Value="clrcall" Condition="'$(CallingConvention-cereal)'==''">
+      <Output TaskParameter="Result" PropertyName="CallingConvention-cereal" />
+    </cereal_Contains>
+  </Target>
+</Project>

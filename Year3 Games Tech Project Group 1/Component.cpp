@@ -6,12 +6,12 @@ int IDManager::compCount = 0;
 int IDManager::getNewCompID() { return ++compCount; }
 
 Component::Component() {
-	Init(true, "Generic GameObject");
+	Init(true);
 }
 
 Component::Component(std::weak_ptr<GameObject> gameObject) {
 	this->gameObject = gameObject;
-	Init(enabled, "Generic GameObject");
+	Init(enabled);
 }
 
 Component::~Component() {
@@ -43,14 +43,6 @@ unsigned int Component::GetGameObjectID() {
 	return g->GetObjectID();
 }
 
-std::string Component::GetName() {
-	return name;
-}
-
-void Component::SetName(std::string name) {
-	this->name = name;
-}
-
 std::weak_ptr<GameObject> Component::GetGameObject() {
 	return gameObject;
 }
@@ -74,8 +66,7 @@ void Component::Destroy() {
 	}
 }
 
-void Component::Init(const bool & enabled, const std::string & name) {
-	this->name = name;
+void Component::Init(const bool & enabled) {
 	SetEnabled(enabled);
 	compID = IDManager::getNewCompID();
 }

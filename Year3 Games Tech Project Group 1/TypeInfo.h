@@ -18,6 +18,8 @@ public:
 	template<> const static ComponentType GetTypeID<CharacterMovementScript>() { return COMPONENT_CHARACTER_MOVEMENT; }
 	template<> const static ComponentType GetTypeID<CameraFollowScript>() { return COMPONENT_CAMERA_FOLLOW; }
 	template<> const static ComponentType GetTypeID<CivWaypointScript>() { return COMPONENT_CIV_WAYPOINT; }
+	template<> const static ComponentType GetTypeID<TileMapper>() { return COMPONENT_TILE_MAPPER; }
+	template<> const static ComponentType GetTypeID<VehicleController>() { return COMPONENT_VEHICLE_CONTROLLER; }
 
 	template <typename T> const static bool AllowMultiple() { return false; };
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
@@ -26,11 +28,13 @@ public:
 	template<> const static bool AllowMultiple<PolygonCollider>() { return true; }
 	template<> const static bool AllowMultiple<WheelJoint>() { return true; }
 	template<> const static bool AllowMultiple<RevoluteJoint>() { return true; }
+	template<> const static bool AllowMultiple<TileMapper>() { return true; }
 
 	template <typename T> const static bool IsScriptable() { return false; }; // to be used for scriptable components
 	template<> const static bool IsScriptable<CharacterMovementScript>() { return true; }
 	template<> const static bool IsScriptable<CameraFollowScript>() { return true; }
 	template<> const static bool IsScriptable<CivWaypointScript>() { return true; }
+	template<> const static bool IsScriptable<VehicleController>() { return true; }
 
 	template <typename T> const static bool IsCollider() { return false; };
 	template<> const static bool IsCollider<BoxCollider>() { return true; }

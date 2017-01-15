@@ -15,7 +15,19 @@ public:
 	void Update(const float & deltaTime) override;
 	void SetZoom(const float & zoom);
 	float GetZoom();
+	const std::string GetName() const override { return "CameraFollowScript"; }
 	void SetTarget(std::weak_ptr<RigidBody2D> target);
+
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("ZoomLevel", zoomLevel));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ScriptableComponent::save(ar);
+		ar(cereal::make_nvp("ZoomLevel", zoomLevel));
+	}
 private:
 	std::weak_ptr<RigidBody2D> myTarget;
 	std::weak_ptr<Transform2D> myTransform;
@@ -25,7 +37,5 @@ private:
 
 
 #endif // !WS_CAMERA_COMPONENT_H
-
-
 
 

@@ -18,6 +18,10 @@ void CircleCollider::Init(const Vector2 & position, const float & radius, const 
 	fixtureDef->friction = friction;
 	fixtureDef->restitution = restitution;
 	fixtureDef->density = density;
+	this->isSensor = isSensor;
+	this->friction = friction;
+	this->restitution = restitution;
+	this->density = density;
 	shape = new b2CircleShape();
 	std::shared_ptr<RigidBody2D> r = GetComponent<RigidBody2D>().lock();
 	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();

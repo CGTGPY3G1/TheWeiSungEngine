@@ -15,9 +15,23 @@ public:
 	Vector2 GetOffset() override;
 	void SetOffset(const Vector2 & newOffset) override;
 	b2PolygonShape* shape;
+	const std::string GetName() const override { return "BoxCollider"; }
+
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("Offset", offset),
+		   cereal::make_nvp("Width", size));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Collider::save(ar);
+		ar(cereal::make_nvp("Offset", offset),
+		   cereal::make_nvp("Width", size));
+	}
 private:
-	Vector2 offset;
+	Vector2 offset, size;
 	float rotation = 0;
 };
 #endif // !WS_BOX_COLLIDER_H
- 
+  

@@ -26,7 +26,7 @@ void CivWaypointScript::FixedUpdate(const float & fixedDeltaTime) {
 		Vector2 direction = (target - position).Normalized();
 		rigidBody->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(direction) * 0.1f));
 
-		movementScript.lock()->MoveUsingPhysics(direction * Physics::PIXELS_PER_METRE * 2.0f);
+		movementScript.lock()->MoveUsingPhysics(direction * 2.0f);
 		retargetTimer -= fixedDeltaTime;
 		if(retargetTimer <= 0.0f) {
 			if((target - position).Magnitude() < 64.0f) {

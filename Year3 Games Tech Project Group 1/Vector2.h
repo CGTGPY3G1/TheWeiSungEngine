@@ -161,6 +161,15 @@ public:
 		return Vector2(x + (float)in.x, y + (float)in.y);
 	}
 
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("X", x), cereal::make_nvp("Y", y));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ar(cereal::make_nvp("X", x), cereal::make_nvp("Y", y));
+	}
 };
 
 #endif // !WS_VECTOR2_H

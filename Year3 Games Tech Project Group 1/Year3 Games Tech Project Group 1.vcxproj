@@ -156,11 +156,19 @@
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="CameraFollowScript.h" />
+    <ClInclude Include="CerealTypeRegistration.h" />
     <ClInclude Include="CharacterMovementScript.h" />
     <ClInclude Include="CivWaypointScript.h" />
     <ClInclude Include="ComponentData.h" />
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="FileManager.h" />
+    <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="Joint.h" />
+    <ClInclude Include="ParsedTMX.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="TMXPrinter.h" />
+    <ClInclude Include="VehicleController.h" />
+    <ClInclude Include="XMLDocument.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RevoluteJoint.h" />
@@ -194,6 +202,7 @@
     <ClInclude Include="SpriteBatch.h" />
     <ClInclude Include="SpriteRenderingSystem.h" />
     <ClInclude Include="TestScene.h" />
+    <ClInclude Include="TileMapper.h" />
     <ClInclude Include="TypeConversion.h" />
     <ClInclude Include="SpriteRenderer.h" />
     <ClInclude Include="Time.h" />
@@ -218,20 +227,26 @@
     <ClCompile Include="CollisionData.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Joint.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="ParsedTMX.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PolygonCollider.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="TileMapper.cpp" />
+    <ClCompile Include="VehicleController.cpp" />
+    <ClCompile Include="XMLDocument.cpp" />
     <ClCompile Include="RevoluteJoint.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />
@@ -265,6 +280,9 @@
     <Import Project="..\packages\sfml-window.2.4.0.0\build\native\sfml-window.targets" Condition="Exists('..\packages\sfml-window.2.4.0.0\build\native\sfml-window.targets')" />
     <Import Project="..\packages\sfml-graphics.2.4.0.0\build\native\sfml-graphics.targets" Condition="Exists('..\packages\sfml-graphics.2.4.0.0\build\native\sfml-graphics.targets')" />
     <Import Project="..\packages\Box2D.2.3.0\build\native\Box2D.targets" Condition="Exists('..\packages\Box2D.2.3.0\build\native\Box2D.targets')" />
+    <Import Project="..\packages\cereal.1.0.0\build\native\cereal.targets" Condition="Exists('..\packages\cereal.1.0.0\build\native\cereal.targets')" />
+    <Import Project="..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets')" />
+    <Import Project="..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets" Condition="Exists('..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -279,5 +297,8 @@
     <Error Condition="!Exists('..\packages\sfml-window.2.4.0.0\build\native\sfml-window.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml-window.2.4.0.0\build\native\sfml-window.targets'))" />
     <Error Condition="!Exists('..\packages\sfml-graphics.2.4.0.0\build\native\sfml-graphics.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sfml-graphics.2.4.0.0\build\native\sfml-graphics.targets'))" />
     <Error Condition="!Exists('..\packages\Box2D.2.3.0\build\native\Box2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Box2D.2.3.0\build\native\Box2D.targets'))" />
+    <Error Condition="!Exists('..\packages\cereal.1.0.0\build\native\cereal.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cereal.1.0.0\build\native\cereal.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v120.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.targets'))" />
   </Target>
 </Project>

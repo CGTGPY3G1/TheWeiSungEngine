@@ -68,7 +68,8 @@ public:
 	}
 
 	static sf::ContextSettings ConvertToSFContext(const GraphicsSettings & g) {
-		return sf::ContextSettings(g.depthBits, 0U, g.antialiasingLevel, g.majorversion, g.minorVersion);
+		
+		return sf::ContextSettings(g.depthBits, g.stencilBits, g.antialiasingLevel, g.majorversion, g.minorVersion);
 	}
 
 	static sf::View ConvertToSFView(const GraphicsSettings & g) {

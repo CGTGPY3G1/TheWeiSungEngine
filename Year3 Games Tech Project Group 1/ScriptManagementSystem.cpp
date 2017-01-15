@@ -45,6 +45,9 @@ void ScriptManagementSystem::Update(const float & deltaTime) {
 	}
 }
 
+void ScriptManagementSystem::Render() {
+}
+
 void ScriptManagementSystem::LateUpdate() {
 	const size_t noOfObjects = scripts.size();
 	for(size_t i = 0; i < noOfObjects; i++) {

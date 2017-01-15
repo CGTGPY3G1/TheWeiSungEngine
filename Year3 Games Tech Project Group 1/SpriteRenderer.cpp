@@ -2,7 +2,7 @@
 #include "GameObjectManager.h"
 #include "GameObject.h"
 #include "Scene.h"
-
+#include "Debug.h"
 SpriteRenderer::SpriteRenderer() : Component() {
 }
 
@@ -30,7 +30,7 @@ void SpriteRenderer::SetSortLayer(const RenderLayer & newLayer) {
 }
 
 void SpriteRenderer::SetColour(const float & r, const float & g, const float & b, const float & a) {
-	sprite.setColor(sf::Color(r * 255, g * 255, b * 255, a * 255));
+	sprite.setColor(sf::Color((sf::Uint8) (r * 255), (sf::Uint8) (g * 255), (sf::Uint8) (b * 255), (sf::Uint8) (a * 255)));
 }
 
 WSSprite & SpriteRenderer::GetSprite() {
@@ -112,13 +112,13 @@ void SpriteRenderer::SetPivotManually(const Vector2 & pivotPoint) {
 	SetPivotManually(pivotPoint.x, pivotPoint.y);
 }
 
-void SpriteRenderer::Init(const WSSprite & sprite, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
-	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
-}
-
-void SpriteRenderer::Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
-	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
-}
+//void SpriteRenderer::Init(const WSSprite & sprite, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+//	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
+//}
+//
+//void SpriteRenderer::Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
+//	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
+//}
 
 void SpriteRenderer::Init(const std::string & path, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
 	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
@@ -142,7 +142,8 @@ void SpriteRenderer::SetTextureRect(const int & x, const int & y, const int & wi
 }
 
 void SpriteRenderer::LoadSprite(const std::string path) {
-	sprite = WSSprite(gameObject.lock()->GetManager().lock()->GetScene().lock()->GetAssetManager().lock()->GetTexture(path));
+	sprite = WSSprite(AssetManager::GetInstance().GetTexture(path));
+	this->path = path;
 }
 
 sf::Shader * SpriteRenderer::GetShader() {
@@ -152,13 +153,18 @@ sf::Shader * SpriteRenderer::GetShader() {
 void SpriteRenderer::SetShader(const std::string & vert, const std::string & frag) {
 	bool useFrag = !frag.empty(), useVert = !vert.empty();
 	if(useFrag && useVert) {
-		if(!this->shader->loadFromFile(vert, frag)) std::cout << "Couldn't Load Shader\n";
+		if(!this->shader->loadFromFile(vert, frag)) Debug::GetInstance().PrintImmediately("Couldn't Load Shader", DebugMessageType::DEBUG_TYPE_FAILURE_MEDIUM);
+		else {
+			fragName = frag; vertName = vert;
+		}
 	}
 	else if(useFrag) {
-		if(!this->shader->loadFromFile(vert, sf::Shader::Vertex)) std::cout << "Couldn't Load Shader\n";
+		if(!this->shader->loadFromFile(vert, sf::Shader::Vertex)) Debug::GetInstance().PrintImmediately("Couldn't Load Shader", DebugMessageType::DEBUG_TYPE_FAILURE_MEDIUM);
+		else fragName = frag;
 	}
 	else if(useVert) {
-		if(!this->shader->loadFromFile(frag, sf::Shader::Fragment)) std::cout << "Couldn't Load Shader\n";
+		if(!this->shader->loadFromFile(frag, sf::Shader::Fragment)) Debug::GetInstance().PrintImmediately("Couldn't Load Shader", DebugMessageType::DEBUG_TYPE_FAILURE_MEDIUM);
+		else vertName = vert;
 	}
 }
 

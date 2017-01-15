@@ -3,12 +3,18 @@
 #define WS_COMPONENT_MANAGER_H
 #include "TypeInfo.h"
 #include "CollisionHandler.h"
+#include "cereal\cereal.hpp"
+#include "cereal\access.hpp"
+#include "cereal\details\traits.hpp"
+#include <cereal\types\polymorphic.hpp>
+#include <cereal\types\vector.hpp>
 //class GameObject;
 class ComponentManager : public CollisionHandler {
 public:
 	ComponentManager();
 	ComponentManager(std::weak_ptr<GameObject> gameObject);
 	~ComponentManager();
+	friend class cereal::access;
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
@@ -30,6 +36,20 @@ private:
 	std::vector<std::shared_ptr<Component>> components;
 	std::vector<std::shared_ptr<ScriptableComponent>> scriptableComponents;
 	std::weak_ptr<GameObject> gameObject;
+
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("OwnerID", ownerID),
+		   cereal::make_nvp("Components", components),
+		   cereal::make_nvp("ScriptableComponents", scriptableComponents));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ar(cereal::make_nvp("OwnerID", ownerID),
+		   cereal::make_nvp("Components", components),
+		   cereal::make_nvp("ScriptableComponents", scriptableComponents));
+	}
 };
 
 template<typename T> std::weak_ptr<T> ComponentManager::AddComponent() {

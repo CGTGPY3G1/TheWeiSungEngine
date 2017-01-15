@@ -7,9 +7,9 @@
 #include "TypeInfo.h"
 
 class Scene;
-class GameObjectManager : public std::enable_shared_from_this<GameObjectManager> {
+class GameObjectManager{
 public:
-	GameObjectManager(std::weak_ptr<Scene> owner);
+	static GameObjectManager & GetInstance();
 	~GameObjectManager();
 	std::weak_ptr<GameObject> CreateGameObject(const std::string & name = "New GameObject");
 	std::vector<std::shared_ptr<GameObject>> GetGameObjects();
@@ -18,13 +18,12 @@ public:
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithName(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithComponent(const unsigned int & componentMask);
 	void DeleteGameObject(const unsigned int & id);
-	std::weak_ptr<Scene> GetScene();
-private:
+protected:
+	GameObjectManager();
 	std::weak_ptr<Scene> scene;
 	unsigned int nextID = 0;
-	std::vector<unsigned int> freeIDs;
+	std::vector<unsigned int> freeIDs = std::vector<unsigned int>();
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
-	std::weak_ptr<GameObjectManager> GetWeak() { return shared_from_this(); }
 };
 
 struct SortAscending {

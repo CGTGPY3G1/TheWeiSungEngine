@@ -18,19 +18,13 @@ public:
 	virtual void Update(const float & deltaTime);
 	virtual void Render();
 	virtual void End();
-	std::weak_ptr<AssetManager> GetAssetManager();
 	void HandleMessage(const Message & message);
-	std::weak_ptr<GameObjectManager> GetGameObjectManager();
-	PhysicsSystem * GetPhysicsSystem();
 	unsigned int GetID() { return sceneID; }
 	bool operator == (Scene other);
 protected:
 	unsigned int sceneID;
 	bool drawColliders = false;
-	PhysicsSystem * physicsSystem;
 	std::shared_ptr<ScriptManagementSystem> scriptManagementSystem;
-	std::shared_ptr<GameObjectManager> gameObjectManager;
-	std::shared_ptr<AssetManager> assetManager;
 	std::weak_ptr<Scene> GetWeak() { return shared_from_this(); }
 	std::vector<std::shared_ptr<System>> systems;
 };

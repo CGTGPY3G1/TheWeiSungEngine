@@ -15,10 +15,7 @@ Scene::~Scene() {
 }
 
 void Scene::Start() {
-	gameObjectManager = std::make_shared<GameObjectManager>(GetWeak());
-	assetManager = std::make_shared<AssetManager>();
 	scriptManagementSystem = std::make_shared<ScriptManagementSystem>();
-	physicsSystem = new PhysicsSystem();
 	systems.push_back(std::make_shared<SpriteRenderingSystem>());
 }
 
@@ -28,38 +25,36 @@ void Scene::Reset() {
 }
 
 void Scene::FixedUpdate(const float & fixedDeltaTime) {
-	physicsSystem->Update(fixedDeltaTime);
+	PhysicsSystem::GetInstance().Update(fixedDeltaTime);
 	scriptManagementSystem->FixedUpdate(fixedDeltaTime);
 }
 
 void Scene::SyncPhysics() {
-	physicsSystem->UpdateBodies();
+	PhysicsSystem::GetInstance().UpdateBodies();
 }
 
 void Scene::Update(const float & deltaTime) {
-	std::vector<std::shared_ptr<GameObject>> gameObjects = gameObjectManager->GetGameObjects();
+	std::vector<std::shared_ptr<GameObject>> gameObjects = GameObjectManager::GetInstance().GetGameObjects();
 	scriptManagementSystem->LoadScripts(gameObjects);
 	scriptManagementSystem->Update(deltaTime);
 	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
-		(*i)->ProcessComponents(gameObjects);
+		if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) != ComponentType::COMPONENT_SPRITE_RENDERER)
+			(*i)->ProcessComponents(gameObjects);
 	}
 }
 
-void Scene::Render() {
-	if(physicsSystem && drawColliders) physicsSystem->Draw();
+void Scene::Render() {	
+	std::vector<std::shared_ptr<GameObject>> gameObjects = GameObjectManager::GetInstance().GetGameObjects();
+	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
+		if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) == ComponentType::COMPONENT_SPRITE_RENDERER)
+			(*i)->ProcessComponents(gameObjects);
+	}
+	if(drawColliders) PhysicsSystem::GetInstance().Draw();
 	scriptManagementSystem->LateUpdate();
 }
 
 void Scene::End() {
-	if(physicsSystem) {
-		delete physicsSystem; 
-		physicsSystem = NULL;
-	}
-	
-}
 
-std::weak_ptr<AssetManager> Scene::GetAssetManager() {
-	return assetManager;
 }
 
 void Scene::HandleMessage(const Message & message) {
@@ -68,26 +63,13 @@ void Scene::HandleMessage(const Message & message) {
 	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
 	case MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY:
 	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
-		physicsSystem->HandleMessage(message);
+		PhysicsSystem::GetInstance().HandleMessage(message);
 		break;
 	default:
 		break;
 	}
 }
 
-std::weak_ptr<GameObjectManager> Scene::GetGameObjectManager() {
-	return gameObjectManager;
-}
-PhysicsSystem * Scene::GetPhysicsSystem() {
-	return physicsSystem;
-}
-
 bool Scene::operator == (Scene other) {
 	return sceneID == other.sceneID;
 }
-
-
-
-
-
-

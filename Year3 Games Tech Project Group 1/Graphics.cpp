@@ -33,7 +33,9 @@ void Graphics::Update() {
 			windowOpen = false;
 			break;
 		case sf::Event::Resized:
-			 window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
+			windowScale.x = sfEvent.size.width / settings.resolution.x;
+			windowScale.y = sfEvent.size.height / settings.resolution.y;
+			window.setSize(sf::Vector2u(sfEvent.size.width, sfEvent.size.height));
 			break;
 		default:
 			break;
@@ -120,7 +122,7 @@ void Graphics::Draw(const sf::VertexArray & vertexArray) {
 //	window.draw(toDraw);
 //}
 
-void Graphics::Draw(const std::string & text, const Vector2 & position, unsigned int characterSize, TextAlignment alignment) {
+void Graphics::Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, TextAlignment alignment) {
 	sf::Text toDraw;
 	toDraw.setFont(font);
 	toDraw.setString(text);
@@ -131,7 +133,8 @@ void Graphics::Draw(const std::string & text, const Vector2 & position, unsigned
 		if(alignment == TextAlignment::CENTRE_ALIGNED) toDraw.setOrigin(sf::Vector2f(width / 2, 0));
 		else if(alignment == TextAlignment::RIGHT_ALIGNED) toDraw.setOrigin(sf::Vector2f(width, 0));
 	}
-	toDraw.setPosition(window.mapPixelToCoords(TypeConversion::ConvertToSFVector2i(position)));
+	sf::Vector2i pos = sf::Vector2i((int)(position.x * windowScale.x), (int)(position.y * windowScale.y));
+	toDraw.setPosition(window.mapPixelToCoords(pos));
 	toDraw.setFillColor(sf::Color::White);
 
 	window.draw(toDraw);
@@ -141,11 +144,15 @@ void Graphics::Draw(const sf::Drawable & d, const sf::Transform & t) {
 	window.draw(d, t);
 }
 
+void Graphics::Draw(const sf::Drawable & d, const sf::RenderStates & r) {
+	window.draw(d, r);
+}
+
 void Graphics::DrawCircle(const sf::CircleShape & c) {
 	window.draw(c);
 }
 
-void Graphics::DrawCircle(const Vector2 & position, const float & radius, bool filled, const float & r, const float & g, const float & b, const float & a, const unsigned int & noOfVerts) {
+void Graphics::DrawCircle(const Vector2 & position, const float & radius, const bool & filled, const float & r, const float & g, const float & b, const float & a, const unsigned int & noOfVerts) {
 	sf::CircleShape circle = sf::CircleShape(radius, noOfVerts);
 	sf::Color colour = GetSFColour(r, g, b, a);
 	circle.setOutlineColor(colour);
@@ -161,7 +168,7 @@ void Graphics::DrawRect(const sf::RectangleShape & r) {
 	window.draw(r);
 }
 
-void Graphics::DrawRect(const Vector2 & position, const Vector2 & size, const float & rotation, bool filled, const float & r, const float & g, const float & b, const float & a) {
+void Graphics::DrawRect(const Vector2 & position, const Vector2 & size, const float & rotation, const bool & filled, const float & r, const float & g, const float & b, const float & a) {
 	sf::RectangleShape rect(sf::Vector2f(size.x, size.y));
 	sf::Color colour = GetSFColour(r, g, b, a);
 	if(rotation != 0.0f) rect.rotate(rotation);
@@ -174,6 +181,14 @@ void Graphics::DrawRect(const Vector2 & position, const Vector2 & size, const fl
 }
 
 void Graphics::DrawLine(sf::Vertex line []) {
+	window.draw(line, 2, sf::Lines);
+}
+
+void Graphics::DrawLine(const Vector2 & start, const Vector2 & end) {
+	sf::Vertex line [] = {
+		sf::Vertex(TypeConversion::ConvertToSFVector2f(start), sf::Color::White),
+		sf::Vertex(TypeConversion::ConvertToSFVector2f(end), sf::Color::White)
+	};
 	window.draw(line, 2, sf::Lines);
 }
 
@@ -304,8 +319,13 @@ bool Graphics::GetWindowOpen() {
 	return windowOpen;
 }
 
+sf::View & Graphics::GetView() {
+	return view;
+}
+
 void Graphics::RebuildDisplay() {
-	window.create(sf::VideoMode((int)settings.resolution.x+0.5f, (int)settings.resolution.y+0.5f), settings.windowTitle,
+	sfSettings = TypeConversion::ConvertToSFContext(settings);
+	window.create(sf::VideoMode((unsigned int)(settings.resolution.x+0.5f), (unsigned int)(settings.resolution.y+0.5f)), settings.windowTitle,
 				  (settings.fullScreen ? sf::Style::Fullscreen : (settings.resizeable ? sf::Style::Default : (sf::Style::Titlebar | sf::Style::Close))),
 				  sfSettings);
 	window.setPosition(sf::Vector2i((int)settings.screenPosition.x, (int)settings.screenPosition.y));

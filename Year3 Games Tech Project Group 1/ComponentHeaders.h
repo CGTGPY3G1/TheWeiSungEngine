@@ -14,4 +14,6 @@
 #include "CharacterMovementScript.h"
 #include "CameraFollowScript.h"
 #include "CivWaypointScript.h"
+#include "TileMapper.h"
+#include "VehicleController.h"
 #endif !WS_COMPENENT_HEADERS_H

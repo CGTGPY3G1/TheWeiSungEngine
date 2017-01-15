@@ -7,6 +7,15 @@
 #include "GameObject.h"
 #include "ComponentData.h"
 #include "CollisionData.h"
+float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, const b2Vec2 & normal, float32 fraction) {
+	ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
+	if(colliderData) {
+		hit.hits++;
+		hit.colliders.push_back(std::static_pointer_cast<Collider>(colliderData->comp.lock()));
+	}
+	return 1.0f;
+}
+
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
 	world->SetAllowSleeping(false);
@@ -14,6 +23,12 @@ PhysicsSystem::PhysicsSystem(){
 	debugDraw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_centerOfMassBit);
 	world->SetDebugDraw(debugDraw);
 	world->SetContactListener(this);
+	settings = PhysicsSettings();
+}
+
+PhysicsSystem & PhysicsSystem::GetInstance() {
+	static PhysicsSystem instance = PhysicsSystem();
+	return instance;
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -165,6 +180,12 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 		}
 		
 	}
+}
+
+RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end) {
+	hit.Reset();
+	world->RayCast(this, TypeConversion::ConvertToB2Vector2(start), TypeConversion::ConvertToB2Vector2(end));
+	return hit;
 }
 
 void PhysicsSystem::HandleMessage(const Message & message) {

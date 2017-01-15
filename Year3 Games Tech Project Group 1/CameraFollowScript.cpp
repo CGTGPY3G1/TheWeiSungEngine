@@ -2,6 +2,7 @@
 #include "Transform2D.h"
 #include "RigidBody2D.h"
 #include "GameObject.h"
+
 CameraFollowScript::CameraFollowScript() : ScriptableComponent() {
 }
 

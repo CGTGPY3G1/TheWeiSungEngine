@@ -53,6 +53,19 @@ public:
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void SetTarget(const Vector2 & target);
 	void SetExtents(const float & left, const float & top, const float & right, const float & bottom);
+	const std::string GetName() const override { return "CivWaypointScript"; }
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("Target", target),
+		   cereal::make_nvp("RetargetTimer", retargetTimer));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ScriptableComponent::save(ar);
+		ar(cereal::make_nvp("Target", target),
+		   cereal::make_nvp("RetargetTimer", retargetTimer));
+	}
 private:
 	std::weak_ptr<RigidBody2D> myRigidBody;
 	std::weak_ptr<CharacterMovementScript> movementScript;

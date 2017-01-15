@@ -9,7 +9,8 @@
 #include "Vector2.h"
 #include <bitset>
 #include <type_traits>
-
+#include <cereal\types\polymorphic.hpp>
+#include <cereal/types/base_class.hpp>
 enum ComponentType : unsigned int {
 	COMPONENT_NULL = 0,
 	COMPONENT_TRANSFORM_2D = 1 << 0,
@@ -22,7 +23,9 @@ enum ComponentType : unsigned int {
 	COMPONENT_REVOLUTE_JOINT = 1 << 7,
 	COMPONENT_CHARACTER_MOVEMENT = 1 << 8,
 	COMPONENT_CAMERA_FOLLOW = 1 << 9,
-	COMPONENT_CIV_WAYPOINT = 1 << 10
+	COMPONENT_CIV_WAYPOINT = 1 << 10,
+	COMPONENT_TILE_MAPPER = 1 << 11,
+	COMPONENT_VEHICLE_CONTROLLER = 1 << 11
 };
 
 #define NUMBER_OF_COMPONENTS = 6
@@ -44,13 +47,12 @@ public:
 	Component(std::weak_ptr<GameObject> gameObject);
 	virtual ~Component();
 	virtual const ComponentType Type() const = 0;
-	void SetEnabled(const bool &enabled);
+	virtual void SetEnabled(const bool &enabled);
 	bool GetEnabled();
 	void SetOwner(std::weak_ptr<GameObject> gameObject);
 	unsigned int GetCompID();
 	unsigned int GetGameObjectID();
-	std::string GetName();
-	void SetName(std::string name);
+	const virtual std::string GetName() const = 0;
 	std::weak_ptr<GameObject> GetGameObject();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
@@ -73,12 +75,23 @@ public:
 		return ownerID == other.ownerID && compID == other.compID;
 	}
 
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("TypeID", compID),
+		   cereal::make_nvp("Enabled", enabled));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ar(cereal::make_nvp("Type", GetName()),
+			cereal::make_nvp("TypeID", Type()),
+		   cereal::make_nvp("Enabled", enabled));
+	}
 protected:
 	std::weak_ptr<Component> GetWeak() { return shared_from_this(); }
 	bool enabled = false;
-	std::string name;
 	unsigned int ownerID, compID;
-	void Init(const bool & enabled, const std::string & name);
+	void Init(const bool & enabled);
 	std::weak_ptr<GameObject> gameObject;
 	ComponentData * componentData;
 };

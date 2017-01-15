@@ -11,12 +11,16 @@ enum CollisionCategory {
 	CATEGORY_AI_CHARACTER = 1 << 4,
 	CATEGORY_PLAYER = 1 << 5,
 };
+
+
 class GameObject : public std::enable_shared_from_this<GameObject>, public CollisionHandler {
 public:
 	friend class GameObjectManager;
 	friend class ComponentManager;
 	friend class PhysicsSystem;
-	GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & objectID, const std::string & goName = "New GameObject");
+	friend class cereal::access;
+	GameObject(const std::string & goName = "New GameObject");
+	GameObject(const unsigned int & objectID, const std::string & goName = "New GameObject");
 	~GameObject();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
@@ -35,11 +39,12 @@ public:
 	template <typename T> bool HasComponent();
 	bool HasComponents(const unsigned int & mask);
 	unsigned int GetObjectID();
+	void SetObjectID(const unsigned int & newID);
 	unsigned int GetComponentMask();
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();
 	virtual void Init(const Vector2 & position, const float & rotation = 0.0f, const Vector2 & scale = Vector2(1.0f, 1.0f));
-	std::weak_ptr<GameObjectManager> GetManager();
+
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
@@ -51,6 +56,27 @@ public:
 	void SetCollisionMask(const int & collisionMask);
 	int GetCollisionMask();
 	const bool CollidesWith(const int & collisionMask);
+	void Destroy();
+	template <class Archive>
+	void load(Archive & ar) {
+		ar(cereal::make_nvp("Name", name),
+		   cereal::make_nvp("Tag", tag),
+		   cereal::make_nvp("Enabled", enabled),
+		   cereal::make_nvp("CollisionCategory", collisionCategory),
+		   cereal::make_nvp("CollisionMask", collisionMask),
+		   cereal::make_nvp("ComponentManager", componentManager));
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		ar(cereal::make_nvp("Type", std::string("GameObject")), 
+			cereal::make_nvp("Name", name),
+			cereal::make_nvp("Tag", tag),
+			cereal::make_nvp("Enabled", enabled),
+			cereal::make_nvp("CollisionCategory", collisionCategory),
+			cereal::make_nvp("CollisionMask", collisionMask),
+			cereal::make_nvp("ComponentManager", componentManager));
+	}
 protected:	
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	unsigned int objectID;
@@ -59,7 +85,6 @@ protected:
 	int collisionCategory = CATEGORY_ALL, collisionMask = 0xFFFF;
 	ComponentManager componentManager;
 	std::string name, tag = "default";
-	std::weak_ptr<GameObjectManager> manager;
 };
 
 template<typename T>

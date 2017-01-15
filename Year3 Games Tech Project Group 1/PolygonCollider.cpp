@@ -32,6 +32,10 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	fixtureDef->friction = friction;
 	fixtureDef->restitution = restitution;
 	fixtureDef->density = density;
+	this->isSensor = isSensor;
+	this->friction = friction;
+	this->restitution = restitution;
+	this->density = density;
 	fixtureDef->shape = shape;
 	componentData = new ComponentData();
 	componentData->comp = GetWeak();

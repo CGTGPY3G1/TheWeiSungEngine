@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "PhysicsSystem.h"
 #include "CollisionData.h"
-GameObject::GameObject(std::weak_ptr<GameObjectManager> gameObjectManager, const unsigned int & id, const std::string & goName) : manager(gameObjectManager), objectID(id), name(goName) {
+GameObject::GameObject(const unsigned int & id, const std::string & goName) : objectID(id), name(goName) {
 }
 
 GameObject::~GameObject() {
@@ -46,6 +46,10 @@ unsigned int GameObject::GetObjectID() {
 	return objectID;
 }
 
+void GameObject::SetObjectID(const unsigned int & newID) {
+	objectID = newID;
+}
+
 void GameObject::SetComponentMask(const unsigned int & newMask) {
 	componentMask = newMask;
 }
@@ -64,14 +68,10 @@ void GameObject::Init(const Vector2 & position, const float & rotation, const Ve
 	transform->SetPosition(position); transform->SetRotation(rotation); transform->SetScale(scale);
 }
 
-std::weak_ptr<GameObjectManager> GameObject::GetManager() {
-	return manager;
-}
-
 void GameObject::HandleMessage(const Message & message) {
 	switch(message.scope) {
 	case MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM:
-		manager.lock()->GetScene().lock()->GetPhysicsSystem()->HandleMessage(message);
+		PhysicsSystem::GetInstance().HandleMessage(message);
 		break;
 	default:
 		break;
@@ -132,6 +132,13 @@ int GameObject::GetCollisionMask() {
 
 const bool GameObject::CollidesWith(const int & collisionMask) {
 	return (this->collisionMask & collisionMask) == collisionMask;
+}
+
+void GameObject::Destroy() {
+	GameObjectManager::GetInstance().DeleteGameObject(objectID);
+}
+
+GameObject::GameObject(const std::string & goName) : name(goName) {
 }
 
 bool operator<(const GameObject & a, const GameObject & b) {

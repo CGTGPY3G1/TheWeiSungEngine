@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CEREAL_XML_STRING_VALUE
+#define CEREAL_XML_STRING_VALUE "WaiSungSerializedData"
+#endif // CEREAL_XML_STRING_VALUE
 #ifndef WS_ENGINE_H
 #define WS_ENGINE_H
 #include <memory>

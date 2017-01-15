@@ -1,5 +1,7 @@
 #include "CharacterMovementScript.h"
 #include "GameObject.h"
+CharacterMovementScript::CharacterMovementScript() {
+}
 CharacterMovementScript::CharacterMovementScript(std::weak_ptr<GameObject> gameObject) : ScriptableComponent(gameObject) {
 }
 

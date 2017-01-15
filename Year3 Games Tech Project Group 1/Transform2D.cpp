@@ -14,7 +14,8 @@ Transform2D::~Transform2D() {
 }
 
 Vector2 Transform2D::GetPosition() {
-	return GetWorldTransform()*sf::Vector2f();
+	if(dirty) CalculateWorldTransform();
+	return worldPosition;
 }
 
 Vector2 Transform2D::GetLocalPosition() {
@@ -124,7 +125,7 @@ const sf::Transform & Transform2D::GetLocalToWorldTransform() {
 	return local2World;
 }
 
-int Transform2D::GetChildCount() {
+unsigned int Transform2D::GetChildCount() {
 	return children.size();
 }
 
@@ -188,6 +189,7 @@ void Transform2D::CalculateWorldTransform() {
 	world = transform * getTransform();
 	world2Local = world.getInverse();
 	local2World = world2Local.getInverse();
+	worldPosition = world * sf::Vector2f();
 	dirty = false;
 }
 

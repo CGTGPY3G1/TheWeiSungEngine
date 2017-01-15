@@ -13,6 +13,19 @@ public:
 	Vector2 GetOffset() override;
 	void SetOffset(const Vector2 & newOffset) override;
 	b2CircleShape *shape;
-	
+	const std::string GetName() const override { return "CircleCollider"; }
+
+	template <class Archive>
+	void load(Archive & ar) {
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Collider::save(ar);
+		Vector2 offset = TypeConversion::ConvertToVector2(shape->m_p);
+		float radius = shape->m_radius * Physics::PIXELS_PER_METRE;
+		ar(cereal::make_nvp("Offset", offset),
+		   cereal::make_nvp("Radius", radius));
+	}
 };
 #endif // !WS_CIRCLE_COLLIDER_H 

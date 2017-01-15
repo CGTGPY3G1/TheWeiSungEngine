@@ -38,18 +38,33 @@ public:
 	const sf::Transform & GetWorldToLocalTransform();
 	const sf::Transform & GetLocalToWorldTransform();
 
-	int GetChildCount();
+	unsigned int GetChildCount();
 	std::weak_ptr<Transform2D> GetChild(const unsigned int & index);
 	void AddChild(std::weak_ptr<Transform2D> child);
 	std::weak_ptr<Transform2D> GetParent();
 	void SetParent(std::weak_ptr<Transform2D> newParent);
 	/*void HandleMessage(const Message<Vector2> & message) override;
 	void HandleMessage(const Message<float> & message) override;*/
+	const std::string GetName() const override { return "Transform2D"; }
+
+	template <class Archive>
+	void load(Archive & ar) {
+
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Component::save(ar);
+		ar(cereal::make_nvp("Position", worldPosition),
+		   cereal::make_nvp("Rotation", worldRotation),
+		   cereal::make_nvp("Scale", worldScale));
+	}
 protected:
 	bool dirty = true;
 	void CalculateWorldTransform();
 	void SetDirty();
 	sf::Transform world, world2Local, local2World;
+	Vector2 worldPosition = Vector2(0, 0);
 	Vector2 worldScale = Vector2(1, 1);
 	float worldRotation;
 	std::weak_ptr<Transform2D> parent;

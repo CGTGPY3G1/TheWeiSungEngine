@@ -2,6 +2,8 @@
 #include "Math.h"
 #include "GameObject.h"
 #include <SFML/Graphics/Transform.hpp>
+RigidBody2D::RigidBody2D() {
+}
 RigidBody2D::RigidBody2D(std::weak_ptr<GameObject> gameObject) : Component(gameObject) {
 	
 }
@@ -12,16 +14,16 @@ RigidBody2D::~RigidBody2D() {
 
 void RigidBody2D::AddForce(const Vector2 & force, const ForceType & forceType) {
 	if(forceType == IMPULSE_FORCE)
-		body->ApplyLinearImpulseToCenter(TypeConversion::ConvertToB2Vector2(force), true);
+		body->ApplyLinearImpulseToCenter(b2Vec2(force.x, force.y), true);
 	else
-		body->ApplyForceToCenter(TypeConversion::ConvertToB2Vector2(force), true);
+		body->ApplyForceToCenter(b2Vec2(force.x, force.y), true);
 }
 
 void RigidBody2D::AddForceAtPoint(const Vector2 & force, const Vector2 & point, const ForceType & forceType) {
 	if(forceType == IMPULSE_FORCE)
-		body->ApplyLinearImpulse(TypeConversion::ConvertToB2Vector2(force), TypeConversion::ConvertToB2Vector2(point), true);
+		body->ApplyLinearImpulse(b2Vec2(force.x, force.y), TypeConversion::ConvertToB2Vector2(point), true);
 	else
-		body->ApplyForce(TypeConversion::ConvertToB2Vector2(force), TypeConversion::ConvertToB2Vector2(point), true);
+		body->ApplyForce(b2Vec2(force.x, force.y), TypeConversion::ConvertToB2Vector2(point), true);
 }
 
 void RigidBody2D::AddTorque(const float & force, const ForceType & forceType) {
@@ -57,6 +59,10 @@ void RigidBody2D::SetPosition(const Vector2 & newPosition) {
 
 void RigidBody2D::SetRotation(const float & angle) {
 	body->SetTransform(body->GetPosition(), angle * Math::DegreesToRadians());
+}
+
+void RigidBody2D::SetEnabled(const bool & enabled) {
+	body->SetActive(enabled);
 }
 
 Vector2 RigidBody2D::GetForward() {
@@ -114,11 +120,12 @@ float RigidBody2D::GetSpeed() {
 	return body->GetLinearVelocity().Length() * Physics::PIXELS_PER_METRE;
 }
 
-void RigidBody2D::Init(const b2BodyType & type,const float & angularDampening, const float & linearDampening) {
+void RigidBody2D::Init(const b2BodyType & type, const bool & isBullet, const float & angularDampening, const float & linearDampening) {
 	bodyDef = new b2BodyDef();
 	this->bodyDef->type = type;
 	this->bodyDef->angularDamping = angularDampening;
 	this->bodyDef->linearDamping = linearDampening;
+	this->bodyDef->bullet = isBullet;
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	std::shared_ptr<Transform2D> t = g->GetComponent<Transform2D>().lock();
 	bodyDef->position = TypeConversion::ConvertToB2Vector2(t->GetPosition());
@@ -131,7 +138,6 @@ void RigidBody2D::Init(const b2BodyType & type,const float & angularDampening, c
 	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_RIGIDBODY, rigidBodyData);
 	g->HandleMessage(m);
 	SetEnabled(true);
-	
 }
 
 b2Body * RigidBody2D::GetBody() {

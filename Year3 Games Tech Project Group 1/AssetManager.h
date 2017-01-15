@@ -6,15 +6,15 @@
 #include <string>
 #include <map>
 #include <memory>
-class AssetManager : public std::enable_shared_from_this<AssetManager> {
+class AssetManager {
 public:
-	AssetManager();
+	static AssetManager & GetInstance();
 	~AssetManager();
-	void LoadTexture(const std::string & filename);
-	sf::Texture & GetTexture(const std::string & filename);
-private:
-	std::weak_ptr<AssetManager> GetWeak() { return shared_from_this(); }
+	void LoadTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = false, const bool & setSRGB = false);
+	sf::Texture & GetTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = false, const bool & setSRGB = false);
+protected:
 	std::map<std::string, sf::Texture> textures;
+	AssetManager();
 };
 
 #endif // !WS_ASSET_MANAGER_H

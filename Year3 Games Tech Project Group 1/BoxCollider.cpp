@@ -15,9 +15,13 @@ BoxCollider::~BoxCollider() {
 void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool & isSensor, const float & density, const float & friction, const float & restitution) {
 	fixtureDef = new b2FixtureDef();
 	fixtureDef->isSensor = isSensor;
+	this->isSensor = isSensor;
 	fixtureDef->friction = friction;
+	this->friction = friction;
 	fixtureDef->restitution = restitution;
+	this->restitution = restitution;
 	fixtureDef->density = density;
+	this->density = density;
 	shape = new b2PolygonShape();
 	Vector2 scale = GetComponent<Transform2D>().lock()->GetScale();
 	shape->SetAsBox((size.x / 2) * Physics::METRES_PER_PIXEL * scale.x, (size.y / 2) * Physics::METRES_PER_PIXEL * scale.y);

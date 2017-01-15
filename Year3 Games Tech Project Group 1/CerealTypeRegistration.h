@@ -1,0 +1,37 @@
+#pragma once
+#ifndef WS_CEREAL_TYPE_REGISTRATION_H
+#define WS_CEREAL_TYPE_REGISTRATION_H
+#include "ComponentHeaders.h"
+#include "GameObject.h"
+#include<cereal\types\polymorphic.hpp>
+
+CEREAL_REGISTER_TYPE(GameObject);
+CEREAL_REGISTER_TYPE(ComponentManager);
+CEREAL_REGISTER_TYPE(Component);
+CEREAL_REGISTER_TYPE(Transform2D);
+CEREAL_REGISTER_TYPE(RigidBody2D);
+CEREAL_REGISTER_TYPE(Collider);
+CEREAL_REGISTER_TYPE(BoxCollider);
+CEREAL_REGISTER_TYPE(CircleCollider);
+CEREAL_REGISTER_TYPE(PolygonCollider);
+CEREAL_REGISTER_TYPE(SpriteRenderer);
+CEREAL_REGISTER_TYPE(ScriptableComponent);
+CEREAL_REGISTER_TYPE(CivWaypointScript);
+CEREAL_REGISTER_TYPE(CharacterMovementScript);
+CEREAL_REGISTER_TYPE(CameraFollowScript);
+CEREAL_REGISTER_TYPE(VehicleController);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, Transform2D);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, RigidBody2D);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, SpriteRenderer);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, Collider);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, BoxCollider);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CircleCollider);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, PolygonCollider);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, ScriptableComponent);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CivWaypointScript);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CharacterMovementScript);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CameraFollowScript);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, VehicleController);
+#endif // !WS_CEREAL_TYPE_REGISTRATION_H
+
+

@@ -4,6 +4,7 @@
 #include <Box2D\Dynamics\b2Fixture.h>
 #include "Component.h"
 #include "Physics.h"
+#include <cereal/types/base_class.hpp>
 struct PhysicsMaterial {
 	float friction = 1.0f, restitution = 1.0f;
 };
@@ -23,10 +24,27 @@ public:
 	int GetCollisionCategory();
 	void SetCollisionMask(const int & collisionMask);
 	int GetCollisionMask();
+
+
+	template <class Archive>
+	void load(Archive & ar) {
+
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Component::save(ar);
+		ar(cereal::make_nvp("Density", density),
+		   cereal::make_nvp("Restitution", restitution),
+		   cereal::make_nvp("Friction", friction),
+		   cereal::make_nvp("IsSensor", (bool)isSensor));
+	}
 protected:
 	void UpdateCollisionFilter();
 	b2Fixture * fixture;
 	b2FixtureDef * fixtureDef;
+	float density, restitution, friction;
+	bool isSensor;
 };
 
 #endif // !WS_COLLIDER_H

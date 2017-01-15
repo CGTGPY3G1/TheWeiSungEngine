@@ -21,6 +21,7 @@ struct RigidBodyData {
 };
 class RigidBody2D : public Component {
 public:
+	RigidBody2D();
 	RigidBody2D(std::weak_ptr<GameObject> gameObject);
 	~RigidBody2D();
 	const ComponentType Type() const override { return COMPONENT_RIGID_BODY_2D; }
@@ -34,6 +35,7 @@ public:
 	Vector2 GetPosition();
 	void SetPosition(const Vector2 & newPosition);
 	void SetRotation(const float & angle);
+	void SetEnabled(const bool & enabled) override;
 	Vector2 GetForward();
 	Vector2 GetRight();
 	float GetRotation();
@@ -42,9 +44,27 @@ public:
 	Vector2 GetVelocity();
 	void SetVelocity(const Vector2 & newVelocity);
 	float GetSpeed();
-	void Init(const b2BodyType & type = b2BodyType::b2_kinematicBody, const float & angularDampening = 0.05f, const float & linearDampening = 1.0f);
+	void Init(const b2BodyType & type = b2BodyType::b2_kinematicBody, const bool & isBullet = false, const float & angularDampening = 0.05f, const float & linearDampening = 1.0f);
 	b2Body * GetBody();
 	b2BodyDef * GetBodyDef();
+	const std::string GetName() const override { return "RigidBody2D"; }
+
+
+	template <class Archive>
+	void load(Archive & ar) {
+
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Component::save(ar);
+		Vector2 linearVelocity = TypeConversion::ConvertToVector2(body->GetLinearVelocity());
+		float angularVelocity = body->GetAngularVelocity();
+		ar(cereal::make_nvp("LinearDampening", body->GetAngularDamping()),
+		   cereal::make_nvp("AngularDampening", body->GetAngularDamping()),
+		   cereal::make_nvp("LinearVelocity", linearVelocity),
+		   cereal::make_nvp("AngularVelocity", angularVelocity));
+	}
 private:
 	friend class PhysicsSystem;
 	friend class Collider;

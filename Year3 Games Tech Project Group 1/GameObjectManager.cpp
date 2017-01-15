@@ -1,7 +1,12 @@
 #include "GameObjectManager.h"
 #include "Scene.h"
-GameObjectManager::GameObjectManager(std::weak_ptr<Scene> owner) :scene(owner) {
+GameObjectManager::GameObjectManager() {
 
+}
+
+GameObjectManager & GameObjectManager::GetInstance() {
+	static GameObjectManager instance;
+	return instance;
 }
 
 GameObjectManager::~GameObjectManager() {
@@ -10,13 +15,14 @@ GameObjectManager::~GameObjectManager() {
 
 
 std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string & name) {
+	this->gameObjects;
 	unsigned int id;
 	if(!freeIDs.empty()) {
 		id = freeIDs.back();
 		freeIDs.pop_back();
 	}
 	else id = nextID++;
-	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(GetWeak(), id, name);
+	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(id, name);
 	gameObjects.push_back(g);
 	return g;
 }
@@ -55,6 +61,3 @@ void GameObjectManager::DeleteGameObject(const unsigned int & id) {
 	if(it != gameObjects.end()) gameObjects.erase(it);
 }
 
-std::weak_ptr<Scene> GameObjectManager::GetScene() {
-	return scene;
-}

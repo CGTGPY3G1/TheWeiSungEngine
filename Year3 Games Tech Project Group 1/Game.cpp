@@ -26,7 +26,7 @@ void Game::Start() {
 
 void Game::Update(const float & deltaTime) {
 	if(running && !gameOver) {
-		if(activeScene >= 0 && activeScene < scenes.size()) {
+		if(activeScene >= 0 && activeScene < (int)scenes.size()) {
 			float fixedDelta = Engine::GetInstance().GetTimer().lock()->GetFixedDeltaTime();
 			accumulator += deltaTime;
 			while(accumulator >= fixedDelta) {

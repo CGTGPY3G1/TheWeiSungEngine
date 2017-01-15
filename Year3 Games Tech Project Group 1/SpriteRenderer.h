@@ -28,8 +28,8 @@ public:
 	void SetPivot(PivotPoint pivot);
 	void SetPivotManually(const float & x, const float & y);
 	void SetPivotManually(const Vector2 & pivotPoint);
-	void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	void Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	//void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	//void Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	
 	void Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
@@ -42,12 +42,30 @@ public:
 	sf::Shader * GetShader();
 	void SetShader(const std::string & frag, const std::string & vert);
 	void SetShader(std::shared_ptr<sf::Shader> shader);
+	const std::string GetName() const override { return "SpriteRenderer"; }
+
+	template <class Archive>
+	void load(Archive & ar) {
+
+	}
+
+	template <class Archive>
+	void save(Archive & ar) const {
+		Component::save(ar);
+		ar(cereal::make_nvp("PathToTexture", path),
+		   cereal::make_nvp("FragShader", fragName),
+		   cereal::make_nvp("VertShader", vertName),
+		   cereal::make_nvp("Pivot", pivot),
+		   cereal::make_nvp("RenderLayer", sortLayer),
+		   cereal::make_nvp("SortOrder", sortOrder));
+	}
 private:
 	WSSprite sprite;
 	std::shared_ptr<sf::Shader> shader;
 	int sortOrder;
 	RenderLayer sortLayer;
 	PivotPoint pivot = PivotPoint::TopLeft;
+	std::string path, fragName, vertName;
 };
 
 #endif // !WS_SPRITE_RENDERER_H
