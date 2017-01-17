@@ -10,9 +10,9 @@ class AssetManager {
 public:
 	static AssetManager & GetInstance();
 	~AssetManager();
-	void LoadTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = false, const bool & setSRGB = false);
-	sf::Texture & GetTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = false, const bool & setSRGB = false);
+	sf::Texture & GetTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 protected:
+	void LoadTexture(const std::string & filename, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 	std::map<std::string, sf::Texture> textures;
 	AssetManager();
 };

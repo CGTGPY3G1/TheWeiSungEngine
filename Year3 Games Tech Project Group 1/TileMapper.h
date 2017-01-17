@@ -38,7 +38,7 @@ public:
 	bool IsValid();
 	void Draw();
 private:
-
+	Vector2 GetBuildingScale(const unsigned int & buildingType, const float & width, const float & height);
 	std::shared_ptr<TmxMap> map;
 	std::vector<std::vector<Tile>> tiles;
 	std::weak_ptr<Transform2D> myTransform;

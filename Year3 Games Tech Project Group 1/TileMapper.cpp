@@ -69,8 +69,10 @@ void TileMapper::ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
 		
 		const unsigned int noOfProperties = object->properties.size();
-		Vector2 position = Vector2((object->x - halfWidth)* scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
-		std::shared_ptr<GameObject> newBuilding = GameObjectFactory::CreateBuilding(object->type, position, scale, object->rotation).lock();
+		const Vector2 objectScale = GetBuildingScale(object->type, object->width, object->height);
+		const Vector2 adjustedScale = Vector2(scale.x * objectScale.x, scale.y * objectScale.y);
+		Vector2 position = Vector2((object->x - halfWidth) * scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
+		std::shared_ptr<GameObject> newBuilding = GameObjectFactory::CreateBuilding(object->type, position, adjustedScale, object->rotation).lock();
 	}
 }
 
@@ -87,16 +89,16 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 
 		if(ax == 0) tiles.push_back(std::vector<Tile>());
 
-		sf::IntRect rect = sf::IntRect((x*tileset->tileWidth), (y*tileset->tileHeight), tileset->tileWidth, tileset->tileHeight);
+		sf::IntRect rect = sf::IntRect((x*(tileset->tileWidth+2) + 1), (y*(tileset->tileHeight+2) + 1), tileset->tileWidth, tileset->tileHeight);
 		sf::Sprite sprite(texture, rect);
 		sf::Vector2f position = sf::Vector2f(std::round(-halfWidth + (ax * tileset->tileWidth)), std::round(-halfHeight + (ay * tileset->tileWidth)));
 		sprite.setPosition(std::round(-halfWidth + (ax * tileset->tileWidth)), std::round(-halfHeight + (ay * tileset->tileWidth)));
 		
 		Tile toAdd;
 		toAdd.verts.push_back(sf::Vertex(position, sf::Vector2f((float)rect.left, (float)rect.top)));
-		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x, position.y + tileset->tileHeight), sf::Vector2f((float)rect.left, (float)(rect.top + rect.height))));
-		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x + tileset->tileWidth, position.y + tileset->tileHeight), sf::Vector2f((float)(rect.left + rect.width), (float)(rect.top + rect.height))));
 		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x + tileset->tileWidth, position.y), sf::Vector2f((float)(rect.left + rect.width), (float)rect.top)));
+		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x + tileset->tileWidth, position.y + tileset->tileHeight), sf::Vector2f((float)(rect.left + rect.width), (float)(rect.top + rect.height))));
+		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x, position.y + tileset->tileHeight), sf::Vector2f((float)rect.left, (float)(rect.top + rect.height))));
 		toAdd.sprite = sprite;
 		toAdd.id = layer->data[i];
 		tiles[ay].push_back(toAdd);
@@ -171,16 +173,16 @@ void TileMapper::Draw() {
 				for(unsigned int j = minX; j <= ((unsigned int)right >= tiles[i].size() ? tiles[i].size() - 1 : right); j++, xCount++) {
 					Tile tile = tiles[i][j];
 					// Don't use vertex array
-					//graphics->Draw(tile.sprite, rs);
+					graphics->Draw(tile.sprite, rs);
 
-					// Use Vertex array
-					if(first) {
-						rs.texture = tile.sprite.getTexture();
-						first = false;
-					}
-					for(size_t i = 0; i < tile.verts.size(); i++) {
-						vertexArray.append(tile.verts[i]);
-					}
+					//// Use Vertex array
+					//if(first) {
+					//	rs.texture = tile.sprite.getTexture();
+					//	first = false;
+					//}
+					//for(size_t i = 0; i < tile.verts.size(); i++) {
+					//	vertexArray.append(tile.verts[i]);
+					//}
 					/*const sf::Vector2f position = tile.sprite.getPosition();
 					const sf::FloatRect f = tile.sprite.getGlobalBounds();
 					const sf::IntRect texRect = tile.sprite.getTextureRect();
@@ -195,5 +197,35 @@ void TileMapper::Draw() {
 			graphics->Draw(vertexArray, rs);
 		}
 	}
+}
+
+Vector2 TileMapper::GetBuildingScale(const unsigned int & buildingType, const float & width, const float & height) {
+	switch(buildingType) {
+	case 1:
+		return Vector2(width / 64.0f, height / 64.0f);
+	case 2:
+		return Vector2(width / 192.0f, height / 160.0f);
+	case 3:
+		return Vector2(width / 192.0f, height / 224.0f);
+	case 4:
+		return Vector2(width / 128.0f, height / 96.0f);
+	case 5:
+		return Vector2(width / 224.0f, height / 288.0f);
+	case 6:
+		return Vector2(width / 128.0f, height / 224.0f);
+	case 7:
+		return Vector2(width / 256.0f, height / 128.0f);
+	case 8:
+		return Vector2(width / 160.0f, height / 96.0f);
+	case 9:
+		return Vector2(width / 256.0f, height / 96.0f);
+	case 10:
+		return Vector2(width / 96.0f, height / 64.0f);
+	case 11:
+		return Vector2(width / 96.0f, height / 96.0f);
+	default:
+		break;
+	}
+	return Vector2();
 }
 

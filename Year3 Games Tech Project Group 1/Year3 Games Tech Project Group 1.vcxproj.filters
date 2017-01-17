@@ -374,14 +374,14 @@
     <ClCompile Include="ParsedTMX.cpp">
       <Filter>Source Files\Engine\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="TileMapper.cpp">
-      <Filter>Source Files\Engine\Parser</Filter>
-    </ClCompile>
     <ClCompile Include="XMLDocument.cpp">
       <Filter>Source Files\Engine\Parser</Filter>
     </ClCompile>
     <ClCompile Include="VehicleController.cpp">
       <Filter>Source Files\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMapper.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
