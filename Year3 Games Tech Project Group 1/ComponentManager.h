@@ -20,6 +20,8 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> void RemoveComponent(const unsigned int & id);
+	
 	std::vector<std::shared_ptr<ScriptableComponent>> GetScriptableComponents();
 	void Start();
 	void Update();
@@ -130,5 +132,25 @@ bool ComponentManager::ComponentExistsInParents() {
 		parent = parent->GetParent().lock();
 	}
 	return found;
+}
+template<typename T>
+inline void ComponentManager::RemoveComponent(const unsigned int & id) {
+	ComponentType type = TypeInfo::GetTypeID<T>();
+	if(TypeInfo::IsScriptable<T>()) {
+		for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+			if(type == (*i)->Type() && id == (*i)->GetCompID()) {
+				scriptableComponents.erase(i);
+				break;
+			};
+		}
+	}
+	else {
+		for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+			if(type == (*i)->Type() && id == (*i)->GetCompID()) {
+				components.erase(i);
+				break;
+			};
+		}
+	}
 }
 #endif // !WS_COMPONENT_MANAGER_H

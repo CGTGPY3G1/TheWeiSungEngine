@@ -223,9 +223,18 @@ Vector2 TileMapper::GetBuildingScale(const unsigned int & buildingType, const fl
 		return Vector2(width / 96.0f, height / 64.0f);
 	case 11:
 		return Vector2(width / 96.0f, height / 96.0f);
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+		return Vector2(width / 160.0f, height / 64.0f);
+	case 16:
+	case 17:
+	case 18:
+		return Vector2(width / 128.0f, height / 352.0f);
 	default:
 		break;
 	}
-	return Vector2();
+	return Vector2::One;
 }
 

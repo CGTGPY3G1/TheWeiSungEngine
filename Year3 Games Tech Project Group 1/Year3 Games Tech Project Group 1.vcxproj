@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="BulletScript.h" />
     <ClInclude Include="CameraFollowScript.h" />
     <ClInclude Include="CerealTypeRegistration.h" />
     <ClInclude Include="CharacterMovementScript.h" />
@@ -166,9 +167,7 @@
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
     <ClInclude Include="Random.h" />
-    <ClInclude Include="TMXPrinter.h" />
     <ClInclude Include="VehicleController.h" />
-    <ClInclude Include="XMLDocument.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RevoluteJoint.h" />
@@ -219,6 +218,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
+    <ClCompile Include="BulletScript.cpp" />
     <ClCompile Include="CameraFollowScript.cpp" />
     <ClCompile Include="CharacterMovementScript.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
@@ -246,7 +246,6 @@
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />
-    <ClCompile Include="XMLDocument.cpp" />
     <ClCompile Include="RevoluteJoint.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />

@@ -20,8 +20,9 @@ void VehicleController::FixedUpdate(const float & fixedDeltaTime) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
 		Vector2 lateralImpulse = GetLateralVelocity(rb);
-		rb->AddForce(-lateralImpulse * 0.2f, ForceType::IMPULSE_FORCE);
-		rb->AddTorque(0.2f * rb->GetInertia() * -rb->GetAngularVelocity(), ForceType::IMPULSE_FORCE);
+		const float dampeningForce = 0.25f;
+		rb->AddForce(-lateralImpulse * dampeningForce, ForceType::IMPULSE_FORCE);
+		rb->AddTorque(dampeningForce * rb->GetInertia() * -rb->GetAngularVelocity(), ForceType::IMPULSE_FORCE);
 	}
 	else {
 		rigidbody = GetComponent<RigidBody2D>();

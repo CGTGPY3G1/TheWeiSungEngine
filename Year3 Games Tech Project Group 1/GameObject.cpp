@@ -135,6 +135,19 @@ const bool GameObject::CollidesWith(const int & collisionMask) {
 }
 
 void GameObject::Destroy() {
+	std::shared_ptr<Transform2D> t = componentManager.GetComponent<Transform2D>().lock();
+	if(t) {
+		std::vector<std::weak_ptr<GameObject>> children;
+		unsigned int childCount = t->GetChildCount();
+		for(size_t i = 0; i < childCount; i++) {
+			std::shared_ptr<Transform2D> child = t->GetChild(i).lock();
+			if(child) children.push_back(child->GetGameObject());
+		}
+		for(std::vector<std::weak_ptr<GameObject>>::iterator it = children.begin(); it != children.end(); ++it) {
+			std::shared_ptr<GameObject> g = (*it).lock();
+			if(g) g->Destroy();
+		}
+	}
 	GameObjectManager::GetInstance().DeleteGameObject(objectID);
 }
 

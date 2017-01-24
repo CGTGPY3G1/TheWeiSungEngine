@@ -44,7 +44,7 @@ public:
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();
 	virtual void Init(const Vector2 & position, const float & rotation = 0.0f, const Vector2 & scale = Vector2(1.0f, 1.0f));
-
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> void RemoveComponent(const unsigned int & id);
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
@@ -120,5 +120,9 @@ bool GameObject::HasComponent() {
 	if(componentMask == 0) return false;
 	unsigned int component = TypeInfo::GetTypeID<T>();
 	return (componentMask & component) == component;
+}
+template<typename T>
+inline void GameObject::RemoveComponent(const unsigned int & id) {
+	componentManager.RemoveComponent<T>(id);
 }
 #endif // !WS_GAMEOBJECT_H

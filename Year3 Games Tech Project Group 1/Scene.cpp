@@ -26,6 +26,7 @@ void Scene::Reset() {
 
 void Scene::FixedUpdate(const float & fixedDeltaTime) {
 	PhysicsSystem::GetInstance().Update(fixedDeltaTime);
+	SyncPhysics();
 	scriptManagementSystem->FixedUpdate(fixedDeltaTime);
 }
 
@@ -51,6 +52,10 @@ void Scene::Render() {
 	}
 	if(drawColliders) PhysicsSystem::GetInstance().Draw();
 	scriptManagementSystem->LateUpdate();
+}
+
+void Scene::FinaliseFrame() {
+	GameObjectManager::GetInstance().RemoveDeleted();
 }
 
 void Scene::End() {

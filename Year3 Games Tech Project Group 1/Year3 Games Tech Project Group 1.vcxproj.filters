@@ -67,6 +67,9 @@
     <Filter Include="Source Files\Engine\Parser">
       <UniqueIdentifier>{a01cfe20-b4e9-4e9d-8c62-f8e061b7d22f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine\Components\Scripted">
+      <UniqueIdentifier>{be9d8775-f854-4d91-b137-efddf8413482}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h">
@@ -216,13 +219,7 @@
     <ClInclude Include="FileManager.h">
       <Filter>Header Files\Engine\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="XMLDocument.h">
-      <Filter>Header Files\Engine\Parser</Filter>
-    </ClInclude>
     <ClInclude Include="ParsedTMX.h">
-      <Filter>Header Files\Engine\Parser</Filter>
-    </ClInclude>
-    <ClInclude Include="TMXPrinter.h">
       <Filter>Header Files\Engine\Parser</Filter>
     </ClInclude>
     <ClInclude Include="GameObjectFactory.h">
@@ -242,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="CerealTypeRegistration.h">
       <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="BulletScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -350,20 +350,11 @@
     <ClCompile Include="RevoluteJoint.cpp">
       <Filter>Source Files\Engine\Components</Filter>
     </ClCompile>
-    <ClCompile Include="CharacterMovementScript.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraFollowScript.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
-    </ClCompile>
     <ClCompile Include="ScriptManagementSystem.cpp">
       <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Random.cpp">
       <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="CivWaypointScript.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Debug.cpp">
       <Filter>Source Files\Engine\Core</Filter>
@@ -374,14 +365,23 @@
     <ClCompile Include="ParsedTMX.cpp">
       <Filter>Source Files\Engine\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="XMLDocument.cpp">
-      <Filter>Source Files\Engine\Parser</Filter>
-    </ClCompile>
-    <ClCompile Include="VehicleController.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
-    </ClCompile>
     <ClCompile Include="TileMapper.cpp">
       <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="BulletScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraFollowScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="CharacterMovementScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="CivWaypointScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="VehicleController.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

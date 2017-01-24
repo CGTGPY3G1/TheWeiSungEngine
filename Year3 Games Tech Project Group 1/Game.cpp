@@ -33,9 +33,10 @@ void Game::Update(const float & deltaTime) {
 				scenes[activeScene]->FixedUpdate(fixedDelta);
 				accumulator -= fixedDelta;
 			}
-			scenes[activeScene]->SyncPhysics();
+			
 			scenes[activeScene]->Update(deltaTime);
 			scenes[activeScene]->Render();
+			scenes[activeScene]->FinaliseFrame();
 		}
 		else Engine::GetInstance().GetGraphics().lock()->Draw("No Scene Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
 	}

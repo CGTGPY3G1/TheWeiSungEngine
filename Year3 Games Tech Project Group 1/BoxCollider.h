@@ -16,7 +16,6 @@ public:
 	void SetOffset(const Vector2 & newOffset) override;
 	b2PolygonShape* shape;
 	const std::string GetName() const override { return "BoxCollider"; }
-
 	template <class Archive>
 	void load(Archive & ar) {
 		ar(cereal::make_nvp("Offset", offset),

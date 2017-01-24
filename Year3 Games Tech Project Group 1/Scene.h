@@ -17,6 +17,7 @@ public:
 	void SyncPhysics();
 	virtual void Update(const float & deltaTime);
 	virtual void Render();
+	virtual void FinaliseFrame();
 	virtual void End();
 	void HandleMessage(const Message & message);
 	unsigned int GetID() { return sceneID; }

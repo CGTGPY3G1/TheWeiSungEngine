@@ -7,10 +7,9 @@
 #include <string>
 #include "Message.h"
 #include "Vector2.h"
-#include <bitset>
-#include <type_traits>
 #include <cereal\types\polymorphic.hpp>
 #include <cereal/types/base_class.hpp>
+
 enum ComponentType : unsigned int {
 	COMPONENT_NULL = 0,
 	COMPONENT_TRANSFORM_2D = 1 << 0,
@@ -25,7 +24,8 @@ enum ComponentType : unsigned int {
 	COMPONENT_CAMERA_FOLLOW = 1 << 9,
 	COMPONENT_CIV_WAYPOINT = 1 << 10,
 	COMPONENT_TILE_MAPPER = 1 << 11,
-	COMPONENT_VEHICLE_CONTROLLER = 1 << 11
+	COMPONENT_VEHICLE_CONTROLLER = 1 << 11,
+	BULLET_SCRIPT = 1 << 12
 };
 
 #define NUMBER_OF_COMPONENTS = 6
@@ -59,6 +59,7 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
+	
 	virtual void Start();
 	virtual void End();
 	virtual void OnEnable();
@@ -121,6 +122,9 @@ template<typename T> std::vector<std::weak_ptr<T>> Component::GetComponents() {
 template<typename T>
 bool Component::ComponentExistsInParents() {
 	return gameObject.lock()->ComponentExistsInParents<T>();
+}
+template<typename T>
+inline void Component::RemoveComponent(const unsigned int & id) {
 }
 #endif // !WS_COMPONENT_H
 

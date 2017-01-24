@@ -9,7 +9,7 @@ RigidBody2D::RigidBody2D(std::weak_ptr<GameObject> gameObject) : Component(gameO
 }
 
 RigidBody2D::~RigidBody2D() {
-
+	
 }
 
 void RigidBody2D::AddForce(const Vector2 & force, const ForceType & forceType) {
@@ -146,4 +146,9 @@ b2Body * RigidBody2D::GetBody() {
 
 b2BodyDef * RigidBody2D::GetBodyDef() {
 	return bodyDef;
+}
+
+void RigidBody2D::Destroy() {
+	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY, body);
+	gameObject.lock()->HandleMessage(m);
 }

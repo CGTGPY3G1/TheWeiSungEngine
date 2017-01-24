@@ -19,11 +19,15 @@ public:
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithComponent(const unsigned int & componentMask);
 	void DeleteGameObject(const unsigned int & id);
 protected:
+	friend class Scene;
 	GameObjectManager();
 	std::weak_ptr<Scene> scene;
 	unsigned int nextID = 0;
 	std::vector<unsigned int> freeIDs = std::vector<unsigned int>();
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
+	void RemoveDeleted();
+	std::vector<std::shared_ptr<GameObject>> toDelete;
+
 };
 
 struct SortAscending {

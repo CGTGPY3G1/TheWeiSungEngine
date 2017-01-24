@@ -20,6 +20,7 @@ public:
 	template<> const static ComponentType GetTypeID<CivWaypointScript>() { return COMPONENT_CIV_WAYPOINT; }
 	template<> const static ComponentType GetTypeID<TileMapper>() { return COMPONENT_TILE_MAPPER; }
 	template<> const static ComponentType GetTypeID<VehicleController>() { return COMPONENT_VEHICLE_CONTROLLER; }
+	template<> const static ComponentType GetTypeID<BulletScript>() { return BULLET_SCRIPT; }
 
 	template <typename T> const static bool AllowMultiple() { return false; };
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
@@ -35,6 +36,7 @@ public:
 	template<> const static bool IsScriptable<CameraFollowScript>() { return true; }
 	template<> const static bool IsScriptable<CivWaypointScript>() { return true; }
 	template<> const static bool IsScriptable<VehicleController>() { return true; }
+	template<> const static bool IsScriptable<BulletScript>() { return true; }
 
 	template <typename T> const static bool IsCollider() { return false; };
 	template<> const static bool IsCollider<BoxCollider>() { return true; }

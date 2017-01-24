@@ -4,6 +4,10 @@ GameObjectManager::GameObjectManager() {
 
 }
 
+void GameObjectManager::RemoveDeleted() {
+	toDelete.clear();
+}
+
 GameObjectManager & GameObjectManager::GetInstance() {
 	static GameObjectManager instance;
 	return instance;
@@ -58,6 +62,9 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::GetGameObjectsWithCo
 
 void GameObjectManager::DeleteGameObject(const unsigned int & id) {
 	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasGameObjectID(id));
-	if(it != gameObjects.end()) gameObjects.erase(it);
+	if(it != gameObjects.end()) {
+		toDelete.push_back(*it);
+		gameObjects.erase(it);
+	}
 }
 

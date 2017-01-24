@@ -16,4 +16,5 @@
 #include "CivWaypointScript.h"
 #include "TileMapper.h"
 #include "VehicleController.h"
+#include "BulletScript.h"
 #endif !WS_COMPENENT_HEADERS_H

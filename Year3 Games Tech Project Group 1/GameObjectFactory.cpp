@@ -28,7 +28,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 
 std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & buildingNumber, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	if(buildingNumber < 1 || buildingNumber > 11) return std::weak_ptr<GameObject>();
+	if(buildingNumber < 1 || buildingNumber > 18) return std::weak_ptr<GameObject>();
 	std::shared_ptr<GameObject> building = gameObjectManager.CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
@@ -91,8 +91,51 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * scale.x * 1.2f, -gridSize * scale.y * 1.2f), Vector2(18.0f, 18.0f));
 		sprite->SetTextureRect((int)std::roundl(gridSize * 8), (int)std::roundl(gridSize * 10), (int)std::roundl(gridSize * 3), (int)std::roundl(gridSize * 3));
 		break;
+	case 12:
+		building->AddComponent<PolygonCollider>().lock()->Init(Vector2(), {Vector2(gridSize * -2.5f, gridSize), Vector2(gridSize * 1.9f, gridSize), Vector2(gridSize * 1.9f, -gridSize), Vector2(gridSize * -2.5f, -gridSize)});
+		sprite->SetTextureRect(0, (int)std::roundl(gridSize * 11), (int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 2));
+		break;
+	case 13:
+		building->AddComponent<PolygonCollider>().lock()->Init(Vector2(), {Vector2(gridSize * -2.5f, gridSize), Vector2(gridSize * 1.9f, gridSize), Vector2(gridSize * 1.9f, -gridSize), Vector2(gridSize * -2.5f, -gridSize)});
+		sprite->SetTextureRect(0, (int)std::roundl(gridSize * 13), (int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 2));
+		break;
+	case 14:
+		building->AddComponent<PolygonCollider>().lock()->Init(Vector2(), {Vector2(gridSize * -2.5f, gridSize), Vector2(gridSize * 1.9f, gridSize), Vector2(gridSize * 1.9f, -gridSize), Vector2(gridSize * -2.5f, -gridSize)});
+		sprite->SetTextureRect((int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 13), (int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 2));
+		break;
+	case 15:
+		building->AddComponent<PolygonCollider>().lock()->Init(Vector2(), {Vector2(gridSize * -2.5f, gridSize), Vector2(gridSize * 1.9f, gridSize), Vector2(gridSize * 1.9f, -gridSize), Vector2(gridSize * -2.5f, -gridSize)});
+		sprite->SetTextureRect((int)std::roundl(gridSize * 10), (int)std::roundl(gridSize * 13), (int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 2));
+		break;
+	case 16:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4.0f, gridSize * 11.0f));
+		sprite->SetTextureRect((int)std::roundl(gridSize * 25), 0, (int)std::roundl(gridSize * 4), (int)std::roundl(gridSize * 11));
+	case 17:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4.0f, gridSize * 11.0f));
+		sprite->SetTextureRect((int)std::roundl(gridSize * 29), 0, (int)std::roundl(gridSize * 4), (int)std::roundl(gridSize * 11));
+	case 18:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4.0f, gridSize * 11.0f));
+		sprite->SetTextureRect((int)std::roundl(gridSize * 33), 0, (int)std::roundl(gridSize * 4), (int)std::roundl(gridSize * 11));
+		break;
 	default:
 		break;
 	}
 	return building;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag) {
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> bullet = gameObjectManager.CreateGameObject("Bullet").lock();
+	bullet->Init(position, rotation, scale);
+	bullet->SetTag(tag);
+	std::shared_ptr<RigidBody2D> rb = bullet->AddComponent<RigidBody2D>().lock();
+	rb->Init(b2_dynamicBody, true, 0.0f, 0.005f);
+	rb->SetVelocity(bullet->GetComponent<Transform2D>().lock()->GetForward() * speed);
+	std::shared_ptr<BoxCollider> bc = bullet->AddComponent<BoxCollider>().lock();
+	bc->Init(Vector2(), Vector2(6.0f, 2.0f), false, 1000.0f);
+	std::shared_ptr<SpriteRenderer> sprite = bullet->AddComponent<SpriteRenderer>().lock();
+	sprite->Init("Images/Bullet.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, 0);
+	std::shared_ptr<BulletScript> bs = bullet->AddComponent<BulletScript>().lock();
+	bs->Start();
+	return bullet;
 }

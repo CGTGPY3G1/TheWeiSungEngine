@@ -48,7 +48,7 @@ public:
 	b2Body * GetBody();
 	b2BodyDef * GetBodyDef();
 	const std::string GetName() const override { return "RigidBody2D"; }
-
+	void Destroy() override;
 
 	template <class Archive>
 	void load(Archive & ar) {
@@ -68,6 +68,7 @@ public:
 private:
 	friend class PhysicsSystem;
 	friend class Collider;
+	friend class BulletScript;
 	b2Body * body;
 	b2BodyDef * bodyDef;
 	b2MassData * massData;

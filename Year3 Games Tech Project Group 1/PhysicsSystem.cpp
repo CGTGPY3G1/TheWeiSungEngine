@@ -48,9 +48,14 @@ void PhysicsSystem::UpdateBodies() {
 			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
 			if(rb) {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
-				std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
-				t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
-				t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
+				if(r) {
+					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
+					t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
+					t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
+				}
+				else {
+					std::cout << "b2dError: Missing RigidBody";
+				}
 			}
 		}
 		else if(b->GetType() == b2BodyType::b2_kinematicBody || b->GetType() == b2BodyType::b2_staticBody) {
@@ -98,87 +103,97 @@ void PhysicsSystem::SetGravity(const float & x, const float & y) {
 void PhysicsSystem::BeginContact(b2Contact* contact) {
 	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();	
 	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
-	ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
-	ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
-	if(colliderData1 && colliderData2) {
-		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
-		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
-		RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
-		RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
-		std::weak_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
-		std::weak_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
-		std::weak_ptr<GameObject> gameObject1 = rigidBody1.lock()->GetGameObject();
-		std::weak_ptr<GameObject> gameObject2 = rigidBody2.lock()->GetGameObject();
-		if(fixture2->IsSensor() || fixture1->IsSensor()) {
-			gameObject1.lock()->OnSensorEnter(collider2);
-			gameObject2.lock()->OnSensorEnter(collider1);
+	if(body1 && body2) {
+		ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
+		ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
+		if(colliderData1 && colliderData2) {
+			std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
+			std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
+			RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
+			RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
+			std::shared_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
+			std::shared_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
+			if(rigidBody1 && rigidBody2) {
+				std::weak_ptr<GameObject> gameObject1 = rigidBody1->GetGameObject();
+				std::weak_ptr<GameObject> gameObject2 = rigidBody2->GetGameObject();
+				if(fixture2->IsSensor() || fixture1->IsSensor()) {
+					gameObject1.lock()->OnSensorEnter(collider2);
+					gameObject2.lock()->OnSensorEnter(collider1);
+				}
+				else {
+					b2WorldManifold worldManifold;
+					contact->GetWorldManifold(&worldManifold);
+					Vector2 impactVelocity = rigidBody2->GetVelocity();
+					impactVelocity -= rigidBody1->GetVelocity();
+					b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
+					b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
+					Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
+					const size_t cps = 2;
+					ContactPoint contactPoints[2];
+					for(size_t i = 0; i < cps; i++) {
+						contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
+						contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
+					}
+					{
+						CollisionData collisionData = CollisionData(gameObject2, collider2, normal, impactVelocity);
+						for(size_t i = 0; i < cps; i++) {
+							collisionData.contactPoints[i] = contactPoints[i];
+						}
+						gameObject1.lock()->OnCollisionEnter(collisionData);
+					}
+					{
+						CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -impactVelocity);
+						for(size_t i = 0; i < cps; i++) {
+							collisionData.contactPoints[i] = contactPoints[i];
+						}
+						gameObject2.lock()->OnCollisionEnter(collisionData);
+					}
+				}
+			}
 		}
-		else {
-			b2WorldManifold worldManifold;
-			contact->GetWorldManifold(&worldManifold);
-			Vector2 impactVelocity = rigidBody2.lock()->GetVelocity();
-			impactVelocity -= rigidBody1.lock()->GetVelocity();
-			b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
-			b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
-			Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
-			const size_t cps = 2;
-			ContactPoint contactPoints[2];
-			for(size_t i = 0; i < cps; i++) {
-				contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
-				contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
-			}
-			{
-				CollisionData collisionData = CollisionData(gameObject2, collider2, normal, impactVelocity);
-				for(size_t i = 0; i < cps; i++) {
-					collisionData.contactPoints[i] = contactPoints[i];
-				}
-				gameObject1.lock()->OnCollisionEnter(collisionData);
-			}
-			{
-				CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -impactVelocity);
-				for(size_t i = 0; i < cps; i++) {
-					collisionData.contactPoints[i] = contactPoints[i];
-				}
-				gameObject2.lock()->OnCollisionEnter(collisionData);
-			}
-		}	
 	}
+	
 }
 
 void PhysicsSystem::EndContact(b2Contact* contact) {
 	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
 	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
-	ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
-	ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
-	if(colliderData1 && colliderData2) {
-		std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
-		std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
-		RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
-		RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
-		std::weak_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
-		std::weak_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
-		std::weak_ptr<GameObject> gameObject1 = rigidBody1.lock()->GetGameObject();
-		std::weak_ptr<GameObject> gameObject2 = rigidBody2.lock()->GetGameObject();
-		if(fixture1->IsSensor() || fixture2->IsSensor()) {
-			gameObject1.lock()->OnSensorExit(collider2);
-			gameObject2.lock()->OnSensorExit(collider1);
-		}
-		else {
-			b2WorldManifold worldManifold;
-			contact->GetWorldManifold(&worldManifold);
-			Vector2 impactVelocity = rigidBody2.lock()->GetVelocity();
-			impactVelocity -= rigidBody1.lock()->GetVelocity();
-			Vector2 normal = Vector2::Up;
-			{
-				CollisionData collisionData(gameObject2, collider2, normal, impactVelocity);
-				gameObject1.lock()->OnCollisionExit(collisionData);
+	if(body1 && body2) {
+		ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
+		ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
+		if(colliderData1 && colliderData2) {
+			std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
+			std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
+			RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
+			RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
+			std::shared_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
+			std::shared_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
+			if(rigidBody1 && rigidBody2) {
+				std::weak_ptr<GameObject> gameObject1 = rigidBody1->GetGameObject();
+				std::weak_ptr<GameObject> gameObject2 = rigidBody2->GetGameObject();
+				if(!gameObject1.expired() && !gameObject2.expired()) {
+					if(fixture1->IsSensor() || fixture2->IsSensor()) {
+						if(fixture1->IsSensor() && !collider2.expired()) gameObject1.lock()->OnSensorExit(collider2);
+						if(fixture1->IsSensor() && !collider1.expired()) gameObject2.lock()->OnSensorExit(collider1);
+					}
+					else {
+						b2WorldManifold worldManifold;
+						contact->GetWorldManifold(&worldManifold);
+						Vector2 impactVelocity = rigidBody2->GetVelocity();
+						impactVelocity -= rigidBody1->GetVelocity();
+						Vector2 normal = Vector2::Up;
+						if(!gameObject1.expired()) {
+							CollisionData collisionData(gameObject2, collider2, normal, impactVelocity);
+							gameObject1.lock()->OnCollisionExit(collisionData);
+						}
+						if(!gameObject2.expired()) {
+							CollisionData collisionData(gameObject1, collider1, -normal, -impactVelocity);
+							gameObject2.lock()->OnCollisionExit(collisionData);
+						}
+					}
+				}
 			}
-			{
-				CollisionData collisionData(gameObject1, collider1, -normal, -impactVelocity);
-				gameObject2.lock()->OnCollisionExit(collisionData);
-			}
 		}
-		
 	}
 }
 
@@ -202,9 +217,8 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 	}
 	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
 	{
-		RigidBodyData *data = (RigidBodyData*)message.data;
-		std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(data->data.lock());
-		world->DestroyBody(r->body);
+		b2Body *data = (b2Body*)message.data;
+		world->DestroyBody(data);
 		break;
 	}
 	case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:

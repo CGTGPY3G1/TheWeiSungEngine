@@ -4,7 +4,6 @@
 
 #include "Scene.h"
 #include "Vector2.h"
-#include "TMXPrinter.h"
 
 class GameObject;
 class TestScene : public Scene {
