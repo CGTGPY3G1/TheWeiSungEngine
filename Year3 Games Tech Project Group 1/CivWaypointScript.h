@@ -17,8 +17,8 @@ public:
 	Vector2 GetNextLocation(const Vector2 & currentLocation) {
 		int x = 0, y = 0;
 		float closestDistance = 1000000.0f;
-		for(size_t i = 0; i < 2; i++) {
-			for(size_t j = 0; j < 2; j++) {
+		for(int i = 0; i < 2; i++) {
+			for(int j = 0; j < 2; j++) {
 				float distance = (points[i][j] - currentLocation).Magnitude();
 				if(distance < closestDistance) {
 					x = i, y = j;
@@ -59,7 +59,7 @@ public:
 		ar(cereal::make_nvp("Target", target),
 		   cereal::make_nvp("RetargetTimer", retargetTimer));
 	}
-
+	int GetSortOrder() override;
 	template <class Archive>
 	void save(Archive & ar) const {
 		ScriptableComponent::save(ar);

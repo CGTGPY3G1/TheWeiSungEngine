@@ -25,7 +25,9 @@ enum ComponentType : unsigned int {
 	COMPONENT_CIV_WAYPOINT = 1 << 10,
 	COMPONENT_TILE_MAPPER = 1 << 11,
 	COMPONENT_VEHICLE_CONTROLLER = 1 << 11,
-	BULLET_SCRIPT = 1 << 12
+	COMPONENT_BULLET_SCRIPT = 1 << 12,
+	COMPONENT_PLAYER_SCRIPT = 1 << 13,
+	COMPONENT_AUDIO_SOURCE = 1 << 14
 };
 
 #define NUMBER_OF_COMPONENTS = 6
@@ -53,6 +55,7 @@ public:
 	unsigned int GetCompID();
 	unsigned int GetGameObjectID();
 	const virtual std::string GetName() const = 0;
+	std::string GetTag();
 	std::weak_ptr<GameObject> GetGameObject();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> AddComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();

@@ -17,7 +17,7 @@ public:
 	float GetZoom();
 	const std::string GetName() const override { return "CameraFollowScript"; }
 	void SetTarget(std::weak_ptr<RigidBody2D> target);
-
+	int GetSortOrder() override;
 	template <class Archive>
 	void load(Archive & ar) {
 		ar(cereal::make_nvp("ZoomLevel", zoomLevel));

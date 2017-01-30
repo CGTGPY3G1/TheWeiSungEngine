@@ -1,11 +1,12 @@
 #include "TileMapper.h"
-
+#include <queue>
+#include <map>
 #include "AssetManager.h"
 #include "Engine.h"
 #include "FileManager.h"
 #include "GameObjectFactory.h"
 #include <string>
-
+#include "PlayerScript.h"
 
 TileMapper::TileMapper() : Component() {
 
@@ -21,13 +22,43 @@ TileMapper::~TileMapper() {
 void TileMapper::Init(const std::string & fileName, const std::string & tilesetName) {
 	std::string tmx = FileManager::LoadTMX(fileName);
 	LoadTmxMap(tmx, tilesetName);
+}
 
+std::vector<std::pair<int, int>> TileMapper::GetPath(NavInfo * start, NavInfo * destination) {
+	std::priority_queue<NavInfo *, std::vector<NavInfo *>, std::greater<NavInfo *> > frontier;
+	frontier.push(start);
+	std::vector<std::pair<int, int>> cameFrom;
+	std::unordered_map<NavInfo *, int> currentCost;
+
+	while(!frontier.empty()) {
+		NavInfo* current = frontier.top();
+		frontier.pop();
+		if(current == destination) break;
+		for(std::vector<NavInfo *>::iterator i = current->neighbours.begin(); i != current->neighbours.end(); i++) {
+			NavInfo * next = (*i);
+			int newCost = currentCost[current] + (*i)->cost;
+
+			if(!currentCost.count(next) || newCost < currentCost[next]) {
+				currentCost[next] = newCost;
+				next->priority = newCost + TileMapper::GetHeuristic(next, destination);
+				frontier.push(next);
+				cameFrom.push_back(std::pair<int, int>(current->x, current->y));
+			}
+		}
+	}
+
+	return cameFrom;
+}
+
+int TileMapper::GetHeuristic(NavInfo * current, NavInfo * destination) {
+	int x1 = current->x, y1 = current->y, x2 = destination->x, y2 = destination->y;
+	return abs(x1 - x2) + abs(y1 - y2);
 }
 
 bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tilesetName) {
 
 	map = std::make_shared<TmxMap>(xml);
-
+	
 	if(map->isValid) {
 		bool foundSet = false;
 		std::shared_ptr<TmxTileset> tileset;
@@ -51,6 +82,8 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 			group->name;
 			if(group->name == "Buildings") ProcessTmxBuildingGroup(group);
 			else if(group->name == "Characters") ProcessCharacters(group);
+			else if(group->name == "Vehicles") ProcessVehicles(group);
+			
 		}
 	}
 	return map->isValid;
@@ -121,10 +154,28 @@ void TileMapper::ProcessCharacters(std::shared_ptr<TmxGroup> group) {
 			std::shared_ptr<GameObject> player = GameObjectFactory::CreateCharacter(object->name, object->type, position, Vector2::One, object->rotation).lock();
 			std::shared_ptr<CircleCollider> playerSensor = player->AddComponent<CircleCollider>().lock();
 			playerSensor->Init(Vector2(), 200.0f, true);
+			std::shared_ptr<PlayerScript> playerScript = player->AddComponent<PlayerScript>().lock();
+			playerScript->Start();
 		}
 		else {
 			GameObjectFactory::CreateCharacter(object->name, object->type, position, Vector2::One, object->rotation).lock();
 		}
+	}
+}
+
+void TileMapper::ProcessVehicles(std::shared_ptr<TmxGroup> group) {
+	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
+	Vector2 scale = transform->GetScale();
+	const float halfWidth = (float)((map->width - 1)* map->tileWidth) / 2;
+	const float halfHeight = (float)(map->height * map->tileHeight) / 2;
+	const unsigned int noOfObjects = group->objects.size();
+
+	for(size_t i = 0; i < noOfObjects; i++) {
+		std::shared_ptr<TmxObject> object = group->objects[i];
+
+		const unsigned int noOfProperties = object->properties.size();
+		Vector2 position = Vector2((object->x - halfWidth)* scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
+		GameObjectFactory::CreateVehicle(object->type, position, Vector2::One, object->rotation).lock();
 	}
 }
 
@@ -162,39 +213,42 @@ void TileMapper::Draw() {
 
 			vertexArray.setPrimitiveType(sf::Quads);
 			unsigned int arraySize = drawWidth * drawHeight * 4;
-			int spriteCount = 0, vertCount = 300;
-			vertexArray.resize(arraySize);
-			int xCount = 0, yCount = 0;
-			sf::RenderStates rs;
-			rs.transform = transform->GetWorldTransform();
-			bool first = true;
+			if(arraySize > 0 && arraySize < 10000000) {
+				int spriteCount = 0, vertCount = 300;
+				vertexArray.resize(arraySize);
+				int xCount = 0, yCount = 0;
+				sf::RenderStates rs;
+				rs.transform = transform->GetWorldTransform();
+				bool first = true;
 
-			for(unsigned int i = minY; i <= maxY; i++, yCount++) {
-				for(unsigned int j = minX; j <= ((unsigned int)right >= tiles[i].size() ? tiles[i].size() - 1 : right); j++, xCount++) {
-					Tile tile = tiles[i][j];
-					// Don't use vertex array
-					graphics->Draw(tile.sprite, rs);
+				for(unsigned int i = minY; i <= maxY; i++, yCount++) {
+					for(unsigned int j = minX; j <= ((unsigned int)right >= tiles[i].size() ? tiles[i].size() - 1 : right); j++, xCount++) {
+						Tile tile = tiles[i][j];
+						// Don't use vertex array
+						//graphics->Draw(tile.sprite, rs);
 
-					//// Use Vertex array
-					//if(first) {
-					//	rs.texture = tile.sprite.getTexture();
-					//	first = false;
-					//}
-					//for(size_t i = 0; i < tile.verts.size(); i++) {
-					//	vertexArray.append(tile.verts[i]);
-					//}
-					/*const sf::Vector2f position = tile.sprite.getPosition();
-					const sf::FloatRect f = tile.sprite.getGlobalBounds();
-					const sf::IntRect texRect = tile.sprite.getTextureRect();
-					const float h = f.height, w = f.width;
-					const float offset = 0.375;
-					vertexArray.append(sf::Vertex(sf::Vector2f(position.x, position.y), sf::Vector2f(texRect.left + offset, texRect.top + offset)));
-					vertexArray.append(sf::Vertex(sf::Vector2f(position.x, position.y + h), sf::Vector2f(texRect.left + offset, texRect.top + texRect.height - offset)));
-					vertexArray.append(sf::Vertex(sf::Vector2f(position.x + w, position.y + h), sf::Vector2f(texRect.left + texRect.width - offset, texRect.top + texRect.height - offset)));
-					vertexArray.append(sf::Vertex(sf::Vector2f(position.x + w, position.y), sf::Vector2f(texRect.left + texRect.width, texRect.top - offset)));*/
+						// Use Vertex array
+						if(first) {
+							rs.texture = tile.sprite.getTexture();
+							first = false;
+						}
+						for(size_t i = 0; i < tile.verts.size(); i++) {
+							vertexArray.append(tile.verts[i]);
+						}
+						/*const sf::Vector2f position = tile.sprite.getPosition();
+						const sf::FloatRect f = tile.sprite.getGlobalBounds();
+						const sf::IntRect texRect = tile.sprite.getTextureRect();
+						const float h = f.height, w = f.width;
+						const float offset = 0.375;
+						vertexArray.append(sf::Vertex(sf::Vector2f(position.x, position.y), sf::Vector2f(texRect.left + offset, texRect.top + offset)));
+						vertexArray.append(sf::Vertex(sf::Vector2f(position.x, position.y + h), sf::Vector2f(texRect.left + offset, texRect.top + texRect.height - offset)));
+						vertexArray.append(sf::Vertex(sf::Vector2f(position.x + w, position.y + h), sf::Vector2f(texRect.left + texRect.width - offset, texRect.top + texRect.height - offset)));
+						vertexArray.append(sf::Vertex(sf::Vector2f(position.x + w, position.y), sf::Vector2f(texRect.left + texRect.width, texRect.top - offset)));*/
+					}
 				}
+				graphics->Draw(vertexArray, rs);
 			}
-			graphics->Draw(vertexArray, rs);
+			
 		}
 	}
 }
@@ -232,9 +286,11 @@ Vector2 TileMapper::GetBuildingScale(const unsigned int & buildingType, const fl
 	case 17:
 	case 18:
 		return Vector2(width / 128.0f, height / 352.0f);
+	case 19:
+	case 20:
+		return Vector2(width / 192.0f, height / 128.0f);
 	default:
 		break;
 	}
 	return Vector2::One;
 }
-

@@ -243,6 +243,21 @@
     <ClInclude Include="BulletScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
+    <ClInclude Include="EngineSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TileInfo.h">
+      <Filter>Header Files\Engine\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="AStar.h">
+      <Filter>Header Files\Engine\Parser</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioSource.h">
+      <Filter>Header Files\Engine\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -365,9 +380,6 @@
     <ClCompile Include="ParsedTMX.cpp">
       <Filter>Source Files\Engine\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="TileMapper.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="BulletScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
@@ -382,6 +394,21 @@
     </ClCompile>
     <ClCompile Include="VehicleController.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="TileMapper.cpp">
+      <Filter>Source Files\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TileInfo.cpp">
+      <Filter>Header Files\Engine\Parser</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerScript.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioSource.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -325,7 +325,7 @@ sf::View & Graphics::GetView() {
 
 void Graphics::RebuildDisplay() {
 	sfSettings = TypeConversion::ConvertToSFContext(settings);
-	window.create(sf::VideoMode((unsigned int)(settings.resolution.x+0.5f), (unsigned int)(settings.resolution.y+0.5f)), settings.windowTitle,
+	window.create(sf::VideoMode((unsigned int)(settings.resolution.x+0.5f), (unsigned int)(settings.resolution.y+0.5f), 16), settings.windowTitle,
 				  (settings.fullScreen ? sf::Style::Fullscreen : (settings.resizeable ? sf::Style::Default : (sf::Style::Titlebar | sf::Style::Close))),
 				  sfSettings);
 	window.setPosition(sf::Vector2i((int)settings.screenPosition.x, (int)settings.screenPosition.y));

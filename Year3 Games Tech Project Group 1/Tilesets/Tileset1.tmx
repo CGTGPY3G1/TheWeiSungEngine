@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="502" height="505" tilewidth="32" tileheight="32" nextobjectid="136">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="502" height="505" tilewidth="32" tileheight="32" nextobjectid="147">
  <tileset firstgid="1" name="NewTiles" tilewidth="32" tileheight="32" tilecount="450" columns="18">
   <image source="Tiles.png" width="576" height="800"/>
  </tileset>
- <tileset firstgid="451" name="Buildings" tilewidth="256" tileheight="352" tilecount="18" columns="0">
+ <tileset firstgid="451" name="Buildings" tilewidth="256" tileheight="352" tilecount="20" columns="0">
   <tile id="0">
    <image width="64" height="64" source="Building1.png"/>
   </tile>
@@ -57,6 +57,23 @@
   </tile>
   <tile id="17">
    <image width="128" height="352" source="../TiledStuff/Building18.png"/>
+  </tile>
+  <tile id="18">
+   <image width="192" height="128" source="../TiledStuff/Building19.png"/>
+  </tile>
+  <tile id="19">
+   <image width="192" height="128" source="../TiledStuff/Building20.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="471" name="Vehicles" tilewidth="288" tileheight="132" tilecount="3" columns="0">
+  <tile id="0">
+   <image width="288" height="132" source="Car1.png"/>
+  </tile>
+  <tile id="1">
+   <image width="288" height="132" source="Car2.png"/>
+  </tile>
+  <tile id="2">
+   <image width="288" height="132" source="Car3.png"/>
   </tile>
  </tileset>
  <layer name="BackgroundLayer" width="502" height="505">
@@ -670,10 +687,19 @@
   <object id="132" name="Building" type="16" gid="466" x="4480" y="4832" width="128" height="352"/>
   <object id="133" name="Building" type="17" gid="467" x="5536" y="5088" width="128" height="352"/>
   <object id="134" name="Building" type="18" gid="468" x="4448" y="4288" width="128" height="352"/>
+  <object id="136" name="Building" type="19" gid="469" x="4896" y="5664" width="384" height="192"/>
+  <object id="137" name="Building" type="20" gid="470" x="4480" y="5376" width="128" height="96"/>
+  <object id="138" name="Building" type="20" gid="470" x="4480" y="5504" width="128" height="96"/>
+  <object id="139" name="Building" type="20" gid="470" x="4480" y="5632" width="128" height="96"/>
  </objectgroup>
  <objectgroup name="Characters">
   <object id="37" name="Player" type="0" x="11584" y="11488">
    <ellipse/>
   </object>
+ </objectgroup>
+ <objectgroup name="Vehicles">
+  <object id="140" name="Car" type="0" gid="471" x="11856" y="11276" width="72" height="33" rotation="-90"/>
+  <object id="143" name="Car" type="1" gid="472" x="11920" y="11276" width="72" height="33" rotation="-90"/>
+  <object id="145" name="Car" type="2" gid="473" x="11984" y="11276" width="72" height="33" rotation="-90"/>
  </objectgroup>
 </map>

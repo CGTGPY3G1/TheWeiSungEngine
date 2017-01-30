@@ -46,3 +46,7 @@ float CameraFollowScript::GetZoom() {
 void CameraFollowScript::SetTarget(std::weak_ptr<RigidBody2D> target) {
 	myTarget = target;
 }
+
+int CameraFollowScript::GetSortOrder() {
+	return TypeInfo::ScriptSortOrder<CameraFollowScript>();
+}

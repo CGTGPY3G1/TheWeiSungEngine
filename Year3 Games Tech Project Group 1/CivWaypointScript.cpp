@@ -47,3 +47,7 @@ void CivWaypointScript::SetTarget(const Vector2 & target) {
 void CivWaypointScript::SetExtents(const float & left, const float & top, const float & right, const float & bottom) {
 	navigator = Navigator(left, top, right, bottom);
 }
+
+int CivWaypointScript::GetSortOrder() {
+	return TypeInfo::ScriptSortOrder<CivWaypointScript>();
+}

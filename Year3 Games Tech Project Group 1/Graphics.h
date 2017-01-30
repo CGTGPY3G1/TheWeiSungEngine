@@ -16,8 +16,8 @@ enum TextAlignment {
 struct GraphicsSettings {
 	std::string windowTitle = "Unnamed Window";
 	Vector2 screenPosition = {500.0f, 20.0f}, resolution = {1280.0f, 720.0f};
-	unsigned int depthBits = 24, antialiasingLevel = 0, stencilBits = 8, minorVersion = 2, majorversion = 2, maxFPS = 50;
-	bool fullScreen = false, resizeable = true, vSync = false;
+	unsigned int depthBits = 24, antialiasingLevel = 0, stencilBits = 8, minorVersion = 2, majorversion = 2, maxFPS = 60;
+	bool fullScreen = false, resizeable = true, vSync = true;
 	 
 	bool operator == (GraphicsSettings other) {
 		return (screenPosition == screenPosition && resolution == resolution && depthBits == other.depthBits && antialiasingLevel == other.antialiasingLevel && stencilBits == other.stencilBits &&minorVersion == other.minorVersion &&

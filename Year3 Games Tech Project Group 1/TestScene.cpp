@@ -16,7 +16,7 @@
 #include "TileMapper.h"
 #include <memory>
 #include "CerealTypeRegistration.h"
-
+#include "EngineSettings.h"
 TestScene::TestScene() : Scene() {
 }
 
@@ -28,11 +28,11 @@ void TestScene::Start() {
 	Scene::Start();
 	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, false);
 
-	Vector2 scale = Vector2(6.0f, 6.0f);
+	Vector2 scale = Vector2(4.0f, 4.0f);
 	std::shared_ptr<GameObject> tileset = gameObjectManager.CreateGameObject("BackgroundTileset").lock();
 	tileset->Init(Vector2(0, 0), 0, scale);
 	std::shared_ptr<TileMapper> tileMapper = tileset->AddComponent<TileMapper>().lock();
-	tileMapper->Init("Tileset1", "NewTiles");
+	tileMapper->Init(EngineSettings::TILESET_FILE_NAME, EngineSettings::TILESET_NAME);
 
 	Engine::GetInstance().GetGraphics().lock()->SetCameraPosition(gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock()->GetPosition());
 	/*static const std::string vertShader = \
@@ -81,18 +81,7 @@ void TestScene::Start() {
 
 	std::shared_ptr<sf::Shader> shader = std::make_shared<sf::Shader>();
 	shader->loadFromMemory(fragShader, sf::Shader::Fragment);*/
-	
-	std::shared_ptr<GameObject> car = gameObjectManager.CreateGameObject("Car").lock();
-	car->Init(Vector2(22560.0f, 19060.0f), -90.0f);
-	std::shared_ptr<RigidBody2D> carRB = car->AddComponent<RigidBody2D>().lock();
-	carRB->Init(b2BodyType::b2_dynamicBody, true, 1.0f, 1.0f);
-	car->AddComponent<PolygonCollider>().lock()->Init(Vector2(-32.0f, 1.0f), {Vector2(-32.0f, -26.0f), Vector2(-14.0f, -52.0f), Vector2(34.0f, -58.0f), Vector2(64.0f, 50.0f), Vector2(64.0f, -50.0f), Vector2(34.0f, 58.0f), Vector2(-14.0f, 52.0f), Vector2(-32.0f, 26.0f)}, false, 500.0f);
-	car->AddComponent<PolygonCollider>().lock()->Init(Vector2(96.0f, 0.0f), {Vector2(-100.0f, -48.0f), Vector2(76.0f, -64.0f), Vector2(112.0f, -38.0f), Vector2(124.0f, -24.0f), Vector2(124.0f, 24.0f), Vector2(112.0f, 38.0f), Vector2(76.0f, 64.0f), Vector2(-100.0f, 48.0f)}, false, 100.0f);
 
-	std::shared_ptr<SpriteRenderer> carSprite = car->AddComponent<SpriteRenderer>().lock();
-	carSprite->Init("Images/Car.png", PivotPoint::Left, RenderLayer::MIDGROUND_LAYER);
-	carSprite->SetPivotManually(64.0f, carSprite->GetHeight() / 2.0f);
-	car->AddComponent<VehicleController>().lock()->Start();
 	/*car->GetComponent<SpriteRenderer>().lock()->SetShader(shader);
 	car->GetComponent<SpriteRenderer>().lock()->GetShader()->setUniform("texture", sf::Shader::CurrentTexture);*/
 	
@@ -138,72 +127,7 @@ void TestScene::Start() {
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	Engine engine = Engine::GetInstance();
-	std::shared_ptr<Input> input = engine.GetInput().lock();
-	std::shared_ptr<GameObject> gameObject = driving ? gameObjectManager.GetGameObject("Car").lock() : gameObjectManager.GetGameObject("Player").lock();
-	std::shared_ptr<Transform2D> playerTransform = gameObject->GetComponent<Transform2D>().lock();
-	bool useController = input->GetControllerActive(0);
-	RayCastHit raycastHit = PhysicsSystem::GetInstance().RayCast(playerTransform->GetPosition(), playerTransform->GetPosition() + playerTransform->GetForward() * 400);
-	// Movement Test
-	std::shared_ptr<RigidBody2D> rb = gameObject->GetComponent<RigidBody2D>().lock();
-	float dot = rb->GetVelocity().Dot(rb->GetForward());
-	dot = (dot < 0.0001f) ? -1.0f : 1.0f;
-	const float cameraScale = (dot < 0.0f) ? -0.4f : dot;
-	engine.GetGraphics().lock()->MoveCamera((driving ? ((rb->GetPosition() + (rb->GetForward() * cameraScale * rb->GetSpeed())) - engine.GetGraphics().lock()->GetCameraPosition()) : (gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics().lock()->GetCameraPosition())) * (fixedDeltaTime * 1.5f));
-	const float maxVelocity = Physics::PIXELS_PER_METRE * 2.0f;
-	const float speed = gameObject->GetComponent<RigidBody2D>().lock()->GetSpeed();
-	float oldZoom = engine.GetGraphics().lock()->GetCameraZoom();
-	float newZoom = (speed / maxVelocity) * 0.4f;
-	engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.0f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.0f + newZoom) * fixedDeltaTime))));
-	if(driving) {
-		std::shared_ptr<VehicleController> vehicle = gameObject->GetComponent<VehicleController>().lock();
-		if(vehicle) {
-			if(useController) {
-				float force = 200.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::RT);
-				force -= 40.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::LT);
-				vehicle->Drive(force);
-				vehicle->Steer(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH));
-			}
-			else {
-				if(input->GetKey(KeyCodes::KeyCode::W) || input->GetKey(KeyCodes::KeyCode::Up)) vehicle->Drive(250.0f);
-				else if(input->GetKey(KeyCodes::KeyCode::S) || input->GetKey(KeyCodes::KeyCode::Down)) vehicle->Drive(-50.0f);
-				
-				const float steerValue = 1.0f;
-				if(input->GetKey(KeyCodes::KeyCode::A) || input->GetKey(KeyCodes::KeyCode::Left)) vehicle->Steer(-steerValue);
-				else if(input->GetKey(KeyCodes::KeyCode::D) || input->GetKey(KeyCodes::KeyCode::Right)) vehicle->Steer(steerValue);
-			}
-		}
-	}
-	else {
-		Vector2 forward = gameObject->GetComponent<RigidBody2D>().lock()->GetForward();
-		const float forwardAngle = forward.AngleInDegrees();
-		float moveAmount = gameObject->GetComponent<RigidBody2D>().lock()->GetMass() * 2.0f;
-		if(input->GetKey(KeyCodes::KeyCode::LShift) || (useController && input->GetControllerButton(0, ControllerButtons::ControllerButton::LS))) moveAmount *= 1.5f;
-		const float threshold = 0.25f;
-		if(useController) {
-			Vector2 directionToMouse = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::RightStickV));
-			if(directionToMouse.SquareMagnitude() > 0.5f) gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
-			Vector2 moveDirection = Vector2(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH), input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickV));
-			gameObject->GetComponent<RigidBody2D>().lock()->AddForce(moveDirection * moveAmount * ((std::max<float>(forward.Dot(moveDirection.Normalized()), threshold)) + 1.0f), ForceType::FORCE);
-		}
-		else {
-			Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
-
-			gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
-			if(oldInputStyle) {
-				if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, -moveAmount));
-				if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, moveAmount));
-				if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(-moveAmount, 0.0f));
-				if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(moveAmount, 0.0f));
-			}
-			else {
-				if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(moveAmount, 0.0f), false);
-				if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(-moveAmount, 0.0f), false);
-				if(input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, -moveAmount), false);
-				if(input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) gameObject->GetComponent<CharacterMovementScript>().lock()->MoveUsingPhysics(Vector2(0.0f, moveAmount), false);
-			}
-		}
-	}
+	
 	Scene::FixedUpdate(fixedDeltaTime);
 }
 float reloadTime = 0.1f;
@@ -218,36 +142,6 @@ void TestScene::Update(const float & deltaTime) {
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
 	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
-	std::shared_ptr<GameObject> player = gameObjectManager.GetGameObject("Player").lock();
-
-	std::shared_ptr<GameObject> car = gameObjectManager.GetGameObject("Car").lock();
-	if(!driving) {
-		if(reloadTime > 0.0f) {
-			reloadTime -= deltaTime;
-		}
-		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {
-			std::shared_ptr<Transform2D> t = player->GetComponent<Transform2D>().lock();
-			const float recoil = Random::RandomFloat(-10.0f, 10.0f);
-			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 64.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 20.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
-			reloadTime = 0.01f;
-		}
-		if((car->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetPosition() - player->GetComponent<Transform2D>().lock()->GetForward() * Physics::PIXELS_PER_METRE).Magnitude() < Physics::PIXELS_PER_METRE * 2.0f) {
-			if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
-				driving = true;
-				player->SetEnabled(false);
-				player->GetComponent<RigidBody2D>().lock()->SetEnabled(false);
-			}
-		}
-	}
-	else {
-		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
-			std::shared_ptr<Transform2D> carTransform = car->GetComponent<Transform2D>().lock();
-			driving = false;
-			player->GetComponent<RigidBody2D>().lock()->SetPosition(carTransform->GetPosition() + (carTransform->GetRight() * Physics::PIXELS_PER_METRE) + (carTransform->GetForward() * Physics::PIXELS_PER_METRE));
-			player->SetEnabled(true);
-			player->GetComponent<RigidBody2D>().lock()->SetEnabled(true);
-		}
-	}
 }
 
 void TestScene::Render() {
@@ -260,12 +154,6 @@ void TestScene::Render() {
 	Engine engine = Engine::GetInstance();
 	Scene::Render();
 	float zoom = engine.GetGraphics().lock()->GetCameraZoom();
-	/*float speed = gameObjectManager.GetGameObject("Car").lock()->GetComponent<RigidBody2D>().lock()->GetSpeed() * Physics::METRES_PER_PIXEL;
-	speed *= 1.0f / 1000.0f;
-	speed *= 60 * 60;
-	speed *= 0.621371f;
-	engine.GetGraphics().lock()->Draw("Car Speed = " + std::to_string(speed), Vector2(100.0f, 650.0f), 30.0f * zoom);*/
 
 	engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
-	
 }

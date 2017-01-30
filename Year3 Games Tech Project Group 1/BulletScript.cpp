@@ -12,9 +12,21 @@ void BulletScript::Start() {
 }
 void BulletScript::Update(const float & deltaTime) {
 	if(lifeTime > 0.0f) lifeTime -= deltaTime;
-	else gameObject.lock()->Destroy();
+	else {
+		if(!GetComponent<AudioSource>().lock()->IsPlaying()) gameObject.lock()->Destroy();
+		else if(alive) {
+			GetComponent<RigidBody2D>().lock()->SetEnabled(false);
+			GetComponent<SpriteRenderer>().lock()->SetEnabled(false);
+			alive = false;
+		}
+	}
 }
 
 void BulletScript::OnCollisionEnter(const CollisionData & data) {
-	gameObject.lock()->Destroy();
+	lifeTime = -1.0f;
+	
+}
+
+int BulletScript::GetSortOrder() {
+	return TypeInfo::ScriptSortOrder<BulletScript>();
 }

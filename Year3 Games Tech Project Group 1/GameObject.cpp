@@ -35,6 +35,7 @@ bool GameObject::GetEnabled() {
 
 void GameObject::SetEnabled(const bool & enabled) {
 	this->enabled = enabled;
+	componentManager.SetEnabled(enabled);
 }
 
 bool GameObject::HasComponents(const unsigned int & mask) {

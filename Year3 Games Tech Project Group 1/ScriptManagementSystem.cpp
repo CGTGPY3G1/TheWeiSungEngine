@@ -1,6 +1,12 @@
 #include "ScriptManagementSystem.h"
 #include "GameObject.h"
 #include "ScriptableComponent.h"
+
+
+bool SortScripts(const std::shared_ptr<ScriptableComponent> & l, const std::shared_ptr<ScriptableComponent> & r) {
+	return l->GetSortOrder() < r->GetSortOrder();
+}
+
 ScriptManagementSystem::ScriptManagementSystem() {
 }
 
@@ -23,6 +29,7 @@ void ScriptManagementSystem::LoadScripts(std::vector<std::shared_ptr<GameObject>
 			}		
 		}
 	}
+	std::sort(scripts.begin(), scripts.end(), SortScripts);
 }
 
 void ScriptManagementSystem::FixedUpdate(const float & fixedDeltaTime) {
@@ -30,7 +37,7 @@ void ScriptManagementSystem::FixedUpdate(const float & fixedDeltaTime) {
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<ScriptableComponent> script = scripts[i];
 		if(script) {
-			script->FixedUpdate(fixedDeltaTime);
+			if(script->GetEnabled()) script->FixedUpdate(fixedDeltaTime);
 		}
 	}
 }
@@ -40,7 +47,7 @@ void ScriptManagementSystem::Update(const float & deltaTime) {
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<ScriptableComponent> script = scripts[i];
 		if(script) {
-			script->Update(deltaTime);
+			if(script->GetEnabled()) script->Update(deltaTime);
 		}
 	}
 }
@@ -53,7 +60,7 @@ void ScriptManagementSystem::LateUpdate() {
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<ScriptableComponent> script = scripts[i];
 		if(script) {
-			script->LateUpdate();
+			if(script->GetEnabled()) script->LateUpdate();
 		}
 	}
 }

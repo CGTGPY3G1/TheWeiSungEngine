@@ -28,7 +28,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 
 std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & buildingNumber, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	if(buildingNumber < 1 || buildingNumber > 18) return std::weak_ptr<GameObject>();
+	if(buildingNumber < 1 || buildingNumber > 20) return std::weak_ptr<GameObject>();
 	std::shared_ptr<GameObject> building = gameObjectManager.CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
@@ -117,6 +117,14 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 4.0f, gridSize * 11.0f));
 		sprite->SetTextureRect((int)std::roundl(gridSize * 33), 0, (int)std::roundl(gridSize * 4), (int)std::roundl(gridSize * 11));
 		break;
+	case 19:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 6.0f, gridSize * 4.0f));
+		sprite->SetTextureRect((int)std::roundl(gridSize * 25), 0, (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 4));
+		break;
+	case 20:
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 6.0f, gridSize * 4.0f));
+		sprite->SetTextureRect((int)std::roundl(gridSize * 31), 0, (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 4));
+		break;
 	default:
 		break;
 	}
@@ -135,7 +143,28 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const Vector2 & positi
 	bc->Init(Vector2(), Vector2(6.0f, 2.0f), false, 1000.0f);
 	std::shared_ptr<SpriteRenderer> sprite = bullet->AddComponent<SpriteRenderer>().lock();
 	sprite->Init("Images/Bullet.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, 0);
+	std::shared_ptr<AudioSource> as = bullet->AddComponent<AudioSource>().lock();
+	as->Init("Audio/9mm.wav", true);
+	as->SetVolume(0.5f);
 	std::shared_ptr<BulletScript> bs = bullet->AddComponent<BulletScript>().lock();
 	bs->Start();
 	return bullet;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNumber, const Vector2 & position, const Vector2 & scale, const float & rotation) {
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> vehicle = gameObjectManager.CreateGameObject("Vehicle").lock();
+	vehicle->Init(position + Vector2(0.0f, 68.0f), rotation, scale);
+	std::shared_ptr<RigidBody2D> carRB = vehicle->AddComponent<RigidBody2D>().lock();
+	carRB->Init(b2BodyType::b2_dynamicBody, false, 1.0f, 1.0f);
+	vehicle->AddComponent<PolygonCollider>().lock()->Init(Vector2(-32.0f, 1.0f), {Vector2(-32.0f, -26.0f), Vector2(-14.0f, -52.0f), Vector2(34.0f, -58.0f), Vector2(64.0f, 50.0f), Vector2(64.0f, -50.0f), Vector2(34.0f, 58.0f), Vector2(-14.0f, 52.0f), Vector2(-32.0f, 26.0f)}, false, 500.0f);
+	vehicle->AddComponent<PolygonCollider>().lock()->Init(Vector2(96.0f, 0.0f), {Vector2(-100.0f, -48.0f), Vector2(76.0f, -64.0f), Vector2(112.0f, -38.0f), Vector2(124.0f, -24.0f), Vector2(124.0f, 24.0f), Vector2(112.0f, 38.0f), Vector2(76.0f, 64.0f), Vector2(-100.0f, 48.0f)}, false, 100.0f);
+
+	std::shared_ptr<SpriteRenderer> carSprite = vehicle->AddComponent<SpriteRenderer>().lock();
+	carSprite->Init("Images/Cars.png", PivotPoint::Left, RenderLayer::MIDGROUND_LAYER);
+	carSprite->SetTextureRect(0, 132 * vehicleNumber, 288, 132);
+	carSprite->SetPivotManually(64.0f, carSprite->GetHeight() / 2.0f);
+	vehicle->AddComponent<VehicleController>().lock()->Start();
+	vehicle->SetTag("Vehicle");
+	return vehicle;
 }

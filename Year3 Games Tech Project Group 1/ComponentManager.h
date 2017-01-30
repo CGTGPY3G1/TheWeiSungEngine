@@ -28,6 +28,7 @@ public:
 	void Update(double deltaTime);
 	void FixedUpdate(double fixedDeltaTime);
 	void LateUpdate();
+	void SetEnabled(const bool & enabled);
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;

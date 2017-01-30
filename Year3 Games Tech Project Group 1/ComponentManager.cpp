@@ -41,6 +41,15 @@ void ComponentManager::LateUpdate() {
 
 }
 
+void ComponentManager::SetEnabled(const bool & enabled) {
+	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
+		(*i)->SetEnabled(enabled);
+	}
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+		(*i)->SetEnabled(enabled);
+	}
+}
+
 void ComponentManager::HandleMessage(const Message & message) {
 	switch(message.scope) {
 	case MessageScope::MESSAGE_SCOPE_COMPONENTS:

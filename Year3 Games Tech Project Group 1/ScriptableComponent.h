@@ -12,6 +12,7 @@ public:
 	virtual void Update(const float & deltaTime) {}
 	virtual void FixedUpdate(const float & fixedDeltaTime) {}
 	virtual void LateUpdate() {}
+	virtual int GetSortOrder() = 0;
 	void OnCollisionEnter(const CollisionData & data) override {}
 	void OnCollisionExit(const CollisionData & data) override {}
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override {}

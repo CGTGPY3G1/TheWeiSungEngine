@@ -17,4 +17,6 @@
 #include "TileMapper.h"
 #include "VehicleController.h"
 #include "BulletScript.h"
+#include "PlayerScript.h"
+#include "AudioSource.h"
 #endif !WS_COMPENENT_HEADERS_H

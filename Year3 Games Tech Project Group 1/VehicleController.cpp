@@ -39,13 +39,17 @@ void VehicleController::Steer(const float & steerValue) {
 	if(rb) {
 		float dot = rb->GetVelocity().Dot(rb->GetForward());
 		dot = (dot < 0.0f) ? -1.0f : 1.0f;
-		const float massScale = Physics::METRES_PER_PIXEL * rb->GetSpeed() * 3.0f;
+		const float massScale = Physics::METRES_PER_PIXEL * rb->GetSpeed() * 4.0f;
 		rb->AddTorque(steerValue * dot * massScale, ForceType::IMPULSE_FORCE);
 		rb->AddTorque(steerValue * dot * massScale, ForceType::IMPULSE_FORCE);
 	}
 	else {
 		rigidbody = GetComponent<RigidBody2D>();
 	}
+}
+
+int VehicleController::GetSortOrder() {
+	return TypeInfo::ScriptSortOrder<VehicleController>();
 }
 
 Vector2 VehicleController::GetLateralVelocity(std::shared_ptr<RigidBody2D> r) {

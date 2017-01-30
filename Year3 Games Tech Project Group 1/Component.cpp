@@ -42,6 +42,10 @@ unsigned int Component::GetGameObjectID() {
 	return g->GetObjectID();
 }
 
+std::string Component::GetTag() {
+	return gameObject.lock()->GetTag();
+}
+
 std::weak_ptr<GameObject> Component::GetGameObject() {
 	return gameObject;
 }

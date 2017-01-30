@@ -41,3 +41,7 @@ void CharacterMovementScript::Move(Vector2 & amount, const bool & worldSpace) {
 		t->Move(direction * magnitude * scale);
 	}
 }
+
+int CharacterMovementScript::GetSortOrder() {
+	return TypeInfo::ScriptSortOrder<CharacterMovementScript>();
+}

@@ -40,11 +40,12 @@ void stop() {
 
 void PhysicsSystem::Update(const float & deltaTime) {
 	world->Step(deltaTime, settings.velocityIterations, settings.positionIterations);
+	if(!dirty) dirty = true;
 }
 
 void PhysicsSystem::UpdateBodies() {
 	for(b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-		if(b->GetType() == b2BodyType::b2_dynamicBody) {
+		if(dirty && b->GetType() == b2BodyType::b2_dynamicBody) {
 			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
 			if(rb) {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
@@ -69,6 +70,7 @@ void PhysicsSystem::UpdateBodies() {
 			}
 		}
 	}
+	if(dirty) dirty = false;
 }
 
 

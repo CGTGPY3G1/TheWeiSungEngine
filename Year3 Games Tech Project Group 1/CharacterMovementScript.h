@@ -18,7 +18,7 @@ public:
 	void MoveUsingPhysics(Vector2 & force, const bool & worldSpace = true);
 	void Move(Vector2 & amount, const bool & worldSpace = true);
 	const std::string GetName() const override { return "CharacterMovementScript"; }
-
+	int GetSortOrder() override;
 	template <class Archive>
 	void load(Archive & ar) {
 

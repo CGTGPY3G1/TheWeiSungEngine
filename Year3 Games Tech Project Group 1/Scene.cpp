@@ -26,8 +26,8 @@ void Scene::Reset() {
 
 void Scene::FixedUpdate(const float & fixedDeltaTime) {
 	PhysicsSystem::GetInstance().Update(fixedDeltaTime);
-	SyncPhysics();
 	scriptManagementSystem->FixedUpdate(fixedDeltaTime);
+	SyncPhysics();
 }
 
 void Scene::SyncPhysics() {

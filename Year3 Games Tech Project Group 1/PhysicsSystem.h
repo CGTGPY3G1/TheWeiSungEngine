@@ -48,6 +48,7 @@ private:
 	PhysicsSettings settings;
 	float accumulator = 0.0f;
 	RayCastHit hit;
+	bool dirty = false;
 };
 
 #endif // !WS_PHYSICS_SYSTEM_H

@@ -155,6 +155,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="AStar.h" />
+    <ClInclude Include="AudioSource.h" />
     <ClInclude Include="BulletScript.h" />
     <ClInclude Include="CameraFollowScript.h" />
     <ClInclude Include="CerealTypeRegistration.h" />
@@ -162,11 +164,14 @@
     <ClInclude Include="CivWaypointScript.h" />
     <ClInclude Include="ComponentData.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="EngineSettings.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GameObjectFactory.h" />
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
+    <ClInclude Include="PlayerScript.h" />
     <ClInclude Include="Random.h" />
+    <ClInclude Include="TileInfo.h" />
     <ClInclude Include="VehicleController.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="resource.h" />
@@ -217,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="AudioSource.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="BulletScript.cpp" />
     <ClCompile Include="CameraFollowScript.cpp" />
@@ -229,6 +235,7 @@
     <ClCompile Include="ComponentManager.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
+    <ClCompile Include="EngineSettings.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -242,8 +249,10 @@
     <ClCompile Include="ParsedTMX.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
+    <ClCompile Include="PlayerScript.cpp" />
     <ClCompile Include="PolygonCollider.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="TileInfo.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />
     <ClCompile Include="RevoluteJoint.cpp" />
