@@ -404,11 +404,11 @@
     <ClCompile Include="TileInfo.cpp">
       <Filter>Header Files\Engine\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AudioSource.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

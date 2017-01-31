@@ -28,8 +28,7 @@ void PlayerScript::Update(const float & deltaTime) {
 		if(reloadTime > 0.0f) {
 			reloadTime -= deltaTime;
 		}
-		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {
-			
+		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {			
 			const float recoil = Random::RandomFloat(-10.0f, 10.0f);
 			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 64.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 20.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
 			reloadTime = 0.085f;
@@ -95,8 +94,9 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 		float dot = rb->GetVelocity().Dot(rb->GetForward());
 		dot = (dot < 0.0001f) ? -1.0f : 1.0f;
 		const float cameraScale = (dot < 0.0f) ? -0.4f : dot;
-		engine.GetGraphics().lock()->MoveCamera((driving ? ((rb->GetPosition() + (rb->GetForward() * cameraScale * rb->GetSpeed())) - engine.GetGraphics().lock()->GetCameraPosition()) : (gameObject->GetComponent<RigidBody2D>().lock()->GetPosition() - engine.GetGraphics().lock()->GetCameraPosition())) * (fixedDeltaTime * 1.5f));
-		const float maxVelocity = Physics::PIXELS_PER_METRE * 2.0f;
+		const Vector2 camPos = rb->GetPosition() - engine.GetGraphics().lock()->GetCameraPosition();
+		engine.GetGraphics().lock()->MoveCamera((driving ? (camPos + (rb->GetForward() * cameraScale * rb->GetSpeed())) : camPos) * (fixedDeltaTime * 1.5f));
+		const float maxVelocity = Physics::PIXELS_PER_METRE * 3.0f;
 		const float speed = gameObject->GetComponent<RigidBody2D>().lock()->GetSpeed();
 		float oldZoom = engine.GetGraphics().lock()->GetCameraZoom();
 		float newZoom = (speed / maxVelocity) * 0.4f;
