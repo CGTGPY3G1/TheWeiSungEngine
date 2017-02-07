@@ -2,7 +2,7 @@
 #ifndef WS_COLLISION_HANDLER_H
 #define WS_COLLISION_HANDLER_H
 #include "CollisionData.h"
-
+#include "CollisionMask.h"
 class CollisionHandler {
 public:
 	virtual ~CollisionHandler() {}

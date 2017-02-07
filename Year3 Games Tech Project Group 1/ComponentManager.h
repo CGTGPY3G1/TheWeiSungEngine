@@ -57,13 +57,13 @@ private:
 
 template<typename T> std::weak_ptr<T> ComponentManager::AddComponent() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
-	if(!g->HasComponent<T>()) g->componentMask |= TypeInfo::GetTypeID<T>();
 	std::shared_ptr<T> t = std::make_shared<T>(gameObject);
 	if(TypeInfo::IsScriptable<T>()) {
 		std::shared_ptr<ScriptableComponent> sc = std::dynamic_pointer_cast<ScriptableComponent>(t);
 		scriptableComponents.push_back(sc);
 	}
 	else components.push_back(t);
+	g->IterateComponentCount<T>(true);
 	return t;
 }
 
@@ -113,7 +113,9 @@ std::vector<std::weak_ptr<T>> ComponentManager::GetComponents() {
 	for(std::vector<std::shared_ptr<Component>>::iterator i = components.begin(); i != components.end(); ++i) {
 		if(type == (*i)->Type()) toReturn.push_back(std::static_pointer_cast<T>(*i));
 	}
-
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+		if(type == (*i)->Type()) toReturn.push_back(std::dynamic_pointer_cast<T>(*i));
+	}
 	return toReturn;
 }
 
@@ -153,5 +155,7 @@ inline void ComponentManager::RemoveComponent(const unsigned int & id) {
 			};
 		}
 	}
+	std::shared_ptr<GameObject> g = gameObject.lock();
+	if(!g->IterateComponentCount<T>(false)) g->componentMask |= TypeInfo::GetTypeID<T>();
 }
 #endif // !WS_COMPONENT_MANAGER_H

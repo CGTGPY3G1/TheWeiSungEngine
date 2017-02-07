@@ -41,7 +41,7 @@ public:
 private:
 	Vector2 points[2][2];
 };
-class CharacterMovementScript;
+class CharacterScript;
 class RigidBody2D;
 class CivWaypointScript : public ScriptableComponent {
 public:
@@ -68,7 +68,7 @@ public:
 	}
 private:
 	std::weak_ptr<RigidBody2D> myRigidBody;
-	std::weak_ptr<CharacterMovementScript> movementScript;
+	std::weak_ptr<CharacterScript> movementScript;
 	Vector2 target;
 	Navigator navigator;
 	float retargetTimer = 0.0f;

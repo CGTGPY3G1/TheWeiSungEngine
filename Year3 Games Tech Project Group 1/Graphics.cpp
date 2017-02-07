@@ -122,12 +122,13 @@ void Graphics::Draw(const sf::VertexArray & vertexArray) {
 //	window.draw(toDraw);
 //}
 
-void Graphics::Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, TextAlignment alignment) {
+void Graphics::Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, const float & r, const float & g, const float & b, const float & a, TextAlignment alignment) {
 	sf::Text toDraw;
 	toDraw.setFont(font);
 	toDraw.setString(text);
 	toDraw.setCharacterSize(characterSize);
 	toDraw.setStyle(sf::Text::Bold);
+	toDraw.setFillColor(TypeConversion::ConvertToSFColour(r, g, b, a));
 	if(alignment != TextAlignment::LEFT_ALIGNED) {
 		float width = toDraw.getLocalBounds().width;
 		if(alignment == TextAlignment::CENTRE_ALIGNED) toDraw.setOrigin(sf::Vector2f(width / 2, 0));
@@ -332,7 +333,7 @@ void Graphics::RebuildDisplay() {
 	view = window.getView();
 	view.zoom(zoomLevel);
 	window.setView(view);
-	if(settings.vSync) window.setFramerateLimit(settings.maxFPS);
+	if(settings.vSync) (settings.maxFPS);
 	if(!windowOpen) windowOpen = true;
 }
 

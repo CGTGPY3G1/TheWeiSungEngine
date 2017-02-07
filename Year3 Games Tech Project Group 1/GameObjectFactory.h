@@ -8,7 +8,7 @@
 class GameObjectFactory {
 public:
 	~GameObjectFactory() {}
-	static std::weak_ptr<GameObject> CreateCharacter(const std::string & name, const int & characterType, const Vector2 & position, const Vector2 & scale = Vector2::One, const float & rotation = 0.0f);
+	static std::weak_ptr<GameObject> CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale = Vector2::One, const float & rotation = 0.0f);
 	static std::weak_ptr<GameObject> CreateBuilding(const int & buildingNumber, const Vector2 & position, const Vector2 & scale, const float & rotation = 0.0f);
 	static std::weak_ptr<GameObject> CreateBullet(const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag);
 	static std::weak_ptr<GameObject> CreateVehicle(const int & vehicleNumber, const Vector2 & position, const Vector2 & scale, const float & rotation = 0.0f);

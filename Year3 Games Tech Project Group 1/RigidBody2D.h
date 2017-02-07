@@ -43,6 +43,8 @@ public:
 	float GetMass();
 	Vector2 GetVelocity();
 	void SetVelocity(const Vector2 & newVelocity);
+	void SetVelocity(const float & x, const float & y);
+	void SetTorque(const float & torque);
 	float GetSpeed();
 	void Init(const b2BodyType & type = b2BodyType::b2_kinematicBody, const bool & isBullet = false, const float & angularDampening = 0.05f, const float & linearDampening = 1.0f);
 	b2Body * GetBody();

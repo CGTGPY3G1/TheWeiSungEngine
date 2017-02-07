@@ -53,6 +53,13 @@ void ScriptManagementSystem::Update(const float & deltaTime) {
 }
 
 void ScriptManagementSystem::Render() {
+	const size_t noOfObjects = scripts.size();
+	for(size_t i = 0; i < noOfObjects; i++) {
+		std::shared_ptr<ScriptableComponent> script = scripts[i];
+		if(script) {
+			if(script->GetEnabled()) script->Render();
+		}
+	}
 }
 
 void ScriptManagementSystem::LateUpdate() {

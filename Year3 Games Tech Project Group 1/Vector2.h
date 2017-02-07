@@ -52,6 +52,7 @@ public:
 	Vector2 operator /= (const float & scalar);
 	bool operator == (const Vector2 & other);
 	float Dot(const Vector2 & other);
+	const float Dot(const Vector2 & other) const;
 	float Dot(const float & x, const float & y);
 	float Cross(const Vector2 & other);
 	float Cross(const float & x, const float & y);

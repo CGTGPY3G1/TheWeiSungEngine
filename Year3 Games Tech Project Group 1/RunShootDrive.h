@@ -12,6 +12,4 @@ private:
 
 };
 
-
-
 #endif // !WS_RUN_SHOOT_DRIVE_H

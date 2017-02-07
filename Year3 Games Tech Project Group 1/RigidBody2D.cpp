@@ -116,6 +116,15 @@ void RigidBody2D::SetVelocity(const Vector2 & newVelocity) {
 	body->SetLinearVelocity(TypeConversion::ConvertToB2Vector2(newVelocity));
 }
 
+void RigidBody2D::SetVelocity(const float & x, const float & y) {
+	body->SetLinearVelocity(TypeConversion::ConvertToB2Vector2(x, y));
+}
+
+void RigidBody2D::SetTorque(const float & torque) {
+	body->SetAngularVelocity(0.0f);
+	AddTorque(torque);
+}
+
 float RigidBody2D::GetSpeed() {
 	return body->GetLinearVelocity().Length() * Physics::PIXELS_PER_METRE;
 }

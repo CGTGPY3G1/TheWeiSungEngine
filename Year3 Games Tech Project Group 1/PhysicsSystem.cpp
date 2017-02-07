@@ -3,17 +3,30 @@
 #include "Engine.h"
 #include "DebugDraw.h"
 #include "Math.h"
-#include "Vector2.h"
+
 #include "GameObject.h"
 #include "ComponentData.h"
 #include "CollisionData.h"
 float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, const b2Vec2 & normal, float32 fraction) {
-	ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
-	if(colliderData) {
-		hit.hits++;
-		hit.colliders.push_back(std::static_pointer_cast<Collider>(colliderData->comp.lock()));
+	if(fixture->GetFilterData().categoryBits & raycastFilter) {
+		ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
+		if(colliderData) {
+			hit.hits++;
+			hit.colliders.push_back(std::static_pointer_cast<Collider>(colliderData->comp.lock()));
+			hit.normals.push_back(Vector2(normal.x, normal.y));
+			hit.points.push_back(TypeConversion::ConvertToVector2(point));
+			hit.fractions.push_back((float)fraction);
+		}
 	}
 	return 1.0f;
+}
+
+bool PhysicsSystem::ReportFixture(b2Fixture* fixture) {
+	if(fixture->GetFilterData().categoryBits & aabbFilter) {
+		aabbHit = true;
+		return false;
+	}
+	return true;
 }
 
 PhysicsSystem::PhysicsSystem(){
@@ -23,6 +36,7 @@ PhysicsSystem::PhysicsSystem(){
 	debugDraw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_centerOfMassBit);
 	world->SetDebugDraw(debugDraw);
 	world->SetContactListener(this);
+
 	settings = PhysicsSettings();
 }
 
@@ -199,10 +213,21 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 	}
 }
 
-RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end) {
+RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end, const int & collisionMask) {
+	raycastFilter = collisionMask;
 	hit.Reset();
 	world->RayCast(this, TypeConversion::ConvertToB2Vector2(start), TypeConversion::ConvertToB2Vector2(end));
 	return hit;
+}
+
+bool PhysicsSystem::CheckAABB(const AABB & aabb, const int & collisionMask) {
+	aabbFilter = collisionMask;
+	world->QueryAABB(this, TypeConversion::ConvertToB2AABB(aabb));
+	if(aabbHit) {
+		aabbHit = false;
+		return true;
+	}
+	return aabbHit;
 }
 
 void PhysicsSystem::HandleMessage(const Message & message) {

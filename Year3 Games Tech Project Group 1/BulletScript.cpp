@@ -28,5 +28,6 @@ void BulletScript::OnCollisionEnter(const CollisionData & data) {
 }
 
 int BulletScript::GetSortOrder() {
-	return TypeInfo::ScriptSortOrder<BulletScript>();
+	const static int order = TypeInfo::ScriptSortOrder<BulletScript>();
+	return order;
 }

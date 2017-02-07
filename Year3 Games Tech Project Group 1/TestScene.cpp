@@ -127,7 +127,9 @@ void TestScene::Start() {
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	
+	std::shared_ptr<GameObject> player = gameObjectManager.GetGameObject("Player").lock();
+	std::shared_ptr<Transform2D> transform = player->GetComponent<Transform2D>().lock();
+	std::cout<< "AABB Collided = " << std::boolalpha << PhysicsSystem::GetInstance().CheckAABB(AABB(transform->GetPosition() + Vector2(-32.0f, -32.0f), transform->GetPosition() + Vector2(32.0f, 32.0f))) << std::endl;
 	Scene::FixedUpdate(fixedDeltaTime);
 }
 float reloadTime = 0.1f;

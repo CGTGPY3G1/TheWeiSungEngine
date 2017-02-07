@@ -11,7 +11,7 @@
 #include "WheelJoint.h"
 #include "ScriptableComponent.h"
 #include "RevoluteJoint.h"
-#include "CharacterMovementScript.h"
+#include "CharacterScript.h"
 #include "CameraFollowScript.h"
 #include "CivWaypointScript.h"
 #include "TileMapper.h"

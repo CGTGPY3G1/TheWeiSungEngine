@@ -26,7 +26,7 @@ void Scene::Reset() {
 
 void Scene::FixedUpdate(const float & fixedDeltaTime) {
 	PhysicsSystem::GetInstance().Update(fixedDeltaTime);
-	scriptManagementSystem->FixedUpdate(fixedDeltaTime);
+	if(scriptManagementSystem) scriptManagementSystem->FixedUpdate(fixedDeltaTime);
 	SyncPhysics();
 }
 
@@ -50,6 +50,7 @@ void Scene::Render() {
 		if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) == ComponentType::COMPONENT_SPRITE_RENDERER)
 			(*i)->ProcessComponents(gameObjects);
 	}
+	scriptManagementSystem->Render();
 	if(drawColliders) PhysicsSystem::GetInstance().Draw();
 	scriptManagementSystem->LateUpdate();
 }

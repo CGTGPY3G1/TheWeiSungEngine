@@ -48,5 +48,6 @@ void CameraFollowScript::SetTarget(std::weak_ptr<RigidBody2D> target) {
 }
 
 int CameraFollowScript::GetSortOrder() {
-	return TypeInfo::ScriptSortOrder<CameraFollowScript>();
+	const static int order = TypeInfo::ScriptSortOrder<CameraFollowScript>();
+	return order;
 }

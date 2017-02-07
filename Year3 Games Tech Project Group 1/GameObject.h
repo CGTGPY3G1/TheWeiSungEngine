@@ -3,15 +3,7 @@
 #define WS_GAMEOBJECT_H
 #include "ComponentManager.h"
 #include <string>
-
-enum CollisionCategory {
-	CATEGORY_ALL = 1 << 1,
-	CATEGORY_WHEEL = 1 << 2,
-	CATEGORY_CAR = 1 << 3,
-	CATEGORY_AI_CHARACTER = 1 << 4,
-	CATEGORY_PLAYER = 1 << 5,
-};
-
+#include <utility> 
 
 class GameObject : public std::enable_shared_from_this<GameObject>, public CollisionHandler {
 public:
@@ -26,6 +18,7 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::weak_ptr<T> GetComponentInParent();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> std::vector<std::weak_ptr<T>> GetComponents();
+	
 	std::vector<std::shared_ptr<ScriptableComponent>> GetScriptableComponents();
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> bool ComponentExistsInParents();
 	friend bool operator < (const GameObject & a, const GameObject & b);
@@ -55,6 +48,7 @@ public:
 	int GetCollisionCategory();
 	void SetCollisionMask(const int & collisionMask);
 	int GetCollisionMask();
+	void AllowCollisionsWith(const int & category, const bool & allowCollisions);
 	const bool CollidesWith(const int & collisionMask);
 	void Destroy();
 	template <class Archive>
@@ -78,7 +72,9 @@ public:
 			cereal::make_nvp("ComponentManager", componentManager));
 	}
 protected:	
+	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> int IterateComponentCount(const bool & increase);
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
+	std::vector<std::pair<unsigned int, int>> componentCounter;
 	unsigned int objectID;
 	unsigned int componentMask = 0;
 	bool enabled = true;
@@ -117,12 +113,40 @@ bool GameObject::ComponentExistsInParents() {
 
 template<typename T>
 bool GameObject::HasComponent() {
-	if(componentMask == 0) return false;
 	unsigned int component = TypeInfo::GetTypeID<T>();
+	if(componentMask == 0 || component == 0) return false;
 	return (componentMask & component) == component;
 }
 template<typename T>
-inline void GameObject::RemoveComponent(const unsigned int & id) {
+void GameObject::RemoveComponent(const unsigned int & id) {
 	componentManager.RemoveComponent<T>(id);
+}
+
+template<typename T>
+int GameObject::IterateComponentCount(const bool & increase) {
+	int count;
+	unsigned int type = TypeInfo::GetTypeID<T>();
+	bool found = false;
+	for(std::vector<std::pair<unsigned int, int>>::iterator it = componentCounter.begin(); it != componentCounter.end() && !found; ++it) {
+		if((*it).first == type) {
+			if(increase) {
+				count = (*it).second + 1;
+				(*it).second = count;
+				if(count == 1) componentMask |= type;
+			}
+			else {
+				count = (*it).second - 1;
+				(*it).second = count;
+				if(count == 0) componentMask &= ~type;
+			}
+			found = true;
+		}
+	}
+	if(!found && increase) {
+		count = 1;
+		componentCounter.push_back(std::pair<unsigned int, int>(type, count));
+		componentMask |= type;
+	}
+	return count;
 }
 #endif // !WS_GAMEOBJECT_H

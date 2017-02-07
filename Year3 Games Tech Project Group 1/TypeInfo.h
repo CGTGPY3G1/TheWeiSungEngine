@@ -15,7 +15,7 @@ public:
 	template<> const static ComponentType GetTypeID<PolygonCollider>() { return COMPONENT_POLYGON_COLLIDER_2D; }
 	template<> const static ComponentType GetTypeID<WheelJoint>() { return COMPONENT_WHEEL_JOINT; }
 	template<> const static ComponentType GetTypeID<RevoluteJoint>() { return COMPONENT_REVOLUTE_JOINT; }
-	template<> const static ComponentType GetTypeID<CharacterMovementScript>() { return COMPONENT_CHARACTER_MOVEMENT; }
+	template<> const static ComponentType GetTypeID<CharacterScript>() { return COMPONENT_CHARACTER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CameraFollowScript>() { return COMPONENT_CAMERA_FOLLOW; }
 	template<> const static ComponentType GetTypeID<CivWaypointScript>() { return COMPONENT_CIV_WAYPOINT; }
 	template<> const static ComponentType GetTypeID<TileMapper>() { return COMPONENT_TILE_MAPPER; }
@@ -35,7 +35,7 @@ public:
 	template<> const static bool AllowMultiple<AudioSource>() { return true; }
 
 	template <typename T> const static bool IsScriptable() { return false; };
-	template<> const static bool IsScriptable<CharacterMovementScript>() { return true; }
+	template<> const static bool IsScriptable<CharacterScript>() { return true; }
 	template<> const static bool IsScriptable<CameraFollowScript>() { return true; }
 	template<> const static bool IsScriptable<CivWaypointScript>() { return true; }
 	template<> const static bool IsScriptable<VehicleController>() { return true; }
@@ -44,7 +44,7 @@ public:
 
 	template <typename T> const static int ScriptSortOrder() { return 32; };
 	template<> const static int ScriptSortOrder<PlayerScript>() { return 0; }
-	template<> const static int ScriptSortOrder<CharacterMovementScript>() { return 1; }
+	template<> const static int ScriptSortOrder<CharacterScript>() { return 1; }
 	template<> const static int ScriptSortOrder<VehicleController>() { return 2; }
 	template<> const static int ScriptSortOrder<CivWaypointScript>() { return 3; }
 	template<> const static int ScriptSortOrder<BulletScript>() { return 4; }

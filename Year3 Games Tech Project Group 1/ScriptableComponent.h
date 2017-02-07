@@ -11,6 +11,7 @@ public:
 	virtual ~ScriptableComponent() {}
 	virtual void Update(const float & deltaTime) {}
 	virtual void FixedUpdate(const float & fixedDeltaTime) {}
+	virtual void Render() {}
 	virtual void LateUpdate() {}
 	virtual int GetSortOrder() = 0;
 	void OnCollisionEnter(const CollisionData & data) override {}

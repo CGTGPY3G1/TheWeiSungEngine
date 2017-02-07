@@ -17,7 +17,7 @@ CEREAL_REGISTER_TYPE(PolygonCollider);
 CEREAL_REGISTER_TYPE(SpriteRenderer);
 CEREAL_REGISTER_TYPE(ScriptableComponent);
 CEREAL_REGISTER_TYPE(CivWaypointScript);
-CEREAL_REGISTER_TYPE(CharacterMovementScript);
+CEREAL_REGISTER_TYPE(CharacterScript);
 CEREAL_REGISTER_TYPE(CameraFollowScript);
 CEREAL_REGISTER_TYPE(VehicleController);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, Transform2D);
@@ -29,7 +29,7 @@ CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, CircleCollider);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Collider, PolygonCollider);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(Component, ScriptableComponent);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CivWaypointScript);
-CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CharacterMovementScript);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CharacterScript);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, CameraFollowScript);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(ScriptableComponent, VehicleController);
 #endif // !WS_CEREAL_TYPE_REGISTRATION_H

@@ -1,7 +1,7 @@
 #include "CivWaypointScript.h"
 #include "RigidBody2D.h"
 #include "GameObject.h"
-#include "CharacterMovementScript.h"
+#include "CharacterScript.h"
 CivWaypointScript::CivWaypointScript() : ScriptableComponent() {
 }
 
@@ -13,7 +13,7 @@ CivWaypointScript::~CivWaypointScript() {
 
 void CivWaypointScript::Start() {
 	myRigidBody = GetComponent<RigidBody2D>();
-	movementScript = GetComponent<CharacterMovementScript>();
+	movementScript = GetComponent<CharacterScript>();
 }
 
 void CivWaypointScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -49,5 +49,6 @@ void CivWaypointScript::SetExtents(const float & left, const float & top, const 
 }
 
 int CivWaypointScript::GetSortOrder() {
-	return TypeInfo::ScriptSortOrder<CivWaypointScript>();
+	const static int order = TypeInfo::ScriptSortOrder<CivWaypointScript>();
+	return order;
 }

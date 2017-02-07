@@ -106,6 +106,10 @@ float Vector2::Dot(const Vector2 & other) {
 	return Dot(other.x, other.y);
 }
 
+const float Vector2::Dot(const Vector2 & other) const {
+	return (this->x * x) + (this->y * y);
+}
+
 float Vector2::Dot(const float & x, const float & y) {
 	return (this->x * x) + (this->y * y);
 }

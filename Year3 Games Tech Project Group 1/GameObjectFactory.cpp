@@ -1,6 +1,6 @@
 #include "GameObjectFactory.h"
 
-std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const Vector2 & position, const Vector2 & scale, const float & rotation) {
+std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();
 	character->Init(position, rotation, scale);
@@ -22,7 +22,9 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	sr->Init("Images/Characters.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 85);
 	sr->SetTextureRect(64 * characterType, 0, 64, 64);
 	r->SetMass(10);
-	character->AddComponent<CharacterMovementScript>().lock()->Start();
+	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
+	cs->Start();
+	cs->SetArtificiallyIntelligent(aiControlled);
 	return character;
 }
 

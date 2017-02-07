@@ -49,7 +49,8 @@ void VehicleController::Steer(const float & steerValue) {
 }
 
 int VehicleController::GetSortOrder() {
-	return TypeInfo::ScriptSortOrder<VehicleController>();
+	const static int order = TypeInfo::ScriptSortOrder<VehicleController>();
+	return order;
 }
 
 Vector2 VehicleController::GetLateralVelocity(std::shared_ptr<RigidBody2D> r) {

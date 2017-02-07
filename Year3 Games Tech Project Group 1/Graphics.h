@@ -17,7 +17,7 @@ struct GraphicsSettings {
 	std::string windowTitle = "Unnamed Window";
 	Vector2 screenPosition = {500.0f, 20.0f}, resolution = {1280.0f, 720.0f};
 	unsigned int depthBits = 24, antialiasingLevel = 0, stencilBits = 8, minorVersion = 2, majorversion = 2, maxFPS = 60;
-	bool fullScreen = false, resizeable = true, vSync = true;
+	bool fullScreen = false, resizeable = true, vSync = false;
 	 
 	bool operator == (GraphicsSettings other) {
 		return (screenPosition == screenPosition && resolution == resolution && depthBits == other.depthBits && antialiasingLevel == other.antialiasingLevel && stencilBits == other.stencilBits &&minorVersion == other.minorVersion &&
@@ -48,7 +48,7 @@ public:
 	void Draw(const sf::Sprite & sprite);
 	void Draw(const sf::Shape & shape);
 	void Draw(const sf::VertexArray & vertexArray);
-	void Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
+	void Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
 	void DrawCircle(const sf::CircleShape & c);
 	void Draw(const sf::Drawable & d, const sf::Transform & t);
 	void Draw(const sf::Drawable & d, const sf::RenderStates & r);

@@ -14,7 +14,7 @@ PolygonCollider::~PolygonCollider() {
 }
 
 void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2> verts, const bool & isSensor, const float & density, const float & friction, const float & restitution) {
-	unsigned int noOfVerts = verts.size();
+	size_t noOfVerts = verts.size();
 	assert(noOfVerts >= 3);
 	shape = new b2PolygonShape();
 	b2Vec2 cVert = TypeConversion::ConvertToB2Vector2(offset);

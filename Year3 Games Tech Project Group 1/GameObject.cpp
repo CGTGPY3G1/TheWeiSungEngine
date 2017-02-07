@@ -131,6 +131,14 @@ int GameObject::GetCollisionMask() {
 	return collisionMask;
 }
 
+void GameObject::AllowCollisionsWith(const int & category, const bool & allowCollisions) {
+	collisionMask = allowCollisions ? (collisionMask | category) : ~(collisionMask | category);
+	int * data = new int(collisionMask);
+	Message m = Message(MessageScope::MESSAGE_SCOPE_GAMEOBJECT, MessageType::MESSAGE_TYPE_UPDATE_COLLISION_MASK, data);
+	componentManager.HandleMessage(m);
+	delete data;
+}
+
 const bool GameObject::CollidesWith(const int & collisionMask) {
 	return (this->collisionMask & collisionMask) == collisionMask;
 }
@@ -162,3 +170,4 @@ bool operator<(const GameObject & a, const GameObject & b) {
 bool operator == (const GameObject & a, const GameObject & b) {
 	return a.objectID == b.objectID;
 }
+

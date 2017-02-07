@@ -1,0 +1,14 @@
+#pragma once
+#ifndef WS_COLLISION_MASKS_H
+#define WS_COLLISION_MASKS_H
+
+enum CollisionCategory {
+	CATEGORY_ALL = 0xFFFF,
+	CATEGORY_DEFAULT = 1 << 0,
+	CATEGORY_WHEEL = 1 << 1,
+	CATEGORY_CAR = 1 << 2,
+	CATEGORY_AI_CHARACTER = 1 << 3,
+	CATEGORY_PLAYER = 1 << 4,
+};
+
+#endif // !WS_COLLISION_MASKS_H
