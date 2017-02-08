@@ -16,6 +16,10 @@ public:
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	const std::string GetName() const override { return "PlayerScript"; }
 	int GetSortOrder() override;
+	void OnCollisionEnter(const CollisionData & data) override;
+	void OnCollisionExit(const CollisionData & data) override;
+	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 private:
 	bool driving = false;
 	float reloadTime = 0.0f;

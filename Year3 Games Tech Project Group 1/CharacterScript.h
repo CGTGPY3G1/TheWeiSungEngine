@@ -24,10 +24,7 @@ public:
 	float AngleToTurn(const RayCastHit & hit, Vector2 right, Vector2 position);
 	const bool IsArtificiallyIntelligent() const;
 	void SetArtificiallyIntelligent(const bool & isAI);
-	float GetHealth();
-	const float GetHealth() const;
-	void SetHealth(const float newHealth);
-	void AddToHealth(const float amount);
+	
 
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
@@ -41,7 +38,7 @@ public:
 		ScriptableComponent::save(ar);
 	}
 private:
-	float health = 50;
+	
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> transform;
 	bool isAI = false;

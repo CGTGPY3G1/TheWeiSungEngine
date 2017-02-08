@@ -4,13 +4,18 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();
 	character->Init(position, rotation, scale);
-	if(characterType != 0) {
-		int mask = character->GetCollisionMask();
-		mask ^= CollisionCategory::CATEGORY_AI_CHARACTER;
-		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
+	std::shared_ptr<HealthScript> hs = character->AddComponent<HealthScript>().lock();
+	if(characterType != 0) {	
+		const int mask = ~(CollisionCategory::CATEGORY_ALL & CollisionCategory::CATEGORY_PLAYER);
+		character->SetCollisionFilter(CollisionCategory::CATEGORY_PLAYER, mask);		
+		hs->Start();
+		hs->SetHealth(100.0f);
 	}
 	else {
-		character->SetCollisionCategory(CollisionCategory::CATEGORY_PLAYER);
+		const int mask = ~(CollisionCategory::CATEGORY_ALL & CollisionCategory::CATEGORY_AI_CHARACTER);
+		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
+		hs->Start();
+		hs->SetHealth(50.0f);
 	}
 	std::shared_ptr<RigidBody2D> r = character->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody, false, 0.5f, 1.0f);
@@ -25,6 +30,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
 	cs->Start();
 	cs->SetArtificiallyIntelligent(aiControlled);
+	
 	return character;
 }
 

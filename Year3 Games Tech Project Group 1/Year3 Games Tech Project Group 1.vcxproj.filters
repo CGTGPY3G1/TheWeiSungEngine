@@ -198,9 +198,6 @@
     <ClInclude Include="ComponentData.h">
       <Filter>Header Files\Engine\Components</Filter>
     </ClInclude>
-    <ClInclude Include="RevoluteJoint.h">
-      <Filter>Header Files\Engine\Components</Filter>
-    </ClInclude>
     <ClInclude Include="ScriptManagementSystem.h">
       <Filter>Header Files\Engine\Systems</Filter>
     </ClInclude>
@@ -263,6 +260,12 @@
     </ClInclude>
     <ClInclude Include="AABB.h">
       <Filter>Header Files\Engine\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="RampageScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -368,9 +371,6 @@
     <ClCompile Include="Joint.cpp">
       <Filter>Source Files\Engine\Components</Filter>
     </ClCompile>
-    <ClCompile Include="RevoluteJoint.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
-    </ClCompile>
     <ClCompile Include="ScriptManagementSystem.cpp">
       <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
@@ -415,6 +415,12 @@
     </ClCompile>
     <ClCompile Include="CharacterScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="RampageScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthScript.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

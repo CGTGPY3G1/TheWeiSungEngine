@@ -17,6 +17,7 @@
 #include <memory>
 #include "CerealTypeRegistration.h"
 #include "EngineSettings.h"
+
 TestScene::TestScene() : Scene() {
 }
 
@@ -35,6 +36,15 @@ void TestScene::Start() {
 	tileMapper->Init(EngineSettings::TILESET_FILE_NAME, EngineSettings::TILESET_NAME);
 
 	Engine::GetInstance().GetGraphics().lock()->SetCameraPosition(gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock()->GetPosition());
+	Vector2 rampagePosition = Vector2(16312.0f, 11568.0f);
+	std::shared_ptr<GameObject> rampage = gameObjectManager.CreateGameObject("Rampage").lock();
+	rampage->Init(rampagePosition, 0.0f, scale);
+	std::shared_ptr<RampageScript> rs = rampage->AddComponent<RampageScript>().lock();
+	rs->Start();
+	rs->SetSpawnRadius(20.0f * Physics::PIXELS_PER_METRE);
+	rs->SetRequiredKills(50);
+	rs->SetRunTime(60.0f);
+
 	/*static const std::string vertShader = \
 		"void main(){"\
 		"   gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * gl_Vertex;"\
@@ -126,20 +136,29 @@ void TestScene::Start() {
 
 
 void TestScene::FixedUpdate(const float & fixedDeltaTime) {
-	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	std::shared_ptr<GameObject> player = gameObjectManager.GetGameObject("Player").lock();
-	std::shared_ptr<Transform2D> transform = player->GetComponent<Transform2D>().lock();
-	std::cout<< "AABB Collided = " << std::boolalpha << PhysicsSystem::GetInstance().CheckAABB(AABB(transform->GetPosition() + Vector2(-32.0f, -32.0f), transform->GetPosition() + Vector2(32.0f, 32.0f))) << std::endl;
 	Scene::FixedUpdate(fixedDeltaTime);
 }
-float reloadTime = 0.1f;
+
 void TestScene::Update(const float & deltaTime) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-
 	
 	Scene::Update(deltaTime);
 	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
 	mousePosition = input->GetMousePosition();
+	if(input->GetKeyDown(KeyCodes::KeyCode::E)) {
+		std::shared_ptr<GameObject> player = gameObjectManager.GetGameObject("Player").lock(), rampage = gameObjectManager.GetGameObject("Rampage").lock();
+		if(player && rampage) {
+			std::shared_ptr<Transform2D> pt = player->GetComponent<Transform2D>().lock(), rt = rampage->GetComponent<Transform2D>().lock();
+			if(pt && rt) {
+				if((rt->GetPosition() - pt->GetPosition()).Magnitude() < 160.0f) {
+					std::shared_ptr<RampageScript> rs = rampage->GetComponent<RampageScript>().lock();
+					if(rs && !rs->IsActive()) {
+						rs->Activate(pt);
+					}
+				}
+			}
+		}
+	}
 
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
@@ -150,12 +169,13 @@ void TestScene::Render() {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	std::shared_ptr<GameObject> tileset = gameObjectManager.GetGameObject("BackgroundTileset").lock();
 	if(tileset) {
+		
 		std::shared_ptr<TileMapper> tileMapper = tileset->GetComponent<TileMapper>().lock();
 		tileMapper->Draw();
 	}
-	Engine engine = Engine::GetInstance();
+	//Engine engine = Engine::GetInstance();
 	Scene::Render();
-	float zoom = engine.GetGraphics().lock()->GetCameraZoom();
-
-	engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
+	//float zoom = engine.GetGraphics().lock()->GetCameraZoom();
+	//std::shared_ptr<Transform2D> p = gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock();
+	//engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
 }

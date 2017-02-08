@@ -37,9 +37,9 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE, raycastMask);
 			float angle2 = AngleToTurn(hit, right, characterPosition);
 			if(angle2 > 0)
-				angle += angle2;
-			else
 				angle -= angle2;
+			else
+				angle += angle2;
 			rayPosition = characterPosition - offset;
 			forward.RotateInDegrees(-fov * 2.0f);
 			right.RotateInDegrees(-fov * 2.0f);
@@ -50,16 +50,15 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 			else
 				angle -= angle2;
 			if(angle < -0.0001f || angle > 0.0001f) {
-				rb->AddTorque(angle*2.0f, ForceType::IMPULSE_FORCE);
+				rb->AddTorque(angle * (1.0f/25.0f) * rb->GetMass(), ForceType::IMPULSE_FORCE);
 			}
 			else {
 				const float angularVelocity = rb->GetAngularVelocity();
 				if(angularVelocity < -0.0001f || angularVelocity > 0.0001f) {
-					rb->AddTorque(-angularVelocity, ForceType::IMPULSE_FORCE);
+					rb->AddTorque(-angularVelocity * (1.0f / 50.0f) * rb->GetMass(), ForceType::IMPULSE_FORCE);
 				}
 			}
-			float moveAmount = rb->GetMass();
-			MoveUsingPhysics((Vector2(moveAmount, 0.0f)), false);
+			MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
 		}
 	}
 }
@@ -144,21 +143,7 @@ void CharacterScript::SetArtificiallyIntelligent(const bool & isAI) {
 	this->isAI = isAI;
 }
 
-float CharacterScript::GetHealth() {
-	return health;
-}
 
-const float CharacterScript::GetHealth() const {
-	return health;
-}
-
-void CharacterScript::SetHealth(const float newHealth) {
-	health = newHealth;
-}
-
-void CharacterScript::AddToHealth(const float amount) {
-	health -= amount;
-}
 
 int CharacterScript::GetSortOrder() {
 	const static int order = TypeInfo::ScriptSortOrder<CharacterScript>();

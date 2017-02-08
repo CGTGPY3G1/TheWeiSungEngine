@@ -10,7 +10,7 @@
 #include "PolygonCollider.h"
 #include "WheelJoint.h"
 #include "ScriptableComponent.h"
-#include "RevoluteJoint.h"
+#include "RampageScript.h"
 #include "CharacterScript.h"
 #include "CameraFollowScript.h"
 #include "CivWaypointScript.h"
@@ -19,4 +19,5 @@
 #include "BulletScript.h"
 #include "PlayerScript.h"
 #include "AudioSource.h"
+#include "HealthScript.h"
 #endif !WS_COMPENENT_HEADERS_H

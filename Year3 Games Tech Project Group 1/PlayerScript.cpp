@@ -30,7 +30,7 @@ void PlayerScript::Update(const float & deltaTime) {
 		}
 		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {
 			const float recoil = Random::RandomFloat(-10.0f, 10.0f);
-			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 64.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 20.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
+			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 38.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 40.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
 			reloadTime = 0.085f;
 		}
 		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
@@ -73,14 +73,6 @@ void PlayerScript::Update(const float & deltaTime) {
 				}
 			}
 		}
-	}
-	if(input->GetKeyDown(KeyCodes::KeyCode::P)) {
-		std::shared_ptr<GameObject> p = player.lock();
-		if(p) {
-			std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
-			if(cc) cc->SetArtificiallyIntelligent(!cc->IsArtificiallyIntelligent());
-		}
-
 	}
 }
 
@@ -171,5 +163,23 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 int PlayerScript::GetSortOrder() {
 	const static int order = TypeInfo::ScriptSortOrder<PlayerScript>();
 	return order;
+}
+
+void PlayerScript::OnCollisionEnter(const CollisionData & data) {
+	//std::shared_ptr<GameObject> g = data.gameObject.lock();
+	//std::shared_ptr<GameObject> mg = gameObject.lock();
+	//if(g && mg) std::cout << mg->GetName() + " Collided with: " + g->GetName() << std::endl;
+}
+
+void PlayerScript::OnCollisionExit(const CollisionData & data) {
+	/*std::shared_ptr<GameObject> g = data.gameObject.lock();
+	std::shared_ptr<GameObject> mg = gameObject.lock();
+	if(g && mg) std::cout << mg->GetName() + " Stopped Collided with: " + g->GetName() << std::endl;*/
+}
+
+void PlayerScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
+}
+
+void PlayerScript::OnSensorExit(const std::weak_ptr<Collider>& collider) {
 }
 

@@ -24,7 +24,13 @@ void BulletScript::Update(const float & deltaTime) {
 
 void BulletScript::OnCollisionEnter(const CollisionData & data) {
 	lifeTime = -1.0f;
-	
+	std::shared_ptr<GameObject> g = data.gameObject.lock();
+	if(g) {
+		std::shared_ptr<HealthScript> hs = g->GetComponent<HealthScript>().lock();
+		if(hs) {
+			hs->AddToHealth(-Random::RandomFloat(30.0f, 60.0f));
+		}
+	}
 }
 
 int BulletScript::GetSortOrder() {

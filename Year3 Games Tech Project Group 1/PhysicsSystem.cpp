@@ -301,10 +301,6 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
 			wj->joint = world->CreateJoint(wj->jointDef);
 		}
-		if(data->type == ComponentType::COMPONENT_REVOLUTE_JOINT) {
-			std::shared_ptr<RevoluteJoint> rj = std::static_pointer_cast<RevoluteJoint>(data->comp.lock());
-			rj->joint = world->CreateJoint(rj->jointDef);
-		}
 		break;
 	}
 	case MessageType::MESSAGE_TYPE_UNREGISTER_JOINT:
@@ -313,10 +309,6 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 		if(data->type == ComponentType::COMPONENT_WHEEL_JOINT) {
 			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
 			world->DestroyJoint(wj->joint);
-		}
-		if(data->type == ComponentType::COMPONENT_REVOLUTE_JOINT) {
-			std::shared_ptr<RevoluteJoint> rj = std::static_pointer_cast<RevoluteJoint>(data->comp.lock());
-			world->DestroyJoint(rj->joint);
 		}
 		break;
 	}

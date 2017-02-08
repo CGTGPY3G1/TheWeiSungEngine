@@ -172,6 +172,7 @@
     <ClInclude Include="EngineSettings.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GameObjectFactory.h" />
+    <ClInclude Include="HealthScript.h" />
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
     <ClInclude Include="PlayerScript.h" />
@@ -181,7 +182,7 @@
     <ClInclude Include="VehicleController.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="RevoluteJoint.h" />
+    <ClInclude Include="RampageScript.h" />
     <ClInclude Include="ScriptManagementSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="BoxCollider.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="HealthScript.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Joint.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -261,7 +263,7 @@
     <ClCompile Include="TileInfo.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />
-    <ClCompile Include="RevoluteJoint.cpp" />
+    <ClCompile Include="RampageScript.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />

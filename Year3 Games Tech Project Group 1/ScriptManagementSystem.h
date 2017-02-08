@@ -16,6 +16,9 @@ public:
 	void Render();
 	void LateUpdate();
 private:
-	std::vector<std::shared_ptr<ScriptableComponent>> scripts;
+	std::vector<std::shared_ptr<ScriptableComponent>> updatable;
+	std::vector<std::shared_ptr<ScriptableComponent>> fixedUpdatable;
+	std::vector<std::shared_ptr<ScriptableComponent>> lateUpdatable;
+	std::vector<std::shared_ptr<ScriptableComponent>> renderable;
 };
 #endif // !WS_SCRIPT_MAMAGEMENT_SYSTEM_H

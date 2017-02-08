@@ -69,7 +69,7 @@ Vector2 Vector2::operator -= (const Vector2 & toSubtract) {
 }
 
 Vector2 Vector2::Scale(const float & scalar) {
-	this->x *= x; this->y *= y;
+	this->x *= scalar; this->y *= scalar;
 	return *this;
 }
 
