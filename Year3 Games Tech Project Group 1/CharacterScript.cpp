@@ -35,20 +35,15 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 			forward.RotateInDegrees(fov);
 			right.RotateInDegrees(fov);
 			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE, raycastMask);
-			float angle2 = AngleToTurn(hit, right, characterPosition);
-			if(angle2 > 0)
-				angle -= angle2;
-			else
-				angle += angle2;
+			//float angle2 = AngleToTurn(hit, right, characterPosition);
+			//if(angle2 < 0.0f) angle2 *= -1.0f;
+			//angle -= angle2;
 			rayPosition = characterPosition - offset;
 			forward.RotateInDegrees(-fov * 2.0f);
 			right.RotateInDegrees(-fov * 2.0f);
 			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE, raycastMask);
-			angle2 = AngleToTurn(hit, right, characterPosition);
-			if(angle2 > 0)
-				angle += angle2;
-			else
-				angle -= angle2;
+			//angle2 = AngleToTurn(hit, right, characterPosition);
+			//angle += angle2;
 			if(angle < -0.0001f || angle > 0.0001f) {
 				rb->AddTorque(angle * (1.0f/25.0f) * rb->GetMass(), ForceType::IMPULSE_FORCE);
 			}
@@ -130,7 +125,7 @@ float CharacterScript::AngleToTurn(const RayCastHit & hit, Vector2 right, Vector
 			}
 		}
 		const float dot = right.Dot(hit.normals[index]);
-		return dot < 0.0f ? -1.0f + dot : 1.0f - dot;
+		return dot < 0.0f ? -1.0f - dot : 1.0f - dot;
 	}
 	return 0.0f;
 }

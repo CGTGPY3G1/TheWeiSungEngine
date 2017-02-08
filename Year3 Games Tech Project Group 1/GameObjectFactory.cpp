@@ -5,7 +5,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();
 	character->Init(position, rotation, scale);
 	std::shared_ptr<HealthScript> hs = character->AddComponent<HealthScript>().lock();
-	if(characterType != 0) {	
+	if(characterType == 0) {	
 		const int mask = ~(CollisionCategory::CATEGORY_ALL & CollisionCategory::CATEGORY_PLAYER);
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_PLAYER, mask);		
 		hs->Start();

@@ -25,8 +25,8 @@ void RampageScript::Start() {
 
 void RampageScript::Update(const float & deltaTime) {
 	if(activated) {		
-		if(kills < requiredKills) {
-			if(runTime > 0.0f) {
+		bool rampageOver = kills >= requiredKills || runTime <= 0.0001f;
+		if(!rampageOver) {
 				runTime -= deltaTime;
 				if(civs.size() < MAX_CIVS) SpawnCivilians(1);
 				if(!target.expired()) {
@@ -52,7 +52,6 @@ void RampageScript::Update(const float & deltaTime) {
 						}
 					}
 				}
-			}		
 		}
 		else {
 			if(!deactivated) {
@@ -81,7 +80,8 @@ void RampageScript::Render() {
 	std::shared_ptr<Graphics> graphics = engine.GetGraphics().lock();
 	float zoom = graphics->GetCameraZoom();
 	if(activated)  {
-		if(kills < requiredKills) { if(runTime > 0.0f) graphics->Draw("Kill Count = " + std::to_string(kills) + "	Required = " + std::to_string(requiredKills) + " |	Time = " + std::to_string(runTime), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom)); }
+		bool rampageOver = kills >= requiredKills || runTime <= 0.0001f;
+		if(!rampageOver)   graphics->Draw("Kill Count = " + std::to_string(kills) + "	Required = " + std::to_string(requiredKills) + " |	Time = " + std::to_string(runTime), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom)); 
 		else if(endTimer > 0.0f) {
 			Vector2 position = Vector2(640.0f, 150.0f);
 			graphics->Draw(((kills >= requiredKills) ? "You Win!" : "You Lose!"), position, (unsigned int)(80.0f * zoom), 1.0f, 1.0f, 1.0f, 1.0f, TextAlignment::CENTRE_ALIGNED);

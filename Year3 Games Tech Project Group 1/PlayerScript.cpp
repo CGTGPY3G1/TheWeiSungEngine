@@ -29,7 +29,7 @@ void PlayerScript::Update(const float & deltaTime) {
 			reloadTime -= deltaTime;
 		}
 		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {
-			const float recoil = Random::RandomFloat(-10.0f, 10.0f);
+			const float recoil = Random::RandomFloat(-5.0f, 5.0f);
 			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 38.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 40.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
 			reloadTime = 0.085f;
 		}
