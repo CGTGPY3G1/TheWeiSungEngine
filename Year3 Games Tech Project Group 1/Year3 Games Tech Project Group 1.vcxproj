@@ -173,7 +173,6 @@
     <ClInclude Include="EngineSettings.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="GameObjectFactory.h" />
-    <ClInclude Include="GridSolver.h" />
     <ClInclude Include="HealthScript.h" />
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
@@ -251,7 +250,6 @@
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="GameObjectManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="GridSolver.cpp" />
     <ClCompile Include="HealthScript.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Joint.cpp" />
