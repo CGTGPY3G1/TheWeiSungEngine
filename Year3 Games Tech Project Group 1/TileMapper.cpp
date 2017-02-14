@@ -27,6 +27,8 @@ void TileMapper::Init(const std::string & fileName, const std::string & tilesetN
 bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tilesetName) {
 	map = std::make_shared<TmxMap>(xml);
 	if(map->isValid) {
+		std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
+		worldScale = transform->GetScale();
 		halfWidth = (float)((map->width - 1) * map->tileWidth) / 2;
 		halfHeight = (float)(map->height * map->tileHeight) / 2;
 		bool foundSet = false;
@@ -60,8 +62,7 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 
 
 void TileMapper::ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group) {
-	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
-	Vector2 scale = transform->GetScale();
+	
 	const size_t noOfObjects = group->objects.size();
 	
 	for(size_t i = 0; i < noOfObjects; i++) {
@@ -69,8 +70,8 @@ void TileMapper::ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group) {
 		
 		const size_t noOfProperties = object->properties.size();
 		const Vector2 objectScale = GetBuildingScale(object->type, object->width, object->height);
-		const Vector2 adjustedScale = Vector2(scale.x * objectScale.x, scale.y * objectScale.y);
-		Vector2 position = Vector2((object->x - halfWidth) * scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
+		const Vector2 adjustedScale = Vector2(worldScale.x * objectScale.x, worldScale.y * objectScale.y);
+		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		std::shared_ptr<GameObject> newBuilding = GameObjectFactory::CreateBuilding(object->type, position, adjustedScale, object->rotation).lock();
 	}
 }
@@ -106,15 +107,14 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 }
 
 void TileMapper::ProcessCharacters(std::shared_ptr<TmxGroup> group) {
-	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
-	Vector2 scale = transform->GetScale();
+
 	const size_t noOfObjects = group->objects.size();
 
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
 
 		const size_t noOfProperties = object->properties.size();
-		Vector2 position = Vector2((object->x - halfWidth)* scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
+		Vector2 position = Vector2((object->x - halfWidth)* worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		if(object->name == "Player") {
 			std::shared_ptr<GameObject> player = GameObjectFactory::CreateCharacter(object->name, object->type, false, position, Vector2::One, object->rotation).lock();
 			std::shared_ptr<CircleCollider> playerSensor = player->AddComponent<CircleCollider>().lock();
@@ -128,15 +128,14 @@ void TileMapper::ProcessCharacters(std::shared_ptr<TmxGroup> group) {
 }
 
 void TileMapper::ProcessVehicles(std::shared_ptr<TmxGroup> group) {
-	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
-	Vector2 scale = transform->GetScale();
+
 	const size_t noOfObjects = group->objects.size();
 
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
 
 		const size_t noOfProperties = object->properties.size();
-		Vector2 position = Vector2((object->x - halfWidth)* scale.x, (object->y - halfHeight) * scale.y) + Vector2((object->width / 2) * scale.x, (object->height / 2) * -scale.y).RotateInDegrees(object->rotation);
+		Vector2 position = Vector2((object->x - halfWidth)* worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		GameObjectFactory::CreateVehicle(object->type, position, Vector2::One, object->rotation).lock();
 	}
 }
@@ -152,11 +151,20 @@ const GridLocation TileMapper::IndexToGrid(const int & index) {
 }
 
 const GridLocation TileMapper::WorldToGrid(const Vector2 & worldPosition) {
-	return GridLocation((int)(worldPosition.x / tileWidth), (int)(worldPosition.y / tileHeight));
+	const int x = (int)(((worldPosition.x / worldScale.x) + halfWidth) / (tileWidth)), y = (int)(((worldPosition.y / worldScale.y) + halfHeight) / (tileHeight));
+	return GridLocation(x, y);
 }
 
-const int TileMapper::WorldToIndex(const Vector2 & worldPosition) {
-	return 0;
+const TileType TileMapper::GetTileType(const Vector2 & worldPosition) {
+	GridLocation toGrid = WorldToGrid(worldPosition);
+	if(toGrid.x < 0 || toGrid.x >= width || toGrid.y < 0 || toGrid.y >= height) return TileType::TILE_TYPE_NULL;
+	return tiles[toGrid.y][toGrid.x].type;
+}
+
+const std::string TileMapper::GetTileTypeAsString(const Vector2 & worldPosition) {
+	TileType type = GetTileType(worldPosition);
+	if(type == TileType::TILE_TYPE_NULL) return "No Tile Detected";
+	return tileTypeNames[(int)type];
 }
 
 

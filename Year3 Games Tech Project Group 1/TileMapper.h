@@ -5,6 +5,8 @@
 #include "Component.h"
 #include "Graphics.h"
 enum TileType {
+	BLOCKED = -1000,
+	WALKABLE = -500,
 	TILE_TYPE_NULL = -1,
 	TILE_TYPE_WATER = 0,
 	TILE_TYPE_GRASS = 1,
@@ -18,10 +20,11 @@ enum TileType {
 	TILE_TYPE_PAVEMENT_ROAD = 9,
 	TILE_TYPE_PAVEMENT_GRASS = 10,
 	TILE_TYPE_PAVEMENT_WATER = 11,
-	WALKABLE = 500,
-	BLOCKED = 1000
+	MAX_TILE_TYPES
 };
-
+static const std::string tileTypeNames [] = {"Water", "Grass", "Sand", "Pavement", "Road", "Water and Sand", 
+											"Water and Grass", "Sand and Grass", "Road Divider", "Pavement and Road", 
+											"Pavement and Grass", "Pavement and Water"};
 struct GridLocation {
 	GridLocation(const int & nX = 0, const int & nY = 0) : x(nX), y(nY) {}
 	int x = 0, y = 0;
@@ -117,7 +120,8 @@ public:
 	Vector2 IndexToWorld(const int & index);
 	const GridLocation IndexToGrid(const int & index);
 	const GridLocation WorldToGrid(const Vector2 & worldPosition);
-	const int WorldToIndex(const Vector2 & worldPosition);
+	const TileType GetTileType(const Vector2 & worldPosition);
+	const std::string GetTileTypeAsString(const Vector2 & worldPosition);
 	bool IsValid();
 	void Draw();
 private:
@@ -129,6 +133,6 @@ private:
 	sf::RenderStates renderStates;
 	unsigned int tileWidth = 32, tileHeight = 32, width = 0, height = 0;
 	float halfWidth = 0, halfHeight = 0;
-
+	Vector2 worldScale = Vector2::One;
 };
 #endif // !WS_TILE_MAPPER_H

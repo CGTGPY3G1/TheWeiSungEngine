@@ -25,6 +25,7 @@ void PlayerScript::Start() {
 void PlayerScript::Update(const float & deltaTime) {
 	if(player.use_count() < 1) player = GameObjectManager::GetInstance().GetGameObject("Player");
 	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
+	std::cout << GameObjectManager::GetInstance().GetGameObject("BackgroundTileset").lock()->GetComponent<TileMapper>().lock()->GetTileTypeAsString(player.lock()->GetComponent<Transform2D>().lock()->GetPosition());
 	if(!driving) {
 		std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
 		if(reloadTime > 0.0f) {
