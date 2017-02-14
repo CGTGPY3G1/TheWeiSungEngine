@@ -129,6 +129,7 @@ void Graphics::Draw(const std::string & text, const Vector2 & position, const un
 	toDraw.setCharacterSize(characterSize);
 	toDraw.setStyle(sf::Text::Bold);
 	toDraw.setFillColor(TypeConversion::ConvertToSFColour(r, g, b, a));
+	toDraw.setOutlineColor(sf::Color(0, 0, 0, 255));
 	if(alignment != TextAlignment::LEFT_ALIGNED) {
 		float width = toDraw.getLocalBounds().width;
 		if(alignment == TextAlignment::CENTRE_ALIGNED) toDraw.setOrigin(sf::Vector2f(width / 2, 0));
@@ -136,8 +137,6 @@ void Graphics::Draw(const std::string & text, const Vector2 & position, const un
 	}
 	sf::Vector2i pos = sf::Vector2i((int)(position.x * windowScale.x), (int)(position.y * windowScale.y));
 	toDraw.setPosition(window.mapPixelToCoords(pos));
-	toDraw.setFillColor(sf::Color::White);
-
 	window.draw(toDraw);
 }
 

@@ -5,31 +5,30 @@
 #include "Component.h"
 #include "Graphics.h"
 enum TileType {
-	WALKABLE = 1,
-	GRAVEL = 2,
+	TILE_TYPE_NULL = -1,
+	TILE_TYPE_WATER = 0,
+	TILE_TYPE_GRASS = 1,
+	TILE_TYPE_SAND = 2,
+	TILE_TYPE_PAVEMENT = 3,
+	TILE_TYPE_ROAD = 4,
+	TILE_TYPE_WATER_SAND = 5,
+	TILE_TYPE_WATER_GRASS = 6,
+	TILE_TYPE_SAND_GRASS = 7,
+	TILE_TYPE_ROAD_DIVIDER = 8,
+	TILE_TYPE_PAVEMENT_ROAD = 9,
+	TILE_TYPE_PAVEMENT_GRASS = 10,
+	TILE_TYPE_PAVEMENT_WATER = 11,
+	WALKABLE = 500,
 	BLOCKED = 1000
 };
 
 struct GridLocation {
-	unsigned int x = 0, y = 0;
+	GridLocation(const int & nX = 0, const int & nY = 0) : x(nX), y(nY) {}
+	int x = 0, y = 0;
 	bool operator == (const GridLocation& other) const { return x == other.x && y == other.y; }
-	bool operator < (const GridLocation& other) const { 
-		const unsigned int dif = other.x - x;
-		if(dif == 0) return (other.y - y < 0);
-		return dif < 0;
-	}
-	bool operator > (const GridLocation& other) const {
-		const unsigned int dif = other.x - x;
-		if(dif == 0) return (other.y - y > 0);
-		return dif > 0;
-	}
-	bool operator()(const GridLocation& other) const { 
-		const unsigned int dif = other.x - x;
-		if(dif == 0) return (other.y - y < 0);
-		return dif < 0;
-	}
-	//bool operator()(const GridLocation& lhs, const GridLocation& rhs) const { return lhs.x == rhs.x && lhs.y == rhs.y; }
+	bool operator()(const GridLocation& other) const { return x == other.x && y == other.y; }
 };
+
 namespace std {
 	template <>
 	struct hash<GridLocation> : public unary_function<GridLocation, int> {
@@ -40,7 +39,7 @@ namespace std {
 	template <>
 	struct equal_to<GridLocation> : public unary_function<GridLocation, bool> {
 		bool operator()(const GridLocation& lhs, const GridLocation& rhs) const {
-			return lhs.x == rhs.x && lhs.y == rhs.y;;
+			return lhs.x == rhs.x && lhs.y == rhs.y;
 		}
 	};
 
@@ -63,24 +62,25 @@ struct NavInfo {
 	bool operator == (const NavInfo* other) const { return x == other->x && y == other->y; }
 
 	bool operator()(const NavInfo& lhs, const NavInfo& rhs) const { 
-		const float dif = (lhs.g + lhs.h) - (rhs.g + rhs.h);
+		/*const float dif = (lhs.g + lhs.h) - (rhs.g + rhs.h);
 		if(dif > -0.00001f && dif < 0.00001f) return lhs.h < rhs.h;
-		return dif > 0;
+		return dif > 0;*/
+		return (lhs.GetF() < rhs.GetF());
 	}
 	bool operator()(const NavInfo* lhs, const NavInfo* rhs) const { 
-		return (lhs->x + lhs->y) < (rhs->x + rhs->y);
+		return (lhs->GetF() < rhs->GetF());
 	}
 	bool operator < (const NavInfo& rhs) const {
-		return (x + y) < (rhs.x + rhs.y);
+		return (GetF() < rhs.GetF());
 	}
 	bool operator > (const NavInfo& rhs) const { 
-		return (x + y) < (rhs.x + rhs.y);
+		return (GetF() > rhs.GetF());
 	}
 	bool operator < (const NavInfo* rhs) const {
-		return (x + y) < (rhs->x + rhs->y);
+		return (GetF() < rhs->GetF());
 	}
 	bool operator > (const NavInfo* rhs) const {
-		return (x + y) > (rhs->x + rhs->y);
+		return (GetF() > rhs->GetF());
 	}
 };
 
@@ -88,6 +88,7 @@ struct Tile {
 	unsigned int id = -1;
 	sf::Sprite sprite;
 	std::vector<sf::Vertex> verts;
+	TileType type;
 };
 
 class Transform2D;
@@ -113,13 +114,21 @@ public:
 	void ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::shared_ptr<TmxLayer> layer, sf::Texture & texture);
 	void ProcessCharacters(std::shared_ptr<TmxGroup> group);
 	void ProcessVehicles(std::shared_ptr<TmxGroup> group);
+	Vector2 IndexToWorld(const int & index);
+	const GridLocation IndexToGrid(const int & index);
+	const GridLocation WorldToGrid(const Vector2 & worldPosition);
+	const int WorldToIndex(const Vector2 & worldPosition);
 	bool IsValid();
 	void Draw();
 private:
+	TileType TypeFromGID(unsigned int gid);
 	Vector2 GetBuildingScale(const unsigned int & buildingType, const float & width, const float & height);
 	std::shared_ptr<TmxMap> map;
 	std::vector<std::vector<Tile>> tiles;
 	std::weak_ptr<Transform2D> myTransform;
 	sf::RenderStates renderStates;
+	unsigned int tileWidth = 32, tileHeight = 32, width = 0, height = 0;
+	float halfWidth = 0, halfHeight = 0;
+
 };
 #endif // !WS_TILE_MAPPER_H

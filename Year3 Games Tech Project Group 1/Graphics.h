@@ -93,7 +93,7 @@ private:
 	bool windowOpen = false;
 	sf::VertexArray buffer;
 	sf::Vector2f camPos = sf::Vector2f(0.0f, 0.0f);
-	float zoomLevel = 1.0f;
+	float zoomLevel = 1.5f;
 
 	Vector2 windowScale = Vector2(1, 1);
 };

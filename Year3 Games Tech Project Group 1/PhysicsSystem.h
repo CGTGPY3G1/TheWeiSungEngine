@@ -9,6 +9,7 @@
 #include <vector>
 #include "Vector2.h"
 #include "AABB.h"
+#include <limits>
 enum PhysicsBodyType {
 	STATIC_BODY = 0,
 	KINEMATIC_BODY = 1,
@@ -18,18 +19,17 @@ enum PhysicsBodyType {
 struct PhysicsSettings {
 	b2Vec2 gravity = {0, 0};
 	float timeStep = 1.0f / 50.0f;
-	int velocityIterations = 8, positionIterations = 3;
+	int velocityIterations = 5, positionIterations = 2;
 };
 
 class Collider;
 struct RayCastHit {
-	int hits = 0;
-	std::vector<std::weak_ptr<Collider>> colliders;
-	std::vector<Vector2> normals;
-	std::vector<Vector2> points;
-	std::vector<float> fractions;
+	bool hit = false;
+	std::weak_ptr<Collider> collider;
+	Vector2 normal, point;
+	float fraction = std::numeric_limits<float>::max();
 	void Reset() { 
-		hits = 0; colliders.clear(); normals.clear(); points.clear();
+		hit = false; collider = std::weak_ptr<Collider>(); normal = Vector2::Up; point = Vector2::Zero; fraction = std::numeric_limits<float>::max();
 	}
 };
 

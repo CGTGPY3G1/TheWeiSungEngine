@@ -19,8 +19,8 @@ public:
 	void SetRunTime(const float time);
 	float GetRunTime();
 	void SetRequiredKills(const unsigned int kills);
-	float GetRequiredKills();
-	float GetKills();
+	unsigned int GetRequiredKills();
+	unsigned int GetKills();
 	float GetSpawnRadius();
 	void SetSpawnRadius(const float radius);
 	void Activate(std::weak_ptr<Transform2D> targetTransform);
@@ -36,16 +36,18 @@ public:
 
 	}
 private:
+	void ManagePopulation();
 	void SpawnCivilians(const unsigned int number = 1);
+	void MoveCivilian(std::shared_ptr<Transform2D> targetTransform);
 	std::weak_ptr<Transform2D> target;
 	std::vector<std::weak_ptr<Transform2D>> civs;
-	const unsigned int MAX_CIVS = 80;
+	const unsigned int MAX_CIVS = 40;
 	bool activated = false, deactivated = false;
 	float endTimer = -1.0f;
 	float runTime = 50.0f, runTimerReset = 50.0f;
 	void Reset();
-	unsigned int requiredKills = 40, kills = 0;
-	float spawnRadius = 30 * Physics::PIXELS_PER_METRE;
+	unsigned int requiredKills = 40, kills = 0, finalKillCount;
+	float spawnRadius = 35 * Physics::PIXELS_PER_METRE, spawnScale = 1.0f;
 	Vector2 positionReset;
 };
 

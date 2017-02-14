@@ -17,7 +17,8 @@ void AssetManager::LoadTexture(const std::string & filename, const bool & genera
 	sf::Texture texture;
 	
 	if(texture.loadFromFile(filename)) {
-		if(setSmooth) texture.setSmooth(setSmooth);
+		if(filename.compare("Images/Buildings.png") == 0) texture.setSmooth(false);
+		else if (setSmooth) texture.setSmooth(setSmooth);
 		if(setSRGB) texture.setSrgb(setSRGB);
 		if(generateMipMaps) texture.generateMipmap();
 		textures[filename] = texture;

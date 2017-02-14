@@ -17,12 +17,19 @@ public:
 	void Start() override;
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Drive(const float & force);
+	void SetAccelerationForce(const float & force);
+	float GetAccelerationForce();
+	void SetSteeringForce(const float & force);
+	float GetSteeringForce();
+	void SetMaxSpeed(const float & speed);
+	float GetMaxSpeed();
 	/// <summary>
 	/// Steers towards the specified direction (-1 = left | 1 = right).
 	/// </summary>
 	/// <param name="steerValue">A value between -1 and 1 indicating the steering angle.</param>
 	void Steer(const float & steerValue = 0.0f);
 	const std::string GetName() const override { return "VehicleController"; }
+	void OnCollisionEnter(const CollisionData & data) override;
 	int GetSortOrder() override;
 
 	template <class Archive>
@@ -35,9 +42,11 @@ public:
 		ScriptableComponent::save(ar);
 	}
 private:
+
 	Vector2 GetLateralVelocity(std::shared_ptr<RigidBody2D> r);
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> myTransform;
+	float accelerationForce = 30.0f, steeringForce = 1.0f, maxSpeed = 2000.0f, squaredMaxSpeed = maxSpeed * maxSpeed;
 };
 
 #endif // !WS_VEHICLE_CONTROLLER_SCRIPT_H

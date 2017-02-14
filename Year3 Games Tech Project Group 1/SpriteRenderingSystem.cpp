@@ -1,7 +1,9 @@
 #include "SpriteRenderingSystem.h"
-
 #include "SpriteRenderer.h"
 #include "GameObject.h"
+#include "Engine.h"
+#include "Graphics.h"
+
 SpriteRenderingSystem::SpriteRenderingSystem() {
 }
 
@@ -12,6 +14,9 @@ void SpriteRenderingSystem::ProcessComponents(std::vector<std::shared_ptr<GameOb
 	const unsigned int mask = GetComponentMask();
 	const size_t noOfObjects = gameObjects.size();
 	spriteBatch.Clear();
+	const std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+	const sf::Vector2f size = graphics->GetView().getSize(), position = graphics->GetView().getCenter() - (size * 0.5f);
+	const sf::FloatRect viewRect = sf::FloatRect(position, size);
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<GameObject> go = gameObjects[i];
 		if(go) {
@@ -21,10 +26,14 @@ void SpriteRenderingSystem::ProcessComponents(std::vector<std::shared_ptr<GameOb
 					std::vector<std::weak_ptr<SpriteRenderer>> spriteRenderers = go->GetComponents<SpriteRenderer>();
 					for(std::vector<std::weak_ptr<SpriteRenderer>>::iterator i = spriteRenderers.begin(); i != spriteRenderers.end(); ++i) {
 						std::shared_ptr<SpriteRenderer> renderer = (*i).lock();
-						sf::RenderStates states;
-						states.shader = renderer->GetShader();
-						states.transform = transform->GetWorldTransform();
-						if(renderer && renderer->GetEnabled()) spriteBatch.Draw(renderer->GetSprite(), states, renderer->GetSortLayer(), renderer->GetSortOrder());
+						if(renderer && renderer->GetEnabled()) {
+							sf::RenderStates states;
+							states.shader = renderer->GetShader();
+							states.transform = transform->GetWorldTransform();
+							const WSSprite sprite = renderer->GetSprite();
+							const sf::FloatRect spriteRect = states.transform.transformRect(sprite.getGlobalBounds());
+							if(viewRect.intersects(spriteRect)) spriteBatch.Draw(sprite, states, renderer->GetSortLayer(), renderer->GetSortOrder(), renderer->GetCompID());
+						}
 					}
 				}
 			}

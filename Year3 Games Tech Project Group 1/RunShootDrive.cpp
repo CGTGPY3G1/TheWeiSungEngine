@@ -1,6 +1,6 @@
 #include "RunShootDrive.h"
 #include "TestScene.h"
-
+#include "GridSolver.h"
 RunShootDrive::RunShootDrive() : Game() {
 	
 }

@@ -1,8 +1,10 @@
 #pragma once
 #ifndef WS_SCENE_H
 #define WS_SCENE_H
-#include "Message.h"
-#include "AssetManager.h"
+#include <memory>
+#include <vector>
+
+class Message;
 class GameObjectManager;
 class PhysicsSystem;
 class ScriptManagementSystem;

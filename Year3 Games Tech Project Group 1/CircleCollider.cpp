@@ -32,10 +32,11 @@ void CircleCollider::Init(const Vector2 & position, const float & radius, const 
 	componentData->comp = GetWeak();
 	componentData->type = Type();
 	fixtureDef->userData = componentData;
+	std::shared_ptr<GameObject> g = gameObject.lock();
 	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
-	gameObject.lock()->HandleMessage(m);
-	SetEnabled(true);
+	g->HandleMessage(m);
 	Collider::UpdateCollisionFilter();
+	SetEnabled(true);;
 }
 
 Vector2 CircleCollider::GetOffset() {

@@ -8,6 +8,7 @@
 CharacterScript::CharacterScript() {
 }
 CharacterScript::CharacterScript(std::weak_ptr<GameObject> gameObject) : ScriptableComponent(gameObject) {
+	raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
 }
 
 CharacterScript::~CharacterScript() {
@@ -23,35 +24,24 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();		
 		if(rb) {
 			Vector2 forward = rb->GetForward();
-			Vector2 right = rb->GetRight();
+			const Vector2 right = rb->GetRight();
 			const Vector2 characterPosition = rb->GetPosition();
 			Vector2 rayPosition = characterPosition;
-			Vector2 offset = (right * Physics::PIXELS_PER_METRE / 4);
-			float fov = 15.0f;
+			const Vector2 offset = (right * Physics::PIXELS_PER_METRE / 5);
+			const float fov = 10;
 			float angle = 0;
-			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6, raycastMask);
+			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f, raycastMask);
 			angle += AngleToTurn(hit, right, characterPosition);
 			rayPosition += offset;
 			forward.RotateInDegrees(fov);
-			right.RotateInDegrees(fov);
-			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE, raycastMask);
-			//float angle2 = AngleToTurn(hit, right, characterPosition);
-			//if(angle2 < 0.0f) angle2 *= -1.0f;
-			//angle -= angle2;
+			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.8f, raycastMask);			
+			if(hit.hit) angle -= 0.25f;
 			rayPosition = characterPosition - offset;
-			forward.RotateInDegrees(-fov * 2.0f);
-			right.RotateInDegrees(-fov * 2.0f);
-			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE, raycastMask);
-			//angle2 = AngleToTurn(hit, right, characterPosition);
-			//angle += angle2;
-			if(angle < -0.0001f || angle > 0.0001f) {
-				rb->AddTorque(angle * (1.0f/25.0f) * rb->GetMass(), ForceType::IMPULSE_FORCE);
-			}
-			else {
-				const float angularVelocity = rb->GetAngularVelocity();
-				if(angularVelocity < -0.0001f || angularVelocity > 0.0001f) {
-					rb->AddTorque(-angularVelocity * (1.0f / 50.0f) * rb->GetMass(), ForceType::IMPULSE_FORCE);
-				}
+			forward.RotateInDegrees(fov * -2.0f);
+			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
+			if(hit.hit) angle += 0.25f;
+			if(angle < -0.000001f || angle > 0.000001f) {
+				rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
 			}
 			MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
 		}
@@ -59,25 +49,24 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 }
 
 void CharacterScript::Render() {
-	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
-	if(rb) {
-		Vector2 forward = rb->GetForward();
-		Vector2 right = rb->GetRight();
-		const Vector2 characterPosition = rb->GetPosition();
-		Vector2 rayPosition = characterPosition;
-		Vector2 offset = (right * Physics::PIXELS_PER_METRE / 4);
-		float fov = 15.0f;
-		float angle = 0;
-		std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
-		graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6);
-		rayPosition += offset;
-		forward.RotateInDegrees(fov);
-		right.RotateInDegrees(fov);
-		graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE);
-		rayPosition = characterPosition - offset;
-		forward.RotateInDegrees(-fov * 2.0f);
-		right.RotateInDegrees(-fov * 2.0f);
-		graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE);
+	if(isAI) {
+		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+		if(rb) {
+			Vector2 forward = rb->GetForward();
+			const Vector2 right = rb->GetRight();
+			const Vector2 characterPosition = rb->GetPosition();
+			Vector2 rayPosition = characterPosition;
+			const Vector2 offset = (right * Physics::PIXELS_PER_METRE / 5);
+			float fov = 10.0f;
+			std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6);
+			rayPosition += offset;
+			forward.RotateInDegrees(fov);
+			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f);
+			rayPosition = characterPosition - offset;
+			forward.RotateInDegrees(-fov * 2.0f);
+			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f);
+		}
 	}
 }
 
@@ -111,22 +100,12 @@ void CharacterScript::Move(Vector2 & amount, const bool & worldSpace) {
 }
 
 float CharacterScript::AngleToTurn(const RayCastHit & hit, Vector2 right, Vector2 position) {
-	if(hit.hits > 0) {
-		float squaredDistance = std::numeric_limits<float>::max();
+	if(hit.hit) {
+		float distance = std::numeric_limits<float>::max();
 		size_t index = 0;
-		for(size_t i = 0; i < hit.colliders.size(); i++) {
-			std::shared_ptr<Collider> c = hit.colliders[i].lock();
-			if(c) {
-				const float dist = (position - hit.points[i]).SquareMagnitude();
-				if(dist < squaredDistance) {
-					squaredDistance = dist;
-					index = i;
-				}			
-			}
-		}
-		const float dot = right.Dot(hit.normals[index]);
-		return dot < 0.0f ? -1.0f - dot : 1.0f - dot;
-	}
+		const float dot = right.Dot(hit.normal);
+		return (dot < 0.0f ? -1.0f : 1.0f) - dot;
+	}	
 	return 0.0f;
 }
 

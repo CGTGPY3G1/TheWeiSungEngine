@@ -61,15 +61,15 @@ public:
 	template<> const static bool IsCollider<PolygonCollider>() { return true; }
 
 	const static bool IsUpdatable(const ComponentType & type) {
-		static const int colliderMask = COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW | 
+		static const int mask = COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW | 
 			COMPONENT_PLAYER_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_HEALTH_SCRIPT;
-		return (colliderMask & type);
+		return ((mask & type) == type);
 	};
 	
 	const static bool IsFixedUpdatable(const ComponentType & type) {
-		static const int colliderMask = COMPONENT_CHARACTER_SCRIPT | COMPONENT_CIV_WAYPOINT | 
+		static const int mask = COMPONENT_CHARACTER_SCRIPT | COMPONENT_CIV_WAYPOINT | 
 			COMPONENT_PLAYER_SCRIPT | COMPONENT_VEHICLE_CONTROLLER;
-		return (colliderMask & type);
+		return ((mask & type) == type);
 	};
 
 	const static bool IsLateUpdatable(const ComponentType & type) {
@@ -79,14 +79,13 @@ public:
 	};
 
 	const static bool IsRenderable(const ComponentType & type) {
-		static const int colliderMask = COMPONENT_SPRITE_RENDERER | COMPONENT_RAMPAGE_SCRIPT;
-		return (colliderMask & type);
+		static const int mask = COMPONENT_SPRITE_RENDERER | COMPONENT_RAMPAGE_SCRIPT;
+		return ((mask & type) == type);
 	};
 
 	const static bool IsCollider(const ComponentType & type) { 
-		static const int colliderMask = COMPONENT_BOX_COLLIDER_2D | COMPONENT_CIRCLE_COLLIDER | 
-			COMPONENT_POLYGON_COLLIDER_2D;
-		return (colliderMask & type);
+		static const int mask = COMPONENT_BOX_COLLIDER_2D | COMPONENT_CIRCLE_COLLIDER | COMPONENT_POLYGON_COLLIDER_2D;
+		return ((mask & type) == type);
 	};
 };
 #endif // !WS_TYPE_INFO_H

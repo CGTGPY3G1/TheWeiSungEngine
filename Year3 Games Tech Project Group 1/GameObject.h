@@ -78,7 +78,7 @@ protected:
 	unsigned int objectID;
 	unsigned int componentMask = 0;
 	bool enabled = true;
-	int collisionCategory = CATEGORY_ALL, collisionMask = 0xFFFF;
+	int collisionCategory = CATEGORY_DEFAULT, collisionMask = CATEGORY_ALL;
 	ComponentManager componentManager;
 	std::string name, tag = "default";
 };

@@ -77,7 +77,7 @@ Vector2 Vector2::operator * (const float & scalar) {
 	return Vector2(x * scalar, y * scalar);
 }
 
-const Vector2 Vector2::operator*(const float & scalar) const {
+const Vector2 Vector2::operator * (const float & scalar) const {
 	return Vector2(x * scalar, y * scalar);
 }
 
@@ -89,7 +89,7 @@ Vector2 Vector2::operator / (const float & scalar) {
 	return Vector2(x / scalar, y / scalar);
 }
 
-const Vector2 Vector2::operator/(const float & scalar) const {
+const Vector2 Vector2::operator / (const float & scalar) const {
 	return Vector2(x / scalar, y / scalar);
 }
 
@@ -107,7 +107,7 @@ float Vector2::Dot(const Vector2 & other) {
 }
 
 const float Vector2::Dot(const Vector2 & other) const {
-	return (this->x * x) + (this->y * y);
+	return (this->x * other.x) + (this->y * other.y);
 }
 
 float Vector2::Dot(const float & x, const float & y) {

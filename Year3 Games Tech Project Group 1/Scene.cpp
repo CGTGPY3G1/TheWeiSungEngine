@@ -4,6 +4,8 @@
 #include "TypeInfo.h"
 #include "SpriteRenderingSystem.h"
 #include "ScriptManagementSystem.h"
+#include "AssetManager.h"
+#include "Message.h"
 
 Scene::Scene() {
 	static unsigned int id = 0;

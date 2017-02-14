@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Scene.h"
 #include "Debug.h"
+#include "AssetManager.h"
 SpriteRenderer::SpriteRenderer() : Component() {
 }
 

@@ -1,7 +1,6 @@
 #include "ScriptManagementSystem.h"
 #include "GameObject.h"
 #include "ScriptableComponent.h"
-#include "Profiler.h"
 
 bool SortScripts(const std::shared_ptr<ScriptableComponent> & l, const std::shared_ptr<ScriptableComponent> & r) {
 	return l->GetSortOrder() < r->GetSortOrder();

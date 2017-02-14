@@ -42,7 +42,7 @@ private:
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> transform;
 	bool isAI = false;
-	int raycastMask = ~(CollisionCategory::CATEGORY_ALL & CollisionCategory::CATEGORY_AI_CHARACTER);
+	int raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
 };
 
 

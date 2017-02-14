@@ -6,6 +6,8 @@
 #include "GameObjectFactory.h"
 #include "PhysicsSystem.h"
 #include "SpriteRenderer.h"
+#include "HealthScript.h"
+#include "CharacterScript.h"
 PlayerScript::PlayerScript() : ScriptableComponent() {
 }
 
@@ -36,21 +38,13 @@ void PlayerScript::Update(const float & deltaTime) {
 		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(t->GetPosition(), t->GetPosition() + t->GetForward() * Physics::PIXELS_PER_METRE);
 
-			if(hit.hits > 0) {
-				for(size_t i = 0; i < hit.colliders.size(); i++) {
-					std::shared_ptr<Collider> c = hit.colliders[i].lock();
-					if(c) {
-						if(c->GetTag().compare("Vehicle") == 0) {
-
-							car = c->GetComponent<VehicleController>();
-							if(car.use_count() > 0) {
-								driving = true;
-								std::shared_ptr<GameObject> p = player.lock();
-								if(p) {
-									p->GetComponent<RigidBody2D>().lock()->SetEnabled(false);
-									p->GetComponent<SpriteRenderer>().lock()->SetEnabled(false);
-								}
-							}
+			if(hit.hit) {
+				std::shared_ptr<Collider> c = hit.collider.lock();
+				if(c) {
+					if(c->GetTag().compare("Vehicle") == 0) {
+						car = c->GetComponent<VehicleController>();
+						if(car.use_count() > 0) {
+							SetDriving(true);
 						}
 					}
 				}
@@ -58,20 +52,15 @@ void PlayerScript::Update(const float & deltaTime) {
 		}
 	}
 	else {
+		std::shared_ptr<VehicleController> c = car.lock();
+		std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
+		std::shared_ptr<GameObject> p = player.lock();
+		std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
 		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
-			std::shared_ptr<VehicleController> c = car.lock();
-			if(c) {
-				std::shared_ptr<Transform2D> carTransform = c->GetComponent<Transform2D>().lock();
-				driving = false;
-				std::shared_ptr<GameObject> p = player.lock();
-				if(p) {
-					std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
-					rb->SetPosition(carTransform->GetPosition() - (carTransform->GetRight() * Physics::PIXELS_PER_METRE) + (carTransform->GetForward() * Physics::PIXELS_PER_METRE));
-					rb->SetVelocity(Vector2::Zero);
-					rb->SetEnabled(true);
-					p->GetComponent<SpriteRenderer>().lock()->SetEnabled(true);
-				}
-			}
+			if(c) SetDriving(false);
+		}
+		else {
+			rb->SetPosition(carRB->GetPosition());
 		}
 	}
 }
@@ -82,20 +71,22 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 	std::shared_ptr<GameObject> gameObject;
 	std::shared_ptr<GameObject> p = player.lock();
 	if(p) {
-		std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
 
 		if(driving) {
 			std::shared_ptr<VehicleController> c = car.lock();
-			if(c) gameObject = c->GetGameObject().lock();
+			if(c) {
+				gameObject = c->GetGameObject().lock();
+				if(!gameObject) SetDriving(false);
+			}
+			else SetDriving(false);
 		}
-		else {
+		if(!driving) {
 			if(player.use_count() < 1) player = GameObjectManager::GetInstance().GetGameObject("Player");
 			gameObject = player.lock();
 		}
 		if(gameObject) {
 			std::shared_ptr<Transform2D> playerTransform = gameObject->GetComponent<Transform2D>().lock();
 			bool useController = false; // input->GetControllerActive(0);
-
 			std::shared_ptr<RigidBody2D> rb = gameObject->GetComponent<RigidBody2D>().lock();
 			float dot = rb->GetVelocity().Dot(rb->GetForward());
 			dot = (dot < 0.0001f) ? -1.0f : 1.0f;
@@ -106,21 +97,22 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 			const float speed = gameObject->GetComponent<RigidBody2D>().lock()->GetSpeed();
 			float oldZoom = engine.GetGraphics().lock()->GetCameraZoom();
 			float newZoom = (speed / maxVelocity) * 0.4f;
-			engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.0f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.0f + newZoom) * fixedDeltaTime))));
+			engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.5f + newZoom) * fixedDeltaTime))));
+			std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
 			if(cc) {
 				if(!cc->IsArtificiallyIntelligent()) {
 					if(driving) {
 						std::shared_ptr<VehicleController> vehicle = car.lock();
 						if(vehicle) {
 							if(useController) {
-								float force = 200.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::RT);
-								force -= 40.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::LT);
+								float force = 1.0f * input->GetAxis(0, ControllerButtons::ControllerAxis::RT);
+								force -= 0.2f * input->GetAxis(0, ControllerButtons::ControllerAxis::LT);
 								vehicle->Drive(force);
 								vehicle->Steer(input->GetAxis(0, ControllerButtons::ControllerAxis::LeftStickH));
 							}
 							else {
-								if(input->GetKey(KeyCodes::KeyCode::W) || input->GetKey(KeyCodes::KeyCode::Up)) vehicle->Drive(250.0f);
-								else if(input->GetKey(KeyCodes::KeyCode::S) || input->GetKey(KeyCodes::KeyCode::Down)) vehicle->Drive(-50.0f);
+								if(input->GetKey(KeyCodes::KeyCode::W) || input->GetKey(KeyCodes::KeyCode::Up)) vehicle->Drive(1.0f);
+								else if(input->GetKey(KeyCodes::KeyCode::S) || input->GetKey(KeyCodes::KeyCode::Down)) vehicle->Drive(-0.2f);
 
 								const float steerValue = 1.0f;
 								if(input->GetKey(KeyCodes::KeyCode::A) || input->GetKey(KeyCodes::KeyCode::Left)) vehicle->Steer(-steerValue);
@@ -181,5 +173,41 @@ void PlayerScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 }
 
 void PlayerScript::OnSensorExit(const std::weak_ptr<Collider>& collider) {
+}
+
+void PlayerScript::SetCharacterEnabled(const bool & enabled) {
+	std::shared_ptr<GameObject> p = player.lock();
+	if(p) {
+		std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
+		if(rb) rb->SetEnabled(enabled);
+		std::shared_ptr<SpriteRenderer> sr = p->GetComponent<SpriteRenderer>().lock();
+		if(sr) sr->SetEnabled(enabled);
+		std::shared_ptr<HealthScript> hs = p->GetComponent<HealthScript>().lock();
+		if(hs) hs->SetEnabled(enabled);
+		std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
+		if(cs) cs->SetEnabled(enabled);
+	}
+}
+
+void PlayerScript::SetDriving(const bool & driving) {
+	if(driving) {
+		if(!this->driving) {
+			this->driving = true;
+		}
+	}
+	else if(this->driving) {
+		std::shared_ptr<VehicleController> c = car.lock();
+		std::shared_ptr<GameObject> p = player.lock();
+		this->driving = false;
+		if(p) {
+			std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
+			if(c) {
+				std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
+				rb->SetPosition(carRB->GetPosition() - (carRB->GetRight() * Physics::PIXELS_PER_METRE) + (carRB->GetForward() * Physics::PIXELS_PER_METRE));
+				rb->AddForce(carRB->GetVelocity().RotatedInDegrees(-45.0f) * 0.25f);
+			}
+		}
+	}
+	SetCharacterEnabled(!driving);
 }
 

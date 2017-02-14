@@ -3,10 +3,9 @@
 #define PROFILER_H
 #include <iostream>
 #include <string>
-
 #include <iomanip>
-
 #include <chrono>
+
 class Profiler {
 
 public:

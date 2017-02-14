@@ -41,10 +41,11 @@ void PolygonCollider::Init(const Vector2 & offset, std::initializer_list<Vector2
 	componentData->comp = GetWeak();
 	componentData->type = Type();
 	fixtureDef->userData = componentData;
+	std::shared_ptr<GameObject> g = gameObject.lock();
 	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
-	gameObject.lock()->HandleMessage(m);
-	SetEnabled(true);
+	g->HandleMessage(m);
 	Collider::UpdateCollisionFilter();
+	SetEnabled(true);
 }
 
 Vector2 PolygonCollider::GetOffset() {

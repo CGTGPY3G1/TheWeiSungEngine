@@ -8,15 +8,10 @@ SpriteBatch::SpriteBatch() {
 SpriteBatch::~SpriteBatch() {
 }
 
-void SpriteBatch::Draw(WSSprite & sprite, RenderLayer layer, const int & sortOrder) {
-	
-}
-
-void SpriteBatch::Draw(WSSprite sprite, const sf::RenderStates & states, RenderLayer layer, const int & sortOrder) {
+void SpriteBatch::Draw(WSSprite sprite, const sf::RenderStates & states, RenderLayer layer, const int & sortOrder, const unsigned int & id) {
 	int layerIndex = (unsigned int)layer;
 	if(layerIndex >= (int)layers.size()) layers.resize((unsigned int)(layer + 1));
-	SpriteContainer s(sprite, states, sortOrder);
-	layers[layerIndex].sprites.push_back(s);
+	layers[layerIndex].sprites.push_back(SpriteContainer(sprite, states, sortOrder, id));
 }
 
 void SpriteBatch::Clear() {
@@ -24,13 +19,13 @@ void SpriteBatch::Clear() {
 }
 
 void SpriteBatch::Display() {
-	std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+	const std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
 	Sort();
 	for(size_t i = 0; i < layers.size(); i++) {
 		Batch batch = layers[i];
-		for(std::vector<SpriteContainer>::iterator i = batch.sprites.begin(); i != batch.sprites.end(); ++i) {
-			//sf::Transform t = (*i).m_states.transform;
-			graphics->GetWindow().draw((*i).m_sprite, (*i).m_states);
+		for(std::vector<SpriteContainer>::iterator it = batch.sprites.begin(); it != batch.sprites.end(); ++it) {
+			SpriteContainer sc = (*it);
+			graphics->Draw(sc.m_sprite, sc.m_states);
 		}
 	}
 }

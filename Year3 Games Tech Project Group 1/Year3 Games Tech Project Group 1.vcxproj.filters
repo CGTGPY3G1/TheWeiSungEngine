@@ -243,9 +243,6 @@
     <ClInclude Include="TileInfo.h">
       <Filter>Header Files\Engine\Parser</Filter>
     </ClInclude>
-    <ClInclude Include="AStar.h">
-      <Filter>Header Files\Engine\Parser</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
@@ -266,6 +263,9 @@
     </ClInclude>
     <ClInclude Include="HealthScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="GridSolver.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -407,9 +407,6 @@
     <ClCompile Include="TileInfo.cpp">
       <Filter>Header Files\Engine\Parser</Filter>
     </ClCompile>
-    <ClCompile Include="AudioSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
@@ -420,7 +417,13 @@
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
     <ClCompile Include="HealthScript.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioSource.cpp">
+      <Filter>Source Files\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="GridSolver.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

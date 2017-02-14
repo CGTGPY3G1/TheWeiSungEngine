@@ -31,10 +31,11 @@ void BoxCollider::Init(const Vector2 & offset, const Vector2 & size, const bool 
 	componentData->comp = GetWeak();
 	componentData->type = Type();
 	fixtureDef->userData = componentData;
+	std::shared_ptr<GameObject> g = gameObject.lock();
 	Message m = Message(MessageScope::MESSAGE_SCOPE_PHYSICS_SYSTEM, MessageType::MESSAGE_TYPE_REGISTER_COLLIDER, componentData);
-	gameObject.lock()->HandleMessage(m);
-	SetEnabled(true);
+	g->HandleMessage(m);
 	Collider::UpdateCollisionFilter();
+	SetEnabled(true);
 }
 
 void BoxCollider::SetOffset(const Vector2 & newOffset) {

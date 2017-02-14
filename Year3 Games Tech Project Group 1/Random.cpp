@@ -26,7 +26,7 @@ float Random::RandomFloat(const float & max) {
 
 float Random::RandomFloat(const float & min, const float & max) {
 	if(!initialised) Seed();
-	return min + (((float)rand() / RAND_MAX) * abs(max - min));
+	return min + (((float)rand() / RAND_MAX) * std::abs(max - min));
 }
 
 bool Random::RandomBool() {

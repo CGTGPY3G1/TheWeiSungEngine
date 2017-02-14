@@ -8,14 +8,21 @@
 #include "ComponentData.h"
 #include "CollisionData.h"
 float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, const b2Vec2 & normal, float32 fraction) {
-	if(fixture->GetFilterData().categoryBits & raycastFilter) {
-		ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
-		if(colliderData) {
-			hit.hits++;
-			hit.colliders.push_back(std::static_pointer_cast<Collider>(colliderData->comp.lock()));
-			hit.normals.push_back(Vector2(normal.x, normal.y));
-			hit.points.push_back(TypeConversion::ConvertToVector2(point));
-			hit.fractions.push_back((float)fraction);
+	if(!fixture->IsSensor()) {
+		const int oCat = fixture->GetFilterData().categoryBits;
+		if((oCat & raycastFilter) == oCat) {
+			ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
+			if(colliderData) {
+				if(!hit.hit) {
+					hit.hit = true;
+				}
+				if(fraction < hit.fraction) {
+					hit.collider = std::static_pointer_cast<Collider>(colliderData->comp.lock());
+					hit.normal = Vector2(normal.x, normal.y);
+					hit.point = TypeConversion::ConvertToVector2(point);
+					hit.fraction = (float)fraction;
+				}			
+			}
 		}
 	}
 	return 1.0f;
@@ -31,7 +38,8 @@ bool PhysicsSystem::ReportFixture(b2Fixture* fixture) {
 
 PhysicsSystem::PhysicsSystem(){
 	world = new b2World(b2Vec2(0, 0));
-	world->SetAllowSleeping(false);
+	world->SetAllowSleeping(true);
+	
 	DebugDraw * debugDraw = Engine::GetInstance().GetDebugDraw();
 	debugDraw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_centerOfMassBit);
 	world->SetDebugDraw(debugDraw);

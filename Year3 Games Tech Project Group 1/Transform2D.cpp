@@ -126,7 +126,7 @@ const sf::Transform & Transform2D::GetLocalToWorldTransform() {
 }
 
 unsigned int Transform2D::GetChildCount() {
-	return children.size();
+	return (unsigned int)children.size();
 }
 
 std::weak_ptr<Transform2D> Transform2D::GetChild(const unsigned int & index) {

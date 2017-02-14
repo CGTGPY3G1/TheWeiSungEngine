@@ -42,7 +42,6 @@ Input::~Input() {
 
 
 void Input::Update() {
-	std::lock_guard<std::mutex> lock(m);
 	for(unsigned int i = 0; i < NUMBER_OF_KEYS; i++) {
 		bool pressed = sf::Keyboard::isKeyPressed((sf::Keyboard::Key)i);
 		if(keyStates[i] != pressed) {
@@ -83,47 +82,38 @@ void Input::Update() {
 }
 
 bool Input::GetKeyDown(KeyCodes::KeyCode key) {
-	std::lock_guard<std::mutex> lock(m);
 	return keyStates[key] && keyChanged[key];
 }
 
 bool Input::GetKeyUp(KeyCodes::KeyCode key) {
-	std::lock_guard<std::mutex> lock(m);
 	return !keyStates[key] && keyChanged[key];
 }
 
 bool Input::GetKey(KeyCodes::KeyCode key) {
-	std::lock_guard<std::mutex> lock(m);
 	return keyStates[key];
 }
 
 bool Input::GetMouseButtonDown(MouseButtons::MouseButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return mouseButtonStates[button] && mouseButtonChanged[button];
 }
 
 bool Input::GetMouseButtonUp(MouseButtons::MouseButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return !mouseButtonStates[button] && mouseButtonChanged[button];
 }
 
 bool Input::GetMouseButton(MouseButtons::MouseButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return mouseButtonStates[button];
 }
 
 bool Input::GetControllerButtonDown(unsigned int controllerID, ControllerButtons::ControllerButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return ControllerButtonStates[controllerID][button] && ControllerButtonChanged[controllerID][button];
 }
 
 bool Input::GetControllerButtonUp(unsigned int controllerID, ControllerButtons::ControllerButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return !ControllerButtonStates[button] && ControllerButtonChanged[button];
 }
 
 bool Input::GetControllerButton(unsigned int controllerID, ControllerButtons::ControllerButton button) {
-	std::lock_guard<std::mutex> lock(m);
 	return ControllerButtonStates[controllerID][button];
 }
 
@@ -136,17 +126,14 @@ float Input::GetAxis(unsigned int controllerID, ControllerButtons::ControllerAxi
 }
 
 Vector2 Input::GetMousePosition() {
-	std::lock_guard<std::mutex> lock(m);
 	return mousePosition;
 }
 
 float Input::GetMouseX() {
-	std::lock_guard<std::mutex> lock(m);
 	return mousePosition.x;
 }
 
 float Input::GetMouseY() {
-	std::lock_guard<std::mutex> lock(m);
 	return mousePosition.y;
 }
 

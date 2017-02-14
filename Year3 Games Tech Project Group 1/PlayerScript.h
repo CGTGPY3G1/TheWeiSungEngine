@@ -21,6 +21,8 @@ public:
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 private:
+	void SetCharacterEnabled(const bool & enabled);
+	void SetDriving(const bool & driving);
 	bool driving = false;
 	float reloadTime = 0.0f;
 	std::weak_ptr<VehicleController> car;
