@@ -9,6 +9,7 @@
 #include <cereal\types\polymorphic.hpp>
 class RigidBody2D;
 class Transform2D;
+class TileMapper;
 struct RayCastHit;
 class CharacterScript : public ScriptableComponent{
 public:
@@ -38,9 +39,10 @@ public:
 		ScriptableComponent::save(ar);
 	}
 private:
-	
+	float GetForceScale(const Vector2 & worldPosition);
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> transform;
+	std::weak_ptr<TileMapper> tileMapper;
 	bool isAI = false;
 	int raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
 };

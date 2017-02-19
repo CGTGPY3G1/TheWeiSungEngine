@@ -42,6 +42,7 @@ public:
 	void SetMass(const float & newMass);
 	float GetMass();
 	Vector2 GetVelocity();
+	Vector2 GetVelocityFromWorldPoint(const Vector2 & point);
 	void SetVelocity(const Vector2 & newVelocity);
 	void SetVelocity(const float & x, const float & y);
 	void SetTorque(const float & torque);

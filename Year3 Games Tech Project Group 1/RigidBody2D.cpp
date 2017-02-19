@@ -112,6 +112,10 @@ Vector2 RigidBody2D::GetVelocity() {
 	return TypeConversion::ConvertToVector2(body->GetLinearVelocity());
 }
 
+Vector2 RigidBody2D::GetVelocityFromWorldPoint(const Vector2 & point) {
+	return TypeConversion::ConvertToVector2(body->GetLinearVelocityFromWorldPoint(TypeConversion::ConvertToB2Vector2(point)));
+}
+
 void RigidBody2D::SetVelocity(const Vector2 & newVelocity) {
 	body->SetLinearVelocity(TypeConversion::ConvertToB2Vector2(newVelocity));
 }

@@ -25,7 +25,6 @@ void RampageScript::Start() {
 
 void RampageScript::Update(const float & deltaTime) {
 	const size_t noOfCivs = civs.size();
-	std::cout << std::to_string(noOfCivs) << std::endl;
 	if(activated) {
 		ManagePopulation();
 		bool rampageOver = kills >= requiredKills || runTime <= 0.0001f;

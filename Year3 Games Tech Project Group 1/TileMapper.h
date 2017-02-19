@@ -25,6 +25,7 @@ enum TileType {
 static const std::string tileTypeNames [] = {"Water", "Grass", "Sand", "Pavement", "Road", "Water and Sand", 
 											"Water and Grass", "Sand and Grass", "Road Divider", "Pavement and Road", 
 											"Pavement and Grass", "Pavement and Water"};
+static const float forceScaleTable [] = {0.05f, 0.8f, 0.7f, 0.95f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.9f, 0.875f, 0.5f };
 struct GridLocation {
 	GridLocation(const int & nX = 0, const int & nY = 0) : x(nX), y(nY) {}
 	int x = 0, y = 0;
@@ -91,7 +92,8 @@ struct Tile {
 	unsigned int id = -1;
 	sf::Sprite sprite;
 	std::vector<sf::Vertex> verts;
-	TileType type;
+	TileType type = TileType::TILE_TYPE_NULL;
+	float forceScale = 1.0f;
 };
 
 class Transform2D;
@@ -122,6 +124,8 @@ public:
 	const GridLocation WorldToGrid(const Vector2 & worldPosition);
 	const TileType GetTileType(const Vector2 & worldPosition);
 	const std::string GetTileTypeAsString(const Vector2 & worldPosition);
+	const float GetTileForceScale(const Vector2 & worldPosition);
+	const Tile & GetTile(const Vector2 & worldPosition) const;
 	bool IsValid();
 	void Draw();
 private:

@@ -143,13 +143,14 @@ std::weak_ptr<Transform2D> Transform2D::GetParent() {
 }
 
 void Transform2D::SetParent(std::weak_ptr<Transform2D> newParent) {
-	Vector2 oldPosition = TransformToWorldPoint(getPosition());
+	Vector2 oldPosition = GetPosition();
+	float oldRotation = GetRotation();
 	parent = newParent;
 	if(!parent.expired()) {
 		std::shared_ptr<GameObject> g = gameObject.lock();
 		std::shared_ptr<Transform2D> p = parent.lock();
 		SetPosition(oldPosition);
-		SetRotation(getRotation() - p->GetRotation());
+		SetRotation(oldRotation);
 		p->AddChild(GetComponent<Transform2D>());
 	}
 	SetDirty();
@@ -185,10 +186,11 @@ void Transform2D::CalculateWorldTransform() {
 		sf::Vector2f newScale = node->GetScale();
 		worldScale.x *= newScale.x; worldScale.y *= newScale.y;
 	}
-	
+
+	local2World = transform;
 	world = transform * getTransform();
 	world2Local = world.getInverse();
-	local2World = world2Local.getInverse();
+	
 	worldPosition = world * sf::Vector2f();
 	dirty = false;
 }

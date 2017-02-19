@@ -67,7 +67,7 @@ void PhysicsSystem::Update(const float & deltaTime) {
 
 void PhysicsSystem::UpdateBodies() {
 	for(b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-		if(dirty && b->GetType() == b2BodyType::b2_dynamicBody) {
+		if(b->GetType() == b2BodyType::b2_dynamicBody) {
 			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
 			if(rb) {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
@@ -75,9 +75,6 @@ void PhysicsSystem::UpdateBodies() {
 					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
 					t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
 					t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
-				}
-				else {
-					std::cout << "b2dError: Missing RigidBody";
 				}
 			}
 		}
@@ -92,7 +89,7 @@ void PhysicsSystem::UpdateBodies() {
 			}
 		}
 	}
-	if(dirty) dirty = false;
+	//if(dirty) dirty = false;
 }
 
 

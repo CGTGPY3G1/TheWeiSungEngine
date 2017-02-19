@@ -79,7 +79,7 @@ public:
 	};
 
 	const static bool IsRenderable(const ComponentType & type) {
-		static const int mask = COMPONENT_SPRITE_RENDERER | COMPONENT_RAMPAGE_SCRIPT;
+		static const int mask = COMPONENT_SPRITE_RENDERER | COMPONENT_RAMPAGE_SCRIPT;// | COMPONENT_VEHICLE_CONTROLLER;
 		return ((mask & type) == type);
 	};
 

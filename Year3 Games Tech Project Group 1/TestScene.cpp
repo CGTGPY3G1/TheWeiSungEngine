@@ -30,7 +30,7 @@ void TestScene::Start() {
 	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, false);
 
 	Vector2 scale = Vector2(4.0f, 4.0f);
-	std::shared_ptr<GameObject> tileset = gameObjectManager.CreateGameObject("BackgroundTileset").lock();
+	std::shared_ptr<GameObject> tileset = gameObjectManager.CreateGameObject("Tileset").lock();
 	tileset->Init(Vector2(0, 0), 0, scale);
 	std::shared_ptr<TileMapper> tileMapper = tileset->AddComponent<TileMapper>().lock();
 	tileMapper->Init(EngineSettings::TILESET_FILE_NAME, EngineSettings::TILESET_NAME);
@@ -167,7 +167,7 @@ void TestScene::Update(const float & deltaTime) {
 
 void TestScene::Render() {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	std::shared_ptr<GameObject> tileset = gameObjectManager.GetGameObject("BackgroundTileset").lock();
+	std::shared_ptr<GameObject> tileset = gameObjectManager.GetGameObject("Tileset").lock();
 	if(tileset) {
 		
 		std::shared_ptr<TileMapper> tileMapper = tileset->GetComponent<TileMapper>().lock();

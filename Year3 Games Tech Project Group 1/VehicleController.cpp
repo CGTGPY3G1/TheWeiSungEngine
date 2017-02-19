@@ -1,7 +1,12 @@
 #include "VehicleController.h"
+#include "GameObjectManager.h"
+#include "TileMapper.h"
 #include "RigidBody2D.h"
 #include "Transform2D.h"
 #include "GameObject.h"
+#include "CircleCollider.h"
+#include "Engine.h"
+#include "Graphics.h"
 VehicleController::VehicleController() {
 }
 
@@ -12,14 +17,27 @@ VehicleController::~VehicleController() {
 }
 
 void VehicleController::Start() {
-	myTransform = GetComponent<Transform2D>();
+
+	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
+	myTransform = transform;
 	rigidbody = GetComponent<RigidBody2D>();
+	GameObjectManager & goManager = GameObjectManager::GetInstance();
+	Vector2 position = transform->GetPosition(), right = transform->GetRight(), forward = transform->GetForward();
+	for(size_t i = 0; i < 4; i++) {
+		std::shared_ptr<GameObject> wheel = goManager.CreateGameObject("Wheel").lock();
+		wheel->Init(position + (right * wheelsOffsets[i].x) + (forward * wheelsOffsets[i].y), transform->GetRotation());
+		std::shared_ptr<Transform2D> wheelTransform = wheel->GetComponent<Transform2D>().lock();
+		wheelTransform->SetParent(transform);
+		wheels[i] = wheelTransform;
+	}	
+	std::shared_ptr<GameObject> tm = goManager.GetGameObject("Tileset").lock();
+	if(tm) tileMapper = tm->GetComponent<TileMapper>();
 }
 
 void VehicleController::FixedUpdate(const float & fixedDeltaTime) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
-		Vector2 lateralImpulse = GetLateralVelocity(rb);
+		Vector2 lateralImpulse = GetVelocityDampening(rb);
 		const float dampeningForce = 0.6f;
 		rb->AddForce(-lateralImpulse * dampeningForce * 2.0f, ForceType::IMPULSE_FORCE);
 		rb->AddTorque(dampeningForce * rb->GetInertia() * -rb->GetAngularVelocity(), ForceType::IMPULSE_FORCE);
@@ -29,10 +47,35 @@ void VehicleController::FixedUpdate(const float & fixedDeltaTime) {
 	}
 }
 
+void VehicleController::Render() {
+	std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+	for(int i = 0; i < 4; i++) {
+		sf::Vertex verts[2];
+		verts[0].color = sf::Color::Red;
+		std::shared_ptr<Transform2D> wTransform = wheels[i].lock();
+		verts[0].position = wTransform->GetPosition();
+		verts[1].color = sf::Color::Red;
+		verts[1].position = wTransform->GetPosition() + wTransform->GetForward() * 50;
+		graphics->DrawLine(verts);
+		sf::Vertex verts2[2];
+		verts2[0].color = sf::Color::Green;
+		verts2[0].position = wTransform->GetPosition();
+		verts2[1].color = sf::Color::Green;
+		verts2[1].position = wTransform->GetPosition() + wTransform->GetRight() * 50;
+		graphics->DrawLine(verts2);
+	}
+}
+
 void VehicleController::Drive(const float & force) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
-		if((rb->GetVelocity() * Physics::METRES_PER_PIXEL).SquareMagnitude() < squaredMaxSpeed) rb->AddForce(rb->GetForward() * force * accelerationForce * rb->GetMass(), ForceType::FORCE);
+		if((rb->GetVelocity() * Physics::METRES_PER_PIXEL).SquareMagnitude() < squaredMaxSpeed) {
+			const Vector2 lw = wheels[Wheel::FrontLeft].lock()->GetPosition(), rw = wheels[Wheel::FrontRight].lock()->GetPosition(), blw = wheels[Wheel::BackLeft].lock()->GetPosition(), brw = wheels[Wheel::BackRight].lock()->GetPosition();
+			const float tileForceScaleFL = GetForceScale(lw), tileForceScaleFR = GetForceScale(rw), tileForceScaleBL = GetForceScale(lw), tileForceScaleBR = GetForceScale(rw);
+			const float tileForceScale = (tileForceScaleFL + tileForceScaleBL + tileForceScaleFR + tileForceScaleBR) * 0.25f;
+			rb->AddForce(rb->GetForward() * force * accelerationForce * rb->GetMass() * tileForceScale, ForceType::FORCE);
+			//rb->AddForceAtPoint(rb->GetForward() * force * accelerationForce * rb->GetMass() * tileForceScaleR, rw, ForceType::FORCE);
+		}
 	}
 }
 
@@ -64,10 +107,13 @@ float VehicleController::GetMaxSpeed() {
 void VehicleController::Steer(const float & steerValue) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
+		const Vector2 lw = wheels[Wheel::FrontLeft].lock()->GetPosition(), rw = wheels[Wheel::FrontRight].lock()->GetPosition();
+		const float tileForceScaleL = GetForceScale(lw), tileForceScaleR = GetForceScale(rw);
+		const float tileForceScale = (tileForceScaleL + tileForceScaleR) * 0.5f;
 		float dot = rb->GetVelocity().Dot(rb->GetForward());
 		dot = (dot < 0.0f) ? -1.0f : 1.0f;
 		const float massScale = Physics::METRES_PER_PIXEL * rb->GetSpeed() * rb->GetMass();
-		rb->AddTorque(steerValue * dot * steeringForce * massScale, ForceType::FORCE);
+		rb->AddTorque(steerValue * dot * steeringForce * tileForceScale * massScale, ForceType::FORCE);
 		//rb->AddTorque(steerValue * dot * massScale, ForceType::FORCE);
 	}
 	else {
@@ -97,7 +143,18 @@ int VehicleController::GetSortOrder() {
 	return order;
 }
 
-Vector2 VehicleController::GetLateralVelocity(std::shared_ptr<RigidBody2D> r) {
+float VehicleController::GetForceScale(const Vector2 & worldPosition) {
+	float tileForceScale = 1.0f;
+	if(!tileMapper.expired()) tileForceScale = tileMapper.lock()->GetTileForceScale(worldPosition);
+	else {
+		std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
+		if(tm) tileMapper = tm->GetComponent<TileMapper>();
+	}
+	return tileForceScale;
+}
+
+Vector2 VehicleController::GetVelocityDampening(std::shared_ptr<RigidBody2D> r) {
 	Vector2 currentRightNormal = r->GetRight();
-	return currentRightNormal * currentRightNormal.Dot(r->GetVelocity());
+	Vector2 velocity = r->GetVelocity();
+	return (currentRightNormal * currentRightNormal.Dot(velocity)) + (velocity * (1.0f - GetForceScale(r->GetPosition())));
 }

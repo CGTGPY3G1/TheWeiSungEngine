@@ -29,8 +29,8 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 	if(map->isValid) {
 		std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
 		worldScale = transform->GetScale();
-		halfWidth = (float)((map->width - 1) * map->tileWidth) / 2;
-		halfHeight = (float)(map->height * map->tileHeight) / 2;
+		halfWidth = (float)(map->width * map->tileWidth) * 0.5f;
+		halfHeight = (float)(map->height * map->tileHeight) * 0.5f;
 		bool foundSet = false;
 		std::shared_ptr<TmxTileset> tileset;
 		const unsigned int noOfTilesets = map->tilesets.size();
@@ -81,6 +81,7 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 	const int noOfTiles = (int)data.size();
 	width = layer->width; height = layer->height;
 	const int sourceColumns = (tileset->sourceWidth / tileset->tileWidth);
+	const int tileHalfWidth = tileWidth >> 1, tileHalfHeight = tileHeight >> 1;
 	for(int i = 0; i < noOfTiles; i++) {
 		const int gid = layer->data[i];
 		const int x = (gid - 1) % sourceColumns;
@@ -151,7 +152,7 @@ const GridLocation TileMapper::IndexToGrid(const int & index) {
 }
 
 const GridLocation TileMapper::WorldToGrid(const Vector2 & worldPosition) {
-	const int x = (int)(((worldPosition.x / worldScale.x) + halfWidth) / (tileWidth)), y = (int)(((worldPosition.y / worldScale.y) + halfHeight) / (tileHeight));
+	const int x = (int)(((worldPosition.x / worldScale.x) + halfWidth) / (tileWidth)), y = (int)(((worldPosition.y / worldScale.y) + halfHeight) / tileHeight);
 	return GridLocation(x, y);
 }
 
@@ -165,6 +166,18 @@ const std::string TileMapper::GetTileTypeAsString(const Vector2 & worldPosition)
 	TileType type = GetTileType(worldPosition);
 	if(type == TileType::TILE_TYPE_NULL) return "No Tile Detected";
 	return tileTypeNames[(int)type];
+}
+
+const float TileMapper::GetTileForceScale(const Vector2 & worldPosition) {
+	TileType type = GetTileType(worldPosition);
+	if(type == TileType::TILE_TYPE_NULL) return 1.0f;
+	return forceScaleTable[(int)type];
+}
+
+const Tile & TileMapper::GetTile(const Vector2 & worldPosition) const {
+	const int x = (int)(((worldPosition.x / worldScale.x) + halfWidth) / (tileWidth)), y = (int)(((worldPosition.y / worldScale.y) + halfHeight) / tileHeight);
+	if(x < 0 || x >= width || y < 0 || y >= height) return Tile();
+	return tiles[y][x];
 }
 
 
@@ -188,13 +201,13 @@ void TileMapper::Draw() {
 			const int top = (int)(((position.y - goPosition.y - (size.y * 0.5f)) / (scale.y * map->tileHeight)) + halfHeight),
 				left = (int)(((position.x - goPosition.x - (size.x * 0.5f)) / (scale.x * map->tileWidth)) + halfWidth - 1),
 				bottom = (int)(((position.y - goPosition.y + (size.y * 0.5f)) / (scale.y * map->tileHeight)) + halfHeight + 1),
-				right = (int)(((position.x - goPosition.y + (size.x * 0.5f)) / (scale.x * map->tileWidth)) + halfWidth);
+				right = (int)(((position.x - goPosition.y + (size.x * 0.5f)) / (scale.x * map->tileWidth)) + halfWidth + 1);
 
 			const int tilesHigh = tiles.size(), tilesWide = tiles[0].size();
-			const int minY = std::max<int>(0, std::min<int>(top, tilesHigh - 1));
-			const int maxY = std::min<int>(tilesHigh - 1, std::max<int>(0,  bottom));
-			const int minX = std::max<int>(0, std::min<int>(left, tilesWide - 1));
-			const int maxX = std::min<int>(tilesWide - 1, std::max<int>(0, right));
+			const int minY = std::max<int>(0, std::min<int>(top, tilesHigh));
+			const int maxY = std::min<int>(tilesHigh, std::max<int>(0,  bottom));
+			const int minX = std::max<int>(0, std::min<int>(left, tilesWide));
+			const int maxX = std::min<int>(tilesWide, std::max<int>(0, right));
 			const int drawWidth = std::abs(maxX - minX), drawHeight = std::abs(maxY - minY);
 			
 
@@ -205,8 +218,8 @@ void TileMapper::Draw() {
 				rs.transform = transform->GetWorldTransform();
 				bool first = true;
 
-				for(unsigned int i = minY; i <= maxY; i++) {
-					for(unsigned int j = minX; j <= maxX; j++) {
+				for(unsigned int i = minY; i < maxY; i++) {
+					for(unsigned int j = minX; j < maxX; j++) {
 						Tile tile = tiles[i][j];
 						// Don't use vertex array
 						// graphics->Draw(tile.sprite, rs);

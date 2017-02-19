@@ -1,4 +1,5 @@
 #include "CharacterScript.h"
+#include "GameObjectManager.h"
 #include "GameObject.h"
 #include "PhysicsSystem.h"
 #include "Math.h"
@@ -12,11 +13,14 @@ CharacterScript::CharacterScript(std::weak_ptr<GameObject> gameObject) : Scripta
 }
 
 CharacterScript::~CharacterScript() {
+
 }
 
 void CharacterScript::Start() {
 	rigidbody = GetComponent<RigidBody2D>();
 	transform = GetComponent<Transform2D>();
+	std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
+	if(tm) tileMapper = tm->GetComponent<TileMapper>();
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -73,29 +77,34 @@ void CharacterScript::Render() {
 void CharacterScript::MoveUsingPhysics(Vector2 & force, const bool & worldSpace) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
+		const float tileForceScale = GetForceScale(rb->GetPosition());
 		if(worldSpace) {
 			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(force.Normalized()), 0.25f);
-			rb->AddForce(force * scale);
+			rb->AddForce(force * tileForceScale * scale);
 		}
 		else {
 			const float magnitude = force.Magnitude();
 			Vector2 direction = transform.lock()->TransformToLocalDirection(force);
 			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(direction), 0.25f);
-			rb->AddForce(direction * magnitude * scale);
+			rb->AddForce(direction * magnitude * tileForceScale * scale);
 		}
 	}
 }
 
 void CharacterScript::Move(Vector2 & amount, const bool & worldSpace) {
 	std::shared_ptr<Transform2D> t = transform.lock();
-	if(worldSpace) {
-		t->Move(amount);
-	}
-	else {
-		const float magnitude = amount.Magnitude();
-		Vector2 direction = transform.lock()->TransformToLocalDirection(amount);
-		const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(direction), 0.4f);
-		t->Move(direction * magnitude * scale);
+	if(t) {
+		const float tileForceScale = GetForceScale(t->GetPosition());
+		if(worldSpace) {
+			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(amount.Normalized()), 0.4f);
+			t->Move(amount * tileForceScale * scale);
+		}
+		else {
+			const float magnitude = amount.Magnitude();
+			Vector2 direction = transform.lock()->TransformToLocalDirection(amount);
+			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(direction), 0.4f);
+			t->Move(direction * magnitude * tileForceScale * scale);
+		}
 	}
 }
 
@@ -122,4 +131,14 @@ void CharacterScript::SetArtificiallyIntelligent(const bool & isAI) {
 int CharacterScript::GetSortOrder() {
 	const static int order = TypeInfo::ScriptSortOrder<CharacterScript>();
 	return order;
+}
+
+float CharacterScript::GetForceScale(const Vector2 & worldPosition) {
+	float tileForceScale = 1.0f;
+	if(!tileMapper.expired()) tileForceScale = tileMapper.lock()->GetTileForceScale(worldPosition);
+	else {
+		std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
+		if(tm) tileMapper = tm->GetComponent<TileMapper>();
+	}
+	return tileForceScale;
 }
