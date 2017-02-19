@@ -71,10 +71,9 @@ void VehicleController::Drive(const float & force) {
 	if(rb) {
 		if((rb->GetVelocity() * Physics::METRES_PER_PIXEL).SquareMagnitude() < squaredMaxSpeed) {
 			const Vector2 lw = wheels[Wheel::FrontLeft].lock()->GetPosition(), rw = wheels[Wheel::FrontRight].lock()->GetPosition(), blw = wheels[Wheel::BackLeft].lock()->GetPosition(), brw = wheels[Wheel::BackRight].lock()->GetPosition();
-			const float tileForceScaleFL = GetForceScale(lw), tileForceScaleFR = GetForceScale(rw), tileForceScaleBL = GetForceScale(lw), tileForceScaleBR = GetForceScale(rw);
-			const float tileForceScale = (tileForceScaleFL + tileForceScaleBL + tileForceScaleFR + tileForceScaleBR) * 0.25f;
+			const float tileForceScaleFL = GetForceScale(lw), tileForceScaleFR = GetForceScale(rw), tileForceScaleBL = GetForceScale(blw), tileForceScaleBR = GetForceScale(brw);
+			const float tileForceScale = (tileForceScaleFL + tileForceScaleBL + tileForceScaleBR + tileForceScaleFR) * 0.25f;
 			rb->AddForce(rb->GetForward() * force * accelerationForce * rb->GetMass() * tileForceScale, ForceType::FORCE);
-			//rb->AddForceAtPoint(rb->GetForward() * force * accelerationForce * rb->GetMass() * tileForceScaleR, rw, ForceType::FORCE);
 		}
 	}
 }

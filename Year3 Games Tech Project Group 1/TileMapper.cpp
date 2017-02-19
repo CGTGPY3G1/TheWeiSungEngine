@@ -45,7 +45,7 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 		for(size_t j = 0; j < noOfLayers; j++) {
 			std::shared_ptr<TmxLayer> layer = map->layers[j];
 			layer->name;
-			if(layer->name == "BackgroundLayer") ProcessTmxTileLayer(tileset, layer, texture);			
+			if(layer->name == "BackgroundLayer") ProcessTmxTileLayer(tileset, layer, texture);	;
 		}
 		const unsigned int noOfGroups = map->groups.size();
 		for(size_t k = 0; k < noOfGroups; k++) {
@@ -54,6 +54,7 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 			if(group->name == "Buildings") ProcessTmxBuildingGroup(group);
 			else if(group->name == "Characters") ProcessCharacters(group);
 			else if(group->name == "Vehicles") ProcessVehicles(group);
+			else if(group->name == "Barriers") ProcessTmxBarrierGroup(group);
 		}
 	}
 	return map->isValid;
@@ -62,17 +63,27 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 
 
 void TileMapper::ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group) {
-	
 	const size_t noOfObjects = group->objects.size();
 	
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
 		
 		const size_t noOfProperties = object->properties.size();
-		const Vector2 objectScale = GetBuildingScale(object->type, object->width, object->height);
+		const Vector2 objectScale = GetObjectScale(0, object->type, object->width, object->height);
 		const Vector2 adjustedScale = Vector2(worldScale.x * objectScale.x, worldScale.y * objectScale.y);
 		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		std::shared_ptr<GameObject> newBuilding = GameObjectFactory::CreateBuilding(object->type, position, adjustedScale, object->rotation).lock();
+	}
+}
+
+void TileMapper::ProcessTmxBarrierGroup(std::shared_ptr<TmxGroup> group) {
+	const size_t noOfObjects = group->objects.size();
+	for(size_t i = 0; i < noOfObjects; i++) {
+		std::shared_ptr<TmxObject> object = group->objects[i];
+		const Vector2 objectScale = Vector2(object->width / 32.0f, object->height / 32.0f);;
+		const Vector2 adjustedScale = Vector2(worldScale.x * objectScale.x, worldScale.y * objectScale.y);
+		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
+		std::shared_ptr<GameObject> newBarrier = GameObjectFactory::CreateBarrier(object->type, position, adjustedScale, object->rotation).lock();
 	}
 }
 
@@ -319,44 +330,49 @@ TileType TileMapper::TypeFromGID(unsigned int gid) {
 	return toReturn;
 }
 
-Vector2 TileMapper::GetBuildingScale(const unsigned int & buildingType, const float & width, const float & height) {
-	switch(buildingType) {
-	case 1:
-		return Vector2(width / 64.0f, height / 64.0f);
-	case 2:
-		return Vector2(width / 192.0f, height / 160.0f);
-	case 3:
-		return Vector2(width / 192.0f, height / 224.0f);
-	case 4:
-		return Vector2(width / 128.0f, height / 96.0f);
-	case 5:
-		return Vector2(width / 224.0f, height / 288.0f);
-	case 6:
-		return Vector2(width / 128.0f, height / 224.0f);
-	case 7:
-		return Vector2(width / 256.0f, height / 128.0f);
-	case 8:
-		return Vector2(width / 160.0f, height / 96.0f);
-	case 9:
-		return Vector2(width / 256.0f, height / 96.0f);
-	case 10:
-		return Vector2(width / 96.0f, height / 64.0f);
-	case 11:
-		return Vector2(width / 96.0f, height / 96.0f);
-	case 12:
-	case 13:
-	case 14:
-	case 15:
-		return Vector2(width / 160.0f, height / 64.0f);
-	case 16:
-	case 17:
-	case 18:
-		return Vector2(width / 128.0f, height / 352.0f);
-	case 19:
-	case 20:
-		return Vector2(width / 192.0f, height / 128.0f);
-	default:
-		break;
+Vector2 TileMapper::GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height) {
+	if(layerTyoe == 0) {
+		switch(objectType) {
+		case 1:
+			return Vector2(width / 64.0f, height / 64.0f);
+		case 2:
+			return Vector2(width / 192.0f, height / 160.0f);
+		case 3:
+			return Vector2(width / 192.0f, height / 224.0f);
+		case 4:
+			return Vector2(width / 128.0f, height / 96.0f);
+		case 5:
+			return Vector2(width / 224.0f, height / 288.0f);
+		case 6:
+			return Vector2(width / 128.0f, height / 224.0f);
+		case 7:
+			return Vector2(width / 256.0f, height / 128.0f);
+		case 8:
+			return Vector2(width / 160.0f, height / 96.0f);
+		case 9:
+			return Vector2(width / 256.0f, height / 96.0f);
+		case 10:
+			return Vector2(width / 96.0f, height / 64.0f);
+		case 11:
+			return Vector2(width / 96.0f, height / 96.0f);
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			return Vector2(width / 160.0f, height / 64.0f);
+		case 16:
+		case 17:
+		case 18:
+			return Vector2(width / 128.0f, height / 352.0f);
+		case 19:
+		case 20:
+			return Vector2(width / 192.0f, height / 128.0f);
+		default:
+			break;
+		}
+	}
+	else {
+
 	}
 	return Vector2::One;
 }

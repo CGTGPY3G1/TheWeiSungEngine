@@ -116,6 +116,7 @@ public:
 	}
 	bool LoadTmxMap(const std::string & xml, const std::string & tilesetName);
 	void ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group);
+	void ProcessTmxBarrierGroup(std::shared_ptr<TmxGroup> group);
 	void ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::shared_ptr<TmxLayer> layer, sf::Texture & texture);
 	void ProcessCharacters(std::shared_ptr<TmxGroup> group);
 	void ProcessVehicles(std::shared_ptr<TmxGroup> group);
@@ -130,7 +131,7 @@ public:
 	void Draw();
 private:
 	TileType TypeFromGID(unsigned int gid);
-	Vector2 GetBuildingScale(const unsigned int & buildingType, const float & width, const float & height);
+	Vector2 GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height);
 	std::shared_ptr<TmxMap> map;
 	std::vector<std::vector<Tile>> tiles;
 	std::weak_ptr<Transform2D> myTransform;
