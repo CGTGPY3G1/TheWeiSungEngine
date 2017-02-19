@@ -149,38 +149,52 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBarrier(const int & barrierTy
 	barrier->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = barrier->AddComponent<SpriteRenderer>().lock();
 	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000);
-	std::shared_ptr<RigidBody2D> r = barrier->AddComponent<RigidBody2D>().lock();
-	r->Init(b2BodyType::b2_staticBody);
-	barrier->SetCollisionCategory(CATEGORY_BUILDING);
+	
+	
 	const int gridSize = 32;
 	switch(barrierType) {
 	case 1:
+	{
+		std::shared_ptr<RigidBody2D> r = barrier->AddComponent<RigidBody2D>().lock();
+		r->Init(b2BodyType::b2_staticBody);
 		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(32.0f, 32.0f));
 		sprite->SetTextureRect(gridSize * 9, gridSize * 12, gridSize, gridSize);
+	}		
 		break;
 	case 2:
+	{
+		std::shared_ptr<RigidBody2D> r = barrier->AddComponent<RigidBody2D>().lock();
+		r->Init(b2BodyType::b2_staticBody);
 		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(32.0f, 32.0f));
 		sprite->SetTextureRect(gridSize * 11, gridSize * 12, gridSize, gridSize);
+	}
 		break;
 	case 3:
-		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(32.0f, 24.0f));
 		sprite->SetTextureRect(gridSize * 9, gridSize * 14, gridSize, gridSize);
 		break;
 	case 4:
-		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(24.0f, 32.0f));
 		sprite->SetTextureRect(gridSize * 11, gridSize * 14, gridSize, gridSize);
 		break;
 	case 5:
+	{
+		std::shared_ptr<RigidBody2D> r = barrier->AddComponent<RigidBody2D>().lock();
+		r->Init(b2BodyType::b2_staticBody);
 		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(24.0f, 32.0f));
 		sprite->SetTextureRect(gridSize * 13, gridSize * 14, gridSize, gridSize);
+	}
 		break;
 	case 6:
+	{
+		std::shared_ptr<RigidBody2D> r = barrier->AddComponent<RigidBody2D>().lock();
+		r->Init(b2BodyType::b2_staticBody);
 		barrier->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(32.0f, 24.0f));
 		sprite->SetTextureRect(gridSize * 15, gridSize * 14, gridSize, gridSize);
+	}
 		break;
 	default:
 		break;
 	}
+	barrier->SetCollisionCategory(CATEGORY_BUILDING);
 	return barrier;
 }
 
