@@ -36,7 +36,7 @@ void TestScene::Start() {
 	tileMapper->Init(EngineSettings::TILESET_FILE_NAME, EngineSettings::TILESET_NAME);
 
 	Engine::GetInstance().GetGraphics().lock()->SetCameraPosition(gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock()->GetPosition());
-	Vector2 rampagePosition = Vector2(16312.0f, 11568.0f);
+	Vector2 rampagePosition = Vector2(-51458.0f, -83026.0f);
 	std::shared_ptr<GameObject> rampage = gameObjectManager.CreateGameObject("Rampage").lock();
 	rampage->Init(rampagePosition, 0.0f, scale);
 	std::shared_ptr<RampageScript> rs = rampage->AddComponent<RampageScript>().lock();
@@ -177,5 +177,6 @@ void TestScene::Render() {
 	Scene::Render();
 	//float zoom = engine.GetGraphics().lock()->GetCameraZoom();
 	//std::shared_ptr<Transform2D> p = gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock();
+	//std::cout << p->GetPosition() << std::endl;
 	//engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
 }

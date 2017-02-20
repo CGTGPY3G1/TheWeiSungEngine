@@ -19,7 +19,7 @@ enum PhysicsBodyType {
 struct PhysicsSettings {
 	b2Vec2 gravity = {0, 0};
 	float timeStep = 1.0f / 50.0f;
-	int velocityIterations = 5, positionIterations = 2;
+	int velocityIterations = 6, positionIterations = 3;
 };
 
 class Collider;
@@ -48,6 +48,7 @@ public:
 	void BeginContact(b2Contact* contact);
 	void EndContact(b2Contact* contact);
 	RayCastHit RayCast(const Vector2 & start, const Vector2 & end, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
+	std::vector<std::weak_ptr<Collider>> CircleCast(const Vector2 & position, const float & radius, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
 	bool CheckAABB(const AABB & aabb, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
 	void HandleMessage(const Message & message);
 	void Draw();
@@ -56,12 +57,13 @@ private:
 	bool ReportFixture(b2Fixture* fixture);
 	PhysicsSystem();
 	b2World * world;
+	std::vector<std::weak_ptr<Collider>> aabbHits;
 	PhysicsSettings settings;
 	float accumulator = 0.0f;
 	RayCastHit hit;
 	bool dirty = false;
 	int raycastFilter, aabbFilter;
-	bool aabbHit = false;
+	bool aabbHit = false, checkMultipleAABBs = false;
 };
 
 #endif // !WS_PHYSICS_SYSTEM_H

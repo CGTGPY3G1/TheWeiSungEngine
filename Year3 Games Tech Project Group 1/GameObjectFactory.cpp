@@ -53,13 +53,13 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 		sprite->SetTextureRect((int)std::roundl(gridSize * 4), (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 2), (int)std::roundl(gridSize * 2));
 		break;
 	case 2:
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 6.0f, gridSize * 5.0f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(), Vector2(gridSize * 6 - 0.5f, gridSize * 5 - 0.5f));
 		sprite->SetTextureRect(0, 0, (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 5));
 		break;
 	case 3:
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-60.0f * scale.x, 0.0f), Vector2(72.0f, 124.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(12.5f * scale.x, -75.0f * scale.y), Vector2(168.0f, 74.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(12.5f * scale.x, 75.0f * scale.y), Vector2(168.0f, 74.0f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(12.0f * scale.x, -75.0f * scale.y), Vector2(168.0f, 74.0f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(12.0f * scale.x, 75.0f * scale.y), Vector2(168.0f, 74.0f));
 		sprite->SetTextureRect((int)std::roundl(gridSize * 7), 0, (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 7));
 		break;
 	case 4:
@@ -80,8 +80,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 		break;
 	case 8:
 		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, -5.0f * scale.y), Vector2(gridSize * 3.0f + 14.0f, gridSize * 3.0f - 10.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-67.5f * scale.x, 0.0f), Vector2(gridSize * 0.75f, gridSize * 3));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(67.5f * scale.x, 0.0f), Vector2(gridSize * 0.75f, gridSize * 3));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-67.5f * scale.x, 0.0f), Vector2(gridSize * 0.76f, gridSize * 3));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(67.5f * scale.x, 0.0f), Vector2(gridSize * 0.76f, gridSize * 3));
 		sprite->SetTextureRect((int)std::roundl(gridSize * 14), (int)std::roundl(gridSize * 10), (int)std::roundl(gridSize * 5), (int)std::roundl(gridSize * 3));
 		break;
 	case 9:
@@ -95,11 +95,11 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 		sprite->SetTextureRect(0, (int)std::roundl(gridSize * 6), (int)std::roundl(gridSize * 3), (int)std::roundl(gridSize * 2));
 		break;
 	case 11:
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(gridSize * 2.0f + 26.0f, gridSize * 2.0f + 26.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * scale.x * 1.2f, -gridSize * scale.y * 1.2f), Vector2(18.0f, 18.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * scale.x * 1.2f, gridSize * scale.y * 1.2f), Vector2(18.0f, 18.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * scale.x * 1.2f, gridSize * scale.y * 1.2f), Vector2(18.0f, 18.0f));
-		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * scale.x * 1.2f, -gridSize * scale.y * 1.2f), Vector2(18.0f, 18.0f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(0.0f, 0.0f), Vector2(gridSize * 2.0f + 26.5f, gridSize * 2.0f + 26.5f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * scale.x * 1.2f, -gridSize * scale.y * 1.2f), Vector2(18.5f, 18.5f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(-gridSize * scale.x * 1.2f, gridSize * scale.y * 1.2f), Vector2(18.5f, 18.5f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * scale.x * 1.2f, gridSize * scale.y * 1.2f), Vector2(18.5f, 18.5f));
+		building->AddComponent<BoxCollider>().lock()->Init(Vector2(gridSize * scale.x * 1.2f, -gridSize * scale.y * 1.2f), Vector2(18.5f, 18.5f));
 		sprite->SetTextureRect((int)std::roundl(gridSize * 23), (int)std::roundl(gridSize * 8), (int)std::roundl(gridSize * 3), (int)std::roundl(gridSize * 3));
 		break;
 	case 12:
@@ -149,8 +149,6 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBarrier(const int & barrierTy
 	barrier->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = barrier->AddComponent<SpriteRenderer>().lock();
 	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000);
-	
-	
 	const int gridSize = 32;
 	switch(barrierType) {
 	case 1:

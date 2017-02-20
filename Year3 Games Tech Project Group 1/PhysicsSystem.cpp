@@ -25,13 +25,24 @@ float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, 
 			}
 		}
 	}
-	return 1.0f;
+	return fraction;
 }
 
 bool PhysicsSystem::ReportFixture(b2Fixture* fixture) {
-	if(fixture->GetFilterData().categoryBits & aabbFilter) {
-		aabbHit = true;
-		return false;
+	const int oCat = fixture->GetFilterData().categoryBits;
+	if((oCat & raycastFilter) == oCat) {
+		if(checkMultipleAABBs) {
+			ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
+			if(colliderData) {
+				aabbHits.push_back(std::static_pointer_cast<Collider>(colliderData->comp.lock()));
+			}
+		}
+		else {
+			if(fixture->GetFilterData().categoryBits & aabbFilter) {
+				aabbHit = true;
+				return false;
+			}
+		}
 	}
 	return true;
 }
@@ -225,7 +236,21 @@ RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end, co
 	return hit;
 }
 
+std::vector<std::weak_ptr<Collider>> PhysicsSystem::CircleCast(const Vector2 & position, const float & radius, const int & collisionMask) {
+	checkMultipleAABBs = true;
+	aabbHits.clear();
+	world->QueryAABB(this, TypeConversion::ConvertToB2AABB(AABB(position.y - radius, position.x - radius, position.y + radius, position.x + radius)));
+	std::vector<std::weak_ptr<Collider>>::iterator it;
+	const float squareRadius = radius * radius;
+	while(it != aabbHits.end()) {
+		if(((*it).lock()->GetComponent<Transform2D>().lock()->GetPosition() - position).SquareMagnitude() > squareRadius) it = aabbHits.erase(it);
+		else ++it;
+	}
+	return aabbHits;
+}
+
 bool PhysicsSystem::CheckAABB(const AABB & aabb, const int & collisionMask) {
+	checkMultipleAABBs = false;
 	aabbFilter = collisionMask;
 	world->QueryAABB(this, TypeConversion::ConvertToB2AABB(aabb));
 	if(aabbHit) {
