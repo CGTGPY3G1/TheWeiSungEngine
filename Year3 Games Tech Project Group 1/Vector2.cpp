@@ -25,9 +25,8 @@ Vector2 Vector2::Set(const Vector2 & toSet) {
 	return *this;
 }
 
-Vector2 Vector2::operator = (const Vector2 & toSet) {
+void Vector2::operator = (const Vector2 & toSet) {
 	x = toSet.x; y = toSet.y;
-	return *this;
 }
 
 Vector2 Vector2::Add(const float & x, const float & y) {

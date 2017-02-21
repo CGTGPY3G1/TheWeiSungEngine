@@ -135,7 +135,7 @@ void RampageScript::SpawnCivilians(const unsigned int number) {
 			const float dist = Random::RandomFloat((spawnRadius * spawnScale) / 2, spawnRadius * spawnScale);
 			position *= dist;
 			position += graphics->GetCameraPosition();
-			positionClear = !PhysicsSystem::GetInstance().CheckAABB(AABB(position - offset, position + offset));
+			positionClear =  !PhysicsSystem::GetInstance().CheckAABB(AABB(position - offset, position + offset));
 		}
 		const float rotation = Random::RandomFloat(0.0f, 360.0f);
 		civs.push_back(GameObjectFactory::CreateCharacter("Character", 1, true, position, Vector2::One, rotation).lock()->GetComponent<Transform2D>());

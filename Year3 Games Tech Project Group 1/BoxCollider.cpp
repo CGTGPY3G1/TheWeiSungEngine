@@ -54,5 +54,5 @@ void BoxCollider::SetRotation(const float & angle) {
 }
 
 Vector2 BoxCollider::GetOffset() {
-	return Vector2();
+	return offset;
 }

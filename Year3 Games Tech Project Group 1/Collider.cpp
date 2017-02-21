@@ -56,6 +56,12 @@ int Collider::GetCollisionMask() {
 	return fixture->GetFilterData().maskBits;
 }
 
+AABB Collider::GetAABB() {
+	b2AABB aabb;
+	fixture->GetShape()->ComputeAABB(&aabb, GetComponent<RigidBody2D>().lock()->GetBody()->GetTransform(), 0);
+	return TypeConversion::ConvertToAABB(aabb);
+}
+
 void Collider::UpdateCollisionFilter() {
 	std::shared_ptr<GameObject> g = gameObject.lock();
 	SetCollisionFilter(g->GetCollisionCategory(), g->GetCollisionMask());

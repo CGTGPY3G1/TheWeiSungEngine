@@ -8,6 +8,7 @@
 struct PhysicsMaterial {
 	float friction = 1.0f, restitution = 1.0f;
 };
+struct AABB;
 struct ComponentData;
 class Collider : public Component {
 	friend class PhysicsSystem;
@@ -24,7 +25,7 @@ public:
 	int GetCollisionCategory();
 	void SetCollisionMask(const int & collisionMask);
 	int GetCollisionMask();
-
+	AABB GetAABB();
 
 	template <class Archive>
 	void load(Archive & ar) {

@@ -18,6 +18,22 @@
 #include "CerealTypeRegistration.h"
 #include "EngineSettings.h"
 
+void TestScene::Detonate(Vector2 position, float radius, float explosionForce, float damage) {
+	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
+	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
+		std::shared_ptr<Collider> c = (*it).lock();
+		if(c) {
+			std::shared_ptr<RigidBody2D> rb = c->GetComponent<RigidBody2D>().lock();
+			if(rb) {
+				Vector2 cPosition = rb->GetPosition();
+				const float distance = (cPosition - position).Magnitude();
+				Vector2 direction = (cPosition - position).Normalized();
+				rb->AddForce(direction * (radius / (distance != 0 ? distance : radius)) * explosionForce, ForceType::IMPULSE_FORCE);
+			}
+		}
+	}
+}
+
 TestScene::TestScene() : Scene() {
 }
 
@@ -159,7 +175,8 @@ void TestScene::Update(const float & deltaTime) {
 			}
 		}
 	}
-
+	
+	if(input->GetMouseButtonDown(MouseButtons::Right)) Detonate(mousePosition, 5 * Physics::PIXELS_PER_METRE, 10.0f, 100.0f);
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
 	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
@@ -172,11 +189,12 @@ void TestScene::Render() {
 		
 		std::shared_ptr<TileMapper> tileMapper = tileset->GetComponent<TileMapper>().lock();
 		tileMapper->Draw();
+		std::shared_ptr<Transform2D> p = gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock();
+		std::cout << tileMapper->GetTileTypeAsString(p->GetPosition()) << std::endl;
 	}
 	//Engine engine = Engine::GetInstance();
 	Scene::Render();
 	//float zoom = engine.GetGraphics().lock()->GetCameraZoom();
-	//std::shared_ptr<Transform2D> p = gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock();
-	//std::cout << p->GetPosition() << std::endl;
+	
 	//engine.GetGraphics().lock()->Draw("Total Time = " + std::to_string(engine.GetTimer().lock()->GetTotalTime()) + "	Delta Time = " + std::to_string(engine.GetTimer().lock()->GetDeltaTime()) + "	FPS = " + std::to_string(engine.GetFPS()), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
 }

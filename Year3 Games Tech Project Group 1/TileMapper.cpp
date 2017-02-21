@@ -66,13 +66,35 @@ void TileMapper::ProcessTmxBuildingGroup(std::shared_ptr<TmxGroup> group) {
 	const size_t noOfObjects = group->objects.size();
 	
 	for(size_t i = 0; i < noOfObjects; i++) {
-		std::shared_ptr<TmxObject> object = group->objects[i];
-		
+		std::shared_ptr<TmxObject> object = group->objects[i];		
 		const size_t noOfProperties = object->properties.size();
 		const Vector2 objectScale = GetObjectScale(0, object->type, object->width, object->height);
 		const Vector2 adjustedScale = Vector2(worldScale.x * objectScale.x, worldScale.y * objectScale.y);
 		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		std::shared_ptr<GameObject> newBuilding = GameObjectFactory::CreateBuilding(object->type, position, adjustedScale, object->rotation).lock();
+		std::vector<std::weak_ptr<BoxCollider>> colliders = newBuilding->GetComponents<BoxCollider>();
+		std::shared_ptr<Transform2D> transform = newBuilding->GetComponent<Transform2D>().lock();
+		for(std::vector<std::weak_ptr<BoxCollider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
+			std::shared_ptr<BoxCollider> bc = (*it).lock();
+			if(bc) {
+				const AABB aabb = bc->GetAABB();
+				Vector2 buffer = Vector2(16.0f, 16.0f);
+				Vector2 worldTopLeft = Vector2(aabb.left + buffer.x, aabb.top - buffer.y);
+				Vector2 worldBottomRight = Vector2(aabb.right - buffer.x, aabb.bottom + buffer.y);
+				GridLocation topLeft = WorldToGrid(worldTopLeft), bottomRight = WorldToGrid(worldBottomRight);				
+				const int tilesHigh = tiles.size() - 1, tilesWide = tiles[0].size() - 1;
+				const int minY = std::max<int>(0, std::min<int>(bottomRight.y, tilesHigh));
+				const int maxY = std::min<int>(tilesHigh, std::max<int>(0, topLeft.y));
+				const int minX = std::max<int>(0, std::min<int>(topLeft.x, tilesWide));
+				const int maxX = std::min<int>(tilesWide, std::max<int>(0, bottomRight.x));
+					
+				for(unsigned int j = minY; j <= maxY; j++) {
+					for(unsigned int k = minX; k <= maxX; k++) {
+						tiles[j][k].type = TileType::TILE_TYPE_NULL;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -119,19 +141,15 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 }
 
 void TileMapper::ProcessCharacters(std::shared_ptr<TmxGroup> group) {
-
 	const size_t noOfObjects = group->objects.size();
-
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
-
 		const size_t noOfProperties = object->properties.size();
 		Vector2 position = Vector2((object->x - halfWidth)* worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		if(object->name == "Player") {
 			std::shared_ptr<GameObject> player = GameObjectFactory::CreateCharacter(object->name, object->type, false, position, Vector2::One, object->rotation).lock();
 			std::shared_ptr<CircleCollider> playerSensor = player->AddComponent<CircleCollider>().lock();
-			playerSensor->Init(Vector2(), 200.0f, true);
-			
+			playerSensor->Init(Vector2(), 200.0f, true);			
 		}
 		else {
 			GameObjectFactory::CreateCharacter(object->name, object->type, true, position, Vector2::One, object->rotation).lock();

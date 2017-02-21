@@ -46,3 +46,4 @@ Vector2 CircleCollider::GetOffset() {
 void CircleCollider::SetOffset(const Vector2 & newOffset) {
 	shape->m_p = TypeConversion::ConvertToB2Vector2(newOffset);
 }
+

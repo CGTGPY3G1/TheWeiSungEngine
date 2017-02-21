@@ -10,6 +10,7 @@ class TestScene : public Scene {
 public:
 	TestScene();
 	~TestScene();
+	void Detonate(Vector2 position, float radius, float explosionForce, float damage);
 	void Start() override;
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Update(const float & deltaTime) override;

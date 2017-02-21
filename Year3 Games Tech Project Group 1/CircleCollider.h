@@ -3,6 +3,7 @@
 #define WS_CIRCLE_COLLIDER_H
 #include <Box2D\Collision\Shapes\b2CircleShape.h>
 #include "Collider.h"
+
 class CircleCollider : public Collider {
 public:
 	CircleCollider();
@@ -14,7 +15,7 @@ public:
 	void SetOffset(const Vector2 & newOffset) override;
 	b2CircleShape *shape;
 	const std::string GetName() const override { return "CircleCollider"; }
-
+	
 	template <class Archive>
 	void load(Archive & ar) {
 	}

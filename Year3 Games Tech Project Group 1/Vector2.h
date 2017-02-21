@@ -33,7 +33,7 @@ public:
 	~Vector2();
 	Vector2 Set(const float & x, const float & y);
 	Vector2 Set(const Vector2 & toSet);
-	Vector2 operator = (const Vector2 & toSet);
+	void operator = (const Vector2 & toSet);
 	Vector2 Add(const float & x, const float & y);
 	Vector2 operator + (const Vector2 & toAdd);
 	const Vector2 operator + (const Vector2 & toAdd) const;

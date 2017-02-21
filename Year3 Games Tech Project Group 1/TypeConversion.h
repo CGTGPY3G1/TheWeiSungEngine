@@ -12,6 +12,10 @@ public:
 	TypeConversion() {}
 	~TypeConversion() {}
 
+	static AABB ConvertToAABB(const b2AABB & aabb) {
+		return AABB(aabb.upperBound.y * Physics::PIXELS_PER_METRE, aabb.lowerBound.x * Physics::PIXELS_PER_METRE, aabb.lowerBound.y * Physics::PIXELS_PER_METRE, aabb.upperBound.x * Physics::PIXELS_PER_METRE);
+	}
+
 	static b2AABB ConvertToB2AABB(const AABB & aabb) {
 		b2AABB toReturn;
 		toReturn.lowerBound.x = aabb.left * Physics::METRES_PER_PIXEL;
