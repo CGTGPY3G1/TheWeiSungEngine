@@ -212,7 +212,7 @@ void PlayerScript::SetDriving(const bool & driving) {
 			if(c) {
 				std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
 				rb->SetPosition(carRB->GetPosition() - (carRB->GetRight() * Physics::PIXELS_PER_METRE) + (carRB->GetForward() * Physics::PIXELS_PER_METRE));
-				rb->AddForce(carRB->GetVelocity().RotatedInDegrees(-45.0f) * 0.25f);
+				rb->AddForce(carRB->GetVelocity().RotatedInDegrees(-45.0f) * 0.1f);
 			}
 		}
 	}
