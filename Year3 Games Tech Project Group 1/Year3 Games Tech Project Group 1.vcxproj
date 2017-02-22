@@ -177,6 +177,7 @@
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
     <ClInclude Include="PlayerScript.h" />
+    <ClInclude Include="PopulationController.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="AABB.h" />
     <ClInclude Include="TileInfo.h" />
@@ -260,6 +261,7 @@
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PlayerScript.cpp" />
     <ClCompile Include="PolygonCollider.cpp" />
+    <ClCompile Include="PopulationController.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="TileInfo.cpp" />
     <ClCompile Include="TileMapper.cpp" />

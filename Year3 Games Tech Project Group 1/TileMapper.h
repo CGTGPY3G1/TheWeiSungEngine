@@ -22,10 +22,11 @@ enum TileType {
 	TILE_TYPE_PAVEMENT_WATER = 11,
 	MAX_TILE_TYPES
 };
-static const std::string tileTypeNames [] = {"Water", "Grass", "Sand", "Pavement", "Road", "Water and Sand", 
+static const std::string tileTypeNames [] = { "Water", "Grass", "Sand", "Pavement", "Road", "Water and Sand", 
 											"Water and Grass", "Sand and Grass", "Road Divider", "Pavement and Road", 
-											"Pavement and Grass", "Pavement and Water"};
-static const float forceScaleTable [] = {0.05f, 0.8f, 0.7f, 0.95f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.9f, 0.875f, 0.5f };
+											"Pavement and Grass", "Pavement and Water" };
+
+static const float forceScaleTable [] = { 0.0f, 0.8f, 0.7f, 0.95f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.9f, 0.875f, 0.5f };
 struct GridLocation {
 	GridLocation(const int & nX = 0, const int & nY = 0) : x(nX), y(nY) {}
 	int x = 0, y = 0;
