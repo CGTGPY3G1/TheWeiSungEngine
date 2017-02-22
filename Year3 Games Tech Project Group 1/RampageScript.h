@@ -1,10 +1,9 @@
 #pragma once
-#ifndef WS_RAMPAGE_SCRIPT_H
-#define WS_RAMPAGE_SCRIPT_H
+#ifndef WS_REVOLUTE_JOINT_H
+#define WS_REVOLUTE_JOINT_H
 
 #include "ScriptableComponent.h"
 class RigidBody2D;
-class TileMapper;
 class Transform2D;
 class RampageScript : public ScriptableComponent {
 public:
@@ -22,6 +21,8 @@ public:
 	void SetRequiredKills(const unsigned int kills);
 	unsigned int GetRequiredKills();
 	unsigned int GetKills();
+	float GetSpawnRadius();
+	void SetSpawnRadius(const float radius);
 	void Activate(std::weak_ptr<Transform2D> targetTransform);
 	bool IsActive();
 	
@@ -35,14 +36,20 @@ public:
 
 	}
 private:
+	void ManagePopulation();
+	void SpawnCivilians(const unsigned int number = 1);
+	void MoveCivilian(std::shared_ptr<Transform2D> targetTransform);
+	std::weak_ptr<Transform2D> target;
+	std::vector<std::weak_ptr<Transform2D>> civs;
+	const unsigned int MAX_CIVS = 40;
 	bool activated = false, deactivated = false;
 	float endTimer = -1.0f;
 	float runTime = 50.0f, runTimerReset = 50.0f;
 	void Reset();
-	int kills = 0;
-	unsigned int requiredKills = 40, killCountAtStart = 0, finalKillCount;
+	unsigned int requiredKills = 40, kills = 0, finalKillCount;
+	float spawnRadius = 35 * Physics::PIXELS_PER_METRE, spawnScale = 1.0f;
 	Vector2 positionReset;
 };
 
 
-#endif // !WS_RAMPAGE_SCRIPT_H
+#endif // !WS_REVOLUTE_JOINT_H

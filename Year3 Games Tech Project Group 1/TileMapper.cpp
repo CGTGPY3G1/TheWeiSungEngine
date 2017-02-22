@@ -102,7 +102,7 @@ void TileMapper::ProcessTmxBarrierGroup(std::shared_ptr<TmxGroup> group) {
 	const size_t noOfObjects = group->objects.size();
 	for(size_t i = 0; i < noOfObjects; i++) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
-		const Vector2 objectScale = Vector2(object->width / 32.0f, object->height / 32.0f);
+		const Vector2 objectScale = Vector2(object->width / 32.0f, object->height / 32.0f);;
 		const Vector2 adjustedScale = Vector2(worldScale.x * objectScale.x, worldScale.y * objectScale.y);
 		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
 		std::shared_ptr<GameObject> newBarrier = GameObjectFactory::CreateBarrier(object->type, position, adjustedScale, object->rotation).lock();

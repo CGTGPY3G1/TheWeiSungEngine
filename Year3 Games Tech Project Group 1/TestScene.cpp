@@ -17,7 +17,7 @@
 #include <memory>
 #include "CerealTypeRegistration.h"
 #include "EngineSettings.h"
-#include "PopulationController.h"
+
 void TestScene::Detonate(Vector2 position, float radius, float explosionForce, float damage) {
 	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
 	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
@@ -57,6 +57,7 @@ void TestScene::Start() {
 	rampage->Init(rampagePosition, 0.0f, scale);
 	std::shared_ptr<RampageScript> rs = rampage->AddComponent<RampageScript>().lock();
 	rs->Start();
+	rs->SetSpawnRadius(20.0f * Physics::PIXELS_PER_METRE);
 	rs->SetRequiredKills(50);
 	rs->SetRunTime(60.0f);
 
@@ -179,8 +180,6 @@ void TestScene::Update(const float & deltaTime) {
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
 	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
-
-	PopulationController::GetInstance().Update();
 }
 
 void TestScene::Render() {
