@@ -144,7 +144,9 @@ void TestScene::Update(const float & deltaTime) {
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
 	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
 
-
+	std::shared_ptr<TileMapper> tileset = gameObjectManager.GetGameObject("Tileset").lock()->GetComponent<TileMapper>().lock();
+	if(input->GetKeyDown(KeyCodes::KeyCode::N)) tileset->SetShowNavLinks(!tileset->GetShowNavLinks());
+	if(input->GetKeyDown(KeyCodes::KeyCode::L)) tileset->SetShowGridLinks(!tileset->GetShowGridLinks());
 	/*std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
 	const float displacement = 1024.0f * graphics->GetCameraZoom() * deltaTime;
 	if(input->GetKey(KeyCodes::KeyCode::W)) graphics->SetCameraPosition(graphics->GetCameraPosition() + Vector2::Down * displacement);

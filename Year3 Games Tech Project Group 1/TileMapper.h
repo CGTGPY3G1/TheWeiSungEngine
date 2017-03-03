@@ -128,8 +128,8 @@ public:
 	void Draw();
 	bool GetShowNavLinks() { return showNavNodes; }
 	void SetShowNavLinks(const bool & shouldShow) { showNavNodes = shouldShow; }
-	bool GetGridLinks() { return showGridLinks; }
-	void SetGridLinks(const bool & shouldShow) { showGridLinks = shouldShow; }
+	bool GetShowGridLinks() { return showGridLinks; }
+	void SetShowGridLinks(const bool & shouldShow) { showGridLinks = shouldShow; }
 private:
 	TileType TypeFromGID(unsigned int gid);
 	Vector2 GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height);
