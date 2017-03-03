@@ -40,8 +40,10 @@ public:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> void RemoveComponent(const unsigned int & id);
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
+	void OnCollisionStay(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorStay(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 	void SetCollisionFilter(const int & collisionCategory, const int & collisionMask);
 	void SetCollisionCategory(const int & collisionCategory);

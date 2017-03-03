@@ -8,8 +8,10 @@
 #include "Graphics.h"
 CharacterScript::CharacterScript() {
 }
+
 CharacterScript::CharacterScript(std::weak_ptr<GameObject> gameObject) : ScriptableComponent(gameObject) {
 	raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
+	NewRandomState();
 }
 
 CharacterScript::~CharacterScript() {
@@ -25,29 +27,17 @@ void CharacterScript::Start() {
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 	if(isAI) {
-		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();		
-		if(rb) {
-			Vector2 forward = rb->GetForward();
-			const Vector2 right = rb->GetRight();
-			const Vector2 characterPosition = rb->GetPosition();
-			Vector2 rayPosition = characterPosition;
-			const Vector2 offset = (right * Physics::PIXELS_PER_METRE / 5);
-			const float fov = 10;
-			float angle = 0;
-			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f, raycastMask);
-			angle += AngleToTurn(hit, right, characterPosition);
-			rayPosition += offset;
-			forward.RotateInDegrees(fov);
-			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.8f, raycastMask);			
-			if(hit.hit) angle -= 0.25f;
-			rayPosition = characterPosition - offset;
-			forward.RotateInDegrees(fov * -2.0f);
-			hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
-			if(hit.hit) angle += 0.25f;
-			if(angle < -0.000001f || angle > 0.000001f) {
-				rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
-			}
-			MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
+		timeUntilSwitch -= fixedDeltaTime;
+		if(timeUntilSwitch <= 0.0f) NewRandomState();
+		switch(aiState) {
+		case AIState::Standing:
+			Stand();
+			break;
+		case AIState::Walking:
+			Walk();
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -60,10 +50,10 @@ void CharacterScript::Render() {
 			const Vector2 right = rb->GetRight();
 			const Vector2 characterPosition = rb->GetPosition();
 			Vector2 rayPosition = characterPosition;
-			const Vector2 offset = (right * Physics::PIXELS_PER_METRE / 5);
+			const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
 			float fov = 10.0f;
 			std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
-			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6);
+			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f);
 			rayPosition += offset;
 			forward.RotateInDegrees(fov);
 			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f);
@@ -124,6 +114,49 @@ const bool CharacterScript::IsArtificiallyIntelligent() const {
 
 void CharacterScript::SetArtificiallyIntelligent(const bool & isAI) {
 	this->isAI = isAI;
+}
+
+void CharacterScript::Stand() {
+	
+}
+
+void CharacterScript::Walk() {
+	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+	if(rb) {
+		Vector2 forward = rb->GetForward();
+		const Vector2 right = rb->GetRight();
+		const Vector2 characterPosition = rb->GetPosition();
+		Vector2 rayPosition = characterPosition;
+		const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
+		const float fov = 10.0f;
+		float angle = 0.0f;
+		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f, raycastMask);
+		angle += AngleToTurn(hit, right, characterPosition);
+		rayPosition += offset;
+		forward.RotateInDegrees(fov);
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
+		if(hit.hit) angle -= 0.25f;
+		rayPosition = characterPosition - offset;
+		forward.RotateInDegrees(fov * -2.0f);
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
+		if(hit.hit) angle += 0.25f;
+		if(angle < -0.000001f || angle > 0.000001f) {
+			rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
+		}
+		MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
+	}
+}
+
+void CharacterScript::NewRandomState() {
+	int val = Random::RandomInt(100);
+	if(val < 20) {
+		timeUntilSwitch = Random::RandomFloat(3.5f, 10.0f);
+		aiState = AIState::Standing;
+	}
+	else {
+		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
+		aiState = AIState::Walking;
+	}
 }
 
 

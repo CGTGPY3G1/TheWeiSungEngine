@@ -84,6 +84,10 @@ void GameObject::OnCollisionEnter(const CollisionData & data) {
 	componentManager.OnCollisionEnter(data);
 }
 
+void GameObject::OnCollisionStay(const CollisionData & data) {
+	componentManager.OnCollisionStay(data);
+}
+
 void GameObject::OnCollisionExit(const CollisionData & data) {
 	//std::cout << GetName() + " Stopped Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
 	componentManager.OnCollisionExit(data);
@@ -92,6 +96,10 @@ void GameObject::OnCollisionExit(const CollisionData & data) {
 void GameObject::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
 	//std::cout << GetName() + " Started Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorEnter(collider);
+}
+
+void GameObject::OnSensorStay(const std::weak_ptr<Collider>& collider) {
+	componentManager.OnSensorStay(collider);
 }
 
 void GameObject::OnSensorExit(const std::weak_ptr<Collider> & collider) {

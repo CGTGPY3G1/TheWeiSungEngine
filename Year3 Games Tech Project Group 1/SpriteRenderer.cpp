@@ -121,12 +121,12 @@ void SpriteRenderer::SetPivotManually(const Vector2 & pivotPoint) {
 //	SetSprite(sprite); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
 //}
 
-void SpriteRenderer::Init(const std::string & path, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
-	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
+void SpriteRenderer::Init(const std::string & path, const PivotPoint & pivot, const RenderLayer & sortLayer, const int & sortOrder, const bool & generateMipMaps, const bool & setSmooth, const bool & setSRGB) {
+	LoadSprite(path, generateMipMaps, setSmooth, setSRGB); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivot(pivot);
 }
 
-void SpriteRenderer::Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder) {
-	LoadSprite(path); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
+void SpriteRenderer::Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer, const int & sortOrder, const bool & generateMipMaps, const bool & setSmooth, const bool & setSRGB) {
+	LoadSprite(path, generateMipMaps, setSmooth, setSRGB); SetSortLayer(sortLayer); SetSortOrder(sortOrder); SetEnabled(true); SetPivotManually(pivot);
 }
 
 void SpriteRenderer::UpdateOrigin() {
@@ -142,7 +142,7 @@ void SpriteRenderer::SetTextureRect(const int & x, const int & y, const int & wi
 	UpdateOrigin();
 }
 
-void SpriteRenderer::LoadSprite(const std::string path) {
+void SpriteRenderer::LoadSprite(const std::string path, const bool & generateMipMaps, const bool & setSmooth, const bool & setSRGB) {
 	sprite = WSSprite(AssetManager::GetInstance().GetTexture(path));
 	this->path = path;
 }

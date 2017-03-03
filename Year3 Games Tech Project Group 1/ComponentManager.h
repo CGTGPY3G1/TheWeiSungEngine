@@ -31,8 +31,10 @@ public:
 	void SetEnabled(const bool & enabled);
 	void HandleMessage(const Message & message);
 	void OnCollisionEnter(const CollisionData & data) override;
+	void OnCollisionStay(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorStay(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 private:
 	int ownerID = 0;

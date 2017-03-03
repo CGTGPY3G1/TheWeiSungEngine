@@ -8,20 +8,19 @@
 #include "ComponentData.h"
 #include "CollisionData.h"
 float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, const b2Vec2 & normal, float32 fraction) {
-	if(!fixture->IsSensor()) {
-		const int oCat = fixture->GetFilterData().categoryBits;
-		if((oCat & raycastFilter) == oCat) {
-			ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
-			if(colliderData) {
-				if(!hit.hit) {
-					hit.hit = true;
-				}
-				if(fraction < hit.fraction) {
-					hit.collider = std::static_pointer_cast<Collider>(colliderData->comp.lock());
-					hit.normal = Vector2(normal.x, normal.y);
-					hit.point = TypeConversion::ConvertToVector2(point);
-					hit.fraction = (float)fraction;
-				}			
+	if(!reportSensors && fixture->IsSensor()) return fraction;
+	const int oCat = fixture->GetFilterData().categoryBits;
+	if((oCat & raycastFilter) == oCat) {
+		ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
+		if(colliderData) {
+			if(!hit.hit) {
+				hit.hit = true;
+			}
+			if(fraction < hit.fraction) {
+				hit.collider = std::static_pointer_cast<Collider>(colliderData->comp.lock());
+				hit.normal = Vector2(normal.x, normal.y);
+				hit.point = TypeConversion::ConvertToVector2(point);
+				hit.fraction = (float)fraction;
 			}
 		}
 	}
@@ -182,7 +181,62 @@ void PhysicsSystem::BeginContact(b2Contact* contact) {
 			}
 		}
 	}
-	
+}
+
+void PhysicsSystem::PostSolve(b2Contact * contact, const b2ContactImpulse * impulse) {
+
+	b2Fixture * fixture1 = contact->GetFixtureA(), *fixture2 = contact->GetFixtureB();
+	b2Body * body1 = fixture1->GetBody(), *body2 = fixture2->GetBody();
+	if(body1 && body2) {
+		ComponentData * colliderData1 = (ComponentData *)fixture1->GetUserData();
+		ComponentData * colliderData2 = (ComponentData *)fixture2->GetUserData();
+		if(colliderData1 && colliderData2) {
+			std::weak_ptr<Collider> collider1 = std::static_pointer_cast<Collider>(colliderData1->comp.lock());
+			std::weak_ptr<Collider> collider2 = std::static_pointer_cast<Collider>(colliderData2->comp.lock());
+			RigidBodyData * rigidBodyData1 = (RigidBodyData *)body1->GetUserData();
+			RigidBodyData * rigidBodyData2 = (RigidBodyData *)body2->GetUserData();
+			std::shared_ptr<RigidBody2D> rigidBody1 = std::static_pointer_cast<RigidBody2D>(rigidBodyData1->data.lock());
+			std::shared_ptr<RigidBody2D> rigidBody2 = std::static_pointer_cast<RigidBody2D>(rigidBodyData2->data.lock());
+			if(rigidBody1 && rigidBody2) {
+				std::weak_ptr<GameObject> gameObject1 = rigidBody1->GetGameObject();
+				std::weak_ptr<GameObject> gameObject2 = rigidBody2->GetGameObject();
+				if(fixture2->IsSensor() || fixture1->IsSensor()) {
+					gameObject1.lock()->OnSensorStay(collider2);
+					gameObject2.lock()->OnSensorStay(collider1);
+				}
+				else {
+					b2WorldManifold worldManifold;
+					contact->GetWorldManifold(&worldManifold);
+					Vector2 impactVelocity = rigidBody2->GetVelocity();
+					impactVelocity -= rigidBody1->GetVelocity();
+					b2Vec2 normalStart = worldManifold.points[0] + worldManifold.normal;
+					b2Vec2 normalEnd = worldManifold.points[0] - worldManifold.normal;
+					Vector2 normal = TypeConversion::ConvertToVector2((normalEnd - normalStart)).Normalize();
+					const size_t cps = 2;
+					ContactPoint contactPoints[2];
+					for(size_t i = 0; i < cps; i++) {
+						contactPoints[i].point = TypeConversion::ConvertToVector2(worldManifold.points[i]);
+						contactPoints[i].seperation = worldManifold.separations[i] * Physics::PIXELS_PER_METRE;
+					}
+					{
+						CollisionData collisionData = CollisionData(gameObject2, collider2, normal, impactVelocity);
+						for(size_t i = 0; i < cps; i++) {
+							collisionData.contactPoints[i] = contactPoints[i];
+						}
+						gameObject1.lock()->OnCollisionStay(collisionData);
+					}
+					{
+						CollisionData collisionData = CollisionData(gameObject1, collider1, -normal, -impactVelocity);
+						for(size_t i = 0; i < cps; i++) {
+							collisionData.contactPoints[i] = contactPoints[i];
+						}
+						gameObject2.lock()->OnCollisionStay(collisionData);
+					}
+				}
+			}
+		}
+	}
+
 }
 
 void PhysicsSystem::EndContact(b2Contact* contact) {
@@ -227,7 +281,8 @@ void PhysicsSystem::EndContact(b2Contact* contact) {
 	}
 }
 
-RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end, const int & collisionMask) {
+RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end, const bool & reportSensors, const int & collisionMask) {
+	this->reportSensors = reportSensors;
 	raycastFilter = collisionMask;
 	hit.Reset();
 	world->RayCast(this, TypeConversion::ConvertToB2Vector2(start), TypeConversion::ConvertToB2Vector2(end));

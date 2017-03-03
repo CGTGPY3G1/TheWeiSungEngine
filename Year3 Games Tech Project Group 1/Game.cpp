@@ -28,15 +28,16 @@ void Game::Update(const float & deltaTime) {
 	if(running && !gameOver) {
 		if(activeScene >= 0 && activeScene < (int)scenes.size()) {
 			float fixedDelta = Engine::GetInstance().GetTimer().lock()->GetFixedDeltaTime();
+			std::shared_ptr<Scene> scene = scenes[activeScene];
 			accumulator += deltaTime;
 			while(accumulator >= fixedDelta) {
-				scenes[activeScene]->FixedUpdate(fixedDelta);
+				scene->FixedUpdate(fixedDelta);
 				accumulator -= fixedDelta;
 			}
 			
-			scenes[activeScene]->Update(deltaTime);
-			scenes[activeScene]->Render();
-			scenes[activeScene]->FinaliseFrame();
+			scene->Update(deltaTime);
+			scene->Render();
+			scene->FinaliseFrame();
 		}
 		else Engine::GetInstance().GetGraphics().lock()->Draw("No Scene Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
 	}
@@ -65,5 +66,6 @@ void Game::SetActiveScene(unsigned int index) {
 	if(activeScene != index) {
 		if(index < scenes.size()) activeScene = index;
 		if(index >= 0) scenes[activeScene]->Start();
+		
 	}
 }

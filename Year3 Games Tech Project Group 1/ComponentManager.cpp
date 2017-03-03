@@ -103,6 +103,12 @@ void ComponentManager::OnCollisionEnter(const CollisionData & data) {
 	}
 }
 
+void ComponentManager::OnCollisionStay(const CollisionData & data) {
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+		(*i)->OnCollisionStay(data);
+	}
+}
+
 void ComponentManager::OnCollisionExit(const CollisionData & data) {
 	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
 		(*i)->OnCollisionExit(data);
@@ -112,6 +118,12 @@ void ComponentManager::OnCollisionExit(const CollisionData & data) {
 void ComponentManager::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
 	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
 		(*i)->OnSensorEnter(collider);
+	}
+}
+
+void ComponentManager::OnSensorStay(const std::weak_ptr<Collider>& collider) {
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
+		(*i)->OnSensorStay(collider);
 	}
 }
 

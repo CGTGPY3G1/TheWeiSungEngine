@@ -30,15 +30,15 @@ public:
 	void SetPivotManually(const Vector2 & pivotPoint);
 	//void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	//void Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 	
-	void Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
+	void Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 	void UpdateOrigin();
 	//void Init(const WSSprite & sprite, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	//void Init(const std::string path, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void SetSprite(const WSSprite & sprite);
 	void SetTextureRect(const int & x, const int & y, const int & width, const int & height);
-	void LoadSprite(const std::string path);
+	void LoadSprite(const std::string path, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 	sf::Shader * GetShader();
 	void SetShader(const std::string & frag, const std::string & vert);
 	void SetShader(std::shared_ptr<sf::Shader> shader);

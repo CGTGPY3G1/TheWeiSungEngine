@@ -77,7 +77,7 @@ public:
 		return Vector2((*this * inverse) + (target * alpha));
 	}
 	Vector2 Copy();
-	std::string ToString() {
+	const std::string ToString() const {
 		return "X = " + std::to_string(x) + " Y = " + std::to_string(y);
 	}
 	friend std::ostream & operator << (std::ostream & out, const Vector2 & toPrint) {

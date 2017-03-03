@@ -7,6 +7,7 @@
 #include "GameObjectFactory.h"
 #include <string>
 #include "PlayerScript.h"
+#include "PhysicsSystem.h"
 
 TileMapper::TileMapper() : Component() {
 
@@ -26,7 +27,12 @@ void TileMapper::Init(const std::string & fileName, const std::string & tilesetN
 
 bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tilesetName) {
 	map = std::make_shared<TmxMap>(xml);
+	std::shared_ptr<TmxGroup> navGroup, characterGroup, vehicleGroup;
 	if(map->isValid) {
+		std::shared_ptr<GameObject> g = GameObjectManager::GetInstance().CreateGameObject("NavBlocker").lock();
+		g->Init();
+		std::shared_ptr<RigidBody2D> rb = g->AddComponent<RigidBody2D>().lock();
+		rb->Init();
 		std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
 		worldScale = transform->GetScale();
 		halfWidth = (float)(map->width * map->tileWidth) * 0.5f;
@@ -52,11 +58,19 @@ bool TileMapper::LoadTmxMap(const std::string & xml, const std::string & tileset
 			std::shared_ptr<TmxGroup> group = map->groups[k];
 			group->name;
 			if(group->name == "Buildings") ProcessTmxBuildingGroup(group);
-			else if(group->name == "Characters") ProcessCharacters(group);
-			else if(group->name == "Vehicles") ProcessVehicles(group);
+			else if(group->name == "Characters") characterGroup = group;
+			else if(group->name == "Vehicles") vehicleGroup = group;
 			else if(group->name == "Barriers") ProcessTmxBarrierGroup(group);
+			else if(group->name == "NavigationLayer") navGroup = group;
 		}
+		if(navGroup) ProcessNavigationLayer(navGroup);
+		if(vehicleGroup) ProcessVehicles(vehicleGroup);
+		if(characterGroup) ProcessCharacters(characterGroup);
+		g->Destroy();
 	}
+	
+	
+
 	return map->isValid;
 }
 
@@ -115,6 +129,8 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 	width = layer->width; height = layer->height;
 	const int sourceColumns = (tileset->sourceWidth / tileset->tileWidth);
 	const int tileHalfWidth = tileWidth >> 1, tileHalfHeight = tileHeight >> 1;
+	std::shared_ptr<GameObject> g = GameObjectManager::GetInstance().GetGameObject("NavBlocker").lock();
+	Vector2 offset = Vector2(Physics::PIXELS_PER_METRE, Physics::PIXELS_PER_METRE);
 	for(int i = 0; i < noOfTiles; i++) {
 		const int gid = layer->data[i];
 		const int x = (gid - 1) % sourceColumns;
@@ -125,7 +141,7 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 
 		sf::IntRect rect = sf::IntRect((x*(tileset->tileWidth+2) + 1), (y*(tileset->tileHeight+2) + 1), tileset->tileWidth, tileset->tileHeight);
 		sf::Sprite sprite(texture, rect);
-		sf::Vector2f position = sf::Vector2f(-halfWidth + (ax * tileset->tileWidth), -halfHeight + (ay * tileset->tileWidth));
+		Vector2 position = Vector2(-halfWidth + (ax * tileset->tileWidth), -halfHeight + (ay * tileset->tileWidth));
 		sprite.setPosition(position);
 		
 		Tile toAdd;
@@ -134,9 +150,16 @@ void TileMapper::ProcessTmxTileLayer(std::shared_ptr<TmxTileset> tileset, std::s
 		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x + tileset->tileWidth, position.y + tileset->tileHeight), sf::Vector2f((float)(rect.left + rect.width), (float)(rect.top + rect.height))));
 		toAdd.verts.push_back(sf::Vertex(sf::Vector2f(position.x, position.y + tileset->tileHeight), sf::Vector2f((float)rect.left, (float)(rect.top + rect.height))));
 		toAdd.sprite = sprite;
+		toAdd.worldPosition = (position * 4.0f) + (offset * 0.5f);
 		toAdd.id = gid;
-		toAdd.type = TypeFromGID(gid);
+		TileType type = TypeFromGID(gid);
+		toAdd.type = type;
 		tiles[ay].push_back(toAdd);
+
+		if(type == TileType::TILE_TYPE_NULL || type == TileType::TILE_TYPE_WATER || type == TileType::TILE_TYPE_ROAD) {
+			std::shared_ptr<BoxCollider> bc = g->AddComponent<BoxCollider>().lock();
+			bc->Init(toAdd.worldPosition, offset, true);
+		}
 	}
 }
 
@@ -170,6 +193,87 @@ void TileMapper::ProcessVehicles(std::shared_ptr<TmxGroup> group) {
 	}
 }
 
+void TileMapper::ProcessNavigationLayer(std::shared_ptr<TmxGroup> group) {
+	const size_t noOfObjects = group->objects.size();
+	std::vector<std::shared_ptr<NavInfo>> nodes;
+	for(size_t i = 0; i < noOfObjects; i++) {
+		std::shared_ptr<TmxObject> object = group->objects[i];
+		Vector2 position = Vector2((object->x - halfWidth) * worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y);
+		GridLocation g = WorldToGrid(position);
+		std::shared_ptr<NavInfo> node = std::make_shared<NavInfo>(position, g);
+		tiles[g.y][g.x].navInfo = node;
+		tiles[g.y][g.x].closestNode = g;
+		nodes.push_back(node);
+	}
+
+	const float maxDistance = (Physics::PIXELS_PER_METRE * 50.0f) * (Physics::PIXELS_PER_METRE * 50.0f);
+	const size_t noOfNodes = nodes.size();
+	for(size_t i = 0; i < noOfNodes - 1; i++) {
+		std::shared_ptr<NavInfo> n1 = nodes[i];
+		for(size_t j = i + 1; j < noOfNodes; j++) {
+			std::shared_ptr<NavInfo> n2 = nodes[j];
+			if(n1 == n2)
+				continue;
+			if((n1->worldPosition - n2->worldPosition).SquareMagnitude() < maxDistance) {
+				RayCastHit hit = PhysicsSystem::GetInstance().RayCast(n1->worldPosition, n2->worldPosition, true);
+				if(!hit.hit) {
+					Edge e1, e2;
+					e1.linked = n2;
+					e2.linked = n1;
+					bool alreadyLinked1 = n1->AddEdge(e1);
+					bool alreadyLinked2 = n2->AddEdge(e2);
+				}
+			}
+		}
+	}
+	int iteration = 1;
+	bool done = false;
+	while(nodes.size() > 0 && !done) {
+		const GridLocation nullGridLocation = GridLocation(-1, -1);
+		bool stillProcessing = false;
+		for(std::vector<std::shared_ptr<NavInfo>>::iterator i = nodes.begin(); i != nodes.end(); ++i) {
+			if((*i)->processed) continue;
+			if(!stillProcessing) stillProcessing = true;
+			const GridLocation nodeLocation = (*i)->gridLocation;
+			int y = nodeLocation.y, x = nodeLocation.x;
+			bool foundEmpty = false;
+			for(size_t dx = iteration; dx > 0; dx--) {
+				int locX = x + dx, locY = y - (iteration - dx);
+				if(IsOnGrid(locX, locY)) {
+					if(tiles[locY][locX].closestNode == nullGridLocation) {
+						tiles[locY][locX].closestNode = nodeLocation;
+						if(!foundEmpty) foundEmpty = true;
+					}
+				}
+				locX = x - dx, locY = y + (iteration - dx);
+				if(IsOnGrid(locX, locY)) {
+					if(tiles[locY][locX].closestNode == nullGridLocation) {
+						tiles[locY][locX].closestNode = nodeLocation;
+						if(!foundEmpty) foundEmpty = true;
+					}
+				}
+				locX = x - (iteration - dx);  locY = y - dx ;
+				if(IsOnGrid(locX, locY)) {
+					if(tiles[locY][locX].closestNode == nullGridLocation) {
+						tiles[locY][locX].closestNode = nodeLocation;
+						if(!foundEmpty) foundEmpty = true;
+					}
+				}
+				locX = x + (iteration - dx);  locY = y + dx;
+				if(IsOnGrid(locX, locY)) {
+					if(tiles[locY][locX].closestNode == nullGridLocation) {
+						tiles[locY][locX].closestNode = nodeLocation;
+						if(!foundEmpty) foundEmpty = true;
+					}
+				}
+			}
+			if(!foundEmpty) (*i)->processed = true;		
+		}
+		iteration++;
+		done = !stillProcessing;
+	}
+}
+
 Vector2 TileMapper::IndexToWorld(const int & index) {
 	const GridLocation gl = IndexToGrid(index);
 	Vector2 toReturn = Vector2(std::round(-halfWidth + (gl.x * tileWidth)), std::round(-halfHeight + (gl.y * tileWidth)));
@@ -178,6 +282,19 @@ Vector2 TileMapper::IndexToWorld(const int & index) {
 
 const GridLocation TileMapper::IndexToGrid(const int & index) {
 	return GridLocation(index % width, index / width);
+}
+
+const Vector2 TileMapper::GridToWorld(const GridLocation & gridLocation) {
+	const float x = (((gridLocation.x * tileWidth) - halfWidth + (tileWidth * 0.5f)) * worldScale.x), y = (((gridLocation.y * tileHeight) - halfHeight + (tileHeight * 0.5f)) * worldScale.y);
+	return Vector2(x, y);
+}
+
+bool TileMapper::IsOnGrid(const GridLocation & gridLocation) {
+	return IsOnGrid(gridLocation.x, gridLocation.y);
+}
+
+bool TileMapper::IsOnGrid(const int & x, const int & y) {
+	return y < tiles.size() && y >= 0 && x < tiles[0].size() && x >= 0;
 }
 
 const GridLocation TileMapper::WorldToGrid(const Vector2 & worldPosition) {
@@ -207,6 +324,15 @@ const Tile & TileMapper::GetTile(const Vector2 & worldPosition) const {
 	const int x = (int)(((worldPosition.x / worldScale.x) + halfWidth) / (tileWidth)), y = (int)(((worldPosition.y / worldScale.y) + halfHeight) / tileHeight);
 	if(x < 0 || x >= width || y < 0 || y >= height) return Tile();
 	return tiles[y][x];
+}
+
+void TileMapper::PrintTile(const Vector2 & worldPosition) {
+	Tile tile = GetTile(worldPosition);
+	GridLocation l = WorldToGrid(worldPosition);
+	if(tile.navInfo) std::cout << "Y = " + std::to_string(l.y) + " X = " + std::to_string(l.x) << std::endl <<
+		"World Position = " + worldPosition.ToString() << std::endl <<
+		"Tile Position = " + tile.worldPosition.ToString() << std::endl << 
+		"Navinfo Position = " + tile.navInfo->worldPosition.ToString() << std::endl;
 }
 
 
@@ -252,7 +378,6 @@ void TileMapper::Draw() {
 						Tile tile = tiles[i][j];
 						// Don't use vertex array
 						// graphics->Draw(tile.sprite, rs);
-
 						// Use Vertex array
 						if(first) {
 							rs.texture = tile.sprite.getTexture();
@@ -264,6 +389,33 @@ void TileMapper::Draw() {
 					}
 				}
 				graphics->Draw(vertexArray, rs);
+				if(showGridLinks || showNavNodes) {
+					for(unsigned int i = minY; i < maxY; i++) {
+						for(unsigned int j = minX; j < maxX; j++) {
+							Tile tile = tiles[i][j];
+							
+							if(showNavNodes && tile.navInfo) {
+								for(size_t b = 0; b < tile.navInfo->edges.size(); b++) {
+									sf::Vertex line [] = {
+										sf::Vertex(tile.navInfo->worldPosition, sf::Color::White),
+										sf::Vertex(tile.navInfo->edges[b].linked->worldPosition, sf::Color::White)
+									};
+									graphics->DrawLine(line);
+								}
+								graphics->DrawCircle(tile.navInfo->worldPosition, 64.0f);
+							}
+							if(showGridLinks) {
+								Vector2 target = GridToWorld(tile.closestNode);
+								sf::Vertex line [] = {
+									sf::Vertex(tile.worldPosition, sf::Color::Red),
+									sf::Vertex(target, sf::Color::Red)
+								};
+								graphics->DrawLine(line);
+							}
+						}
+					}
+				}
+				
 			}		
 		}
 	}

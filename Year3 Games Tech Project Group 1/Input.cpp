@@ -171,6 +171,7 @@ float Input::GetAxisValue(const unsigned int controllerID, const unsigned int ax
 	default:
 		break;
 	}
+	// set to zero if within Dead Zone else adjust value to within normalized (non Dead Zone) range
 	if(val > -DEAD_ZONE && val < DEAD_ZONE) val = 0.0f;
 	else val = (val - ( val > 0.0f ? DEAD_ZONE : -DEAD_ZONE)) / (1.0f - DEAD_ZONE);
 	return val;

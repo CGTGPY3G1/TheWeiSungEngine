@@ -18,6 +18,7 @@
 #include "CerealTypeRegistration.h"
 #include "EngineSettings.h"
 #include "PopulationController.h"
+#include <SFML\Audio\Listener.hpp>
 void TestScene::Detonate(Vector2 position, float radius, float explosionForce, float damage) {
 	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
 	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
@@ -52,7 +53,7 @@ void TestScene::Start() {
 	tileMapper->Init(EngineSettings::TILESET_FILE_NAME, EngineSettings::TILESET_NAME);
 
 	Engine::GetInstance().GetGraphics().lock()->SetCameraPosition(gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock()->GetPosition());
-	Vector2 rampagePosition = Vector2(-51458.0f, -83026.0f);
+	Vector2 rampagePosition = Vector2(26000.0f, 6100.0f);
 	std::shared_ptr<GameObject> rampage = gameObjectManager.CreateGameObject("Rampage").lock();
 	rampage->Init(rampagePosition, 0.0f, scale);
 	std::shared_ptr<RampageScript> rs = rampage->AddComponent<RampageScript>().lock();
@@ -110,43 +111,6 @@ void TestScene::Start() {
 	/*car->GetComponent<SpriteRenderer>().lock()->SetShader(shader);
 	car->GetComponent<SpriteRenderer>().lock()->GetShader()->setUniform("texture", sf::Shader::CurrentTexture);*/
 	
-	/*const float ppm = Physics::PIXELS_PER_METRE;
-	std::shared_ptr<GameObject> boundaries = gameObjectManager.CreateGameObject("Boundaries").lock();
-	boundaries->Init();
-	std::shared_ptr<RigidBody2D> rb = boundaries->AddComponent<RigidBody2D>().lock();
-	rb->Init(b2BodyType::b2_kinematicBody);
-	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(0, -736 * scale.y), Vector2(2880 * scale.x, ppm * 5), false);
-	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(-1408 * scale.x, 8), Vector2(ppm * 5, 1504 * scale.y), false);
-	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(0, 736 * scale.y), Vector2(2880 * scale.x, ppm * 5), false);
-	boundaries->AddComponent<BoxCollider>().lock()->Init(Vector2(1408 * scale.x, 0), Vector2(ppm * 5, 1504 * scale.y), false);*/
-	/*const float left = -38.5f * scale.x * 32.0f, top = - 17.5f * scale.y * 32.0f;
-	const float right = -left, bottom = -top;
-	for(size_t i = 0; i < 50; i++) {
-		std::shared_ptr<GameObject> tg = GameObjectFactory::CreateCharacter("Civ", 1, Vector2(Random::RandomFloat(left, right), top)).lock();
-		std::shared_ptr<CivWaypointScript> cs = tg->AddComponent<CivWaypointScript>().lock();
-		cs->Start();
-		cs->SetTarget(Random::RandomBool() ? Vector2(right, top) : Vector2(left, top));
-		cs->SetExtents(left, top, right, bottom);
-
-		tg = GameObjectFactory::CreateCharacter("Civ", 1, Vector2(Random::RandomFloat(left, right), bottom)).lock();
-		cs = tg->AddComponent<CivWaypointScript>().lock();
-		cs->Start();
-		cs->SetTarget(Random::RandomBool() ? Vector2(right, bottom) : Vector2(left, bottom));
-		cs->SetExtents(left, top, right, bottom);
-
-		tg = GameObjectFactory::CreateCharacter("Civ", 1, Vector2(left, Random::RandomFloat(top, bottom))).lock();
-		cs = tg->AddComponent<CivWaypointScript>().lock();
-		cs->Start();
-		cs->SetTarget(Random::RandomBool() ? Vector2(left, top) : Vector2(left, bottom));
-		cs->SetExtents(left, top, right, bottom);
-
-		tg = GameObjectFactory::CreateCharacter("Civ", 1, Vector2(right, Random::RandomFloat(top, bottom))).lock();
-		cs = tg->AddComponent<CivWaypointScript>().lock();
-		cs->Start();
-		cs->SetTarget(Random::RandomBool() ? Vector2(right, top) : Vector2(right, bottom));
-		cs->SetExtents(left, top, right, bottom);
-	}*/
-	
 }
 
 
@@ -180,8 +144,19 @@ void TestScene::Update(const float & deltaTime) {
 	if(input->GetKeyDown(KeyCodes::KeyCode::G)) input->SetControllerActive(0, !input->GetControllerActive(0));
 	if(input->GetKeyDown(KeyCodes::KeyCode::I)) oldInputStyle = !oldInputStyle;
 
+
+	/*std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+	const float displacement = 1024.0f * graphics->GetCameraZoom() * deltaTime;
+	if(input->GetKey(KeyCodes::KeyCode::W)) graphics->SetCameraPosition(graphics->GetCameraPosition() + Vector2::Down * displacement);
+	if(input->GetKey(KeyCodes::KeyCode::S)) graphics->SetCameraPosition(graphics->GetCameraPosition() + Vector2::Up * displacement);
+	if(input->GetKey(KeyCodes::KeyCode::A)) graphics->SetCameraPosition(graphics->GetCameraPosition() + Vector2::Left * displacement);
+	if(input->GetKey(KeyCodes::KeyCode::D)) graphics->SetCameraPosition(graphics->GetCameraPosition() + Vector2::Right * displacement);
+	if(input->GetKey(KeyCodes::KeyCode::Q)) graphics->SetCameraZoom(graphics->GetCameraZoom() + 5.0f * deltaTime);
+	if(input->GetKey(KeyCodes::KeyCode::E)) graphics->SetCameraZoom(graphics->GetCameraZoom() - 5.0f * deltaTime);*/
 	PopulationController::GetInstance().Update();
 }
+
+TileType oldTile = TileType::TILE_TYPE_NULL;
 
 void TestScene::Render() {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
@@ -190,8 +165,22 @@ void TestScene::Render() {
 		
 		std::shared_ptr<TileMapper> tileMapper = tileset->GetComponent<TileMapper>().lock();
 		tileMapper->Draw();
-		std::shared_ptr<Transform2D> p = gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock();
-		std::cout << tileMapper->GetTileTypeAsString(p->GetPosition()) << std::endl;
+		std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player").lock();
+		if(p) {
+			std::shared_ptr<Transform2D> t = p->GetComponent<Transform2D>().lock();
+			sf::Listener::setPosition(1, 0, -5);
+			if(t) {
+				const Vector2 pos = t->GetPosition();
+				TileType currentTile = tileMapper->GetTileType(pos);
+				if(oldTile != currentTile) {
+					oldTile = currentTile;
+					std::cout << tileMapper->GetTileTypeAsString(pos) << std::endl;
+					tileMapper->PrintTile(pos);
+				}
+//				tileMapper->PrintTileInfo(pos);
+				sf::Listener::setPosition(pos.x, pos.y, 0);
+			}
+		}
 	}
 	//Engine engine = Engine::GetInstance();
 	Scene::Render();

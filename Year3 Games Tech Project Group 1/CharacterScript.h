@@ -7,6 +7,12 @@
 #include "cereal\access.hpp"
 #include "cereal\details\traits.hpp"
 #include <cereal\types\polymorphic.hpp>
+
+enum AIState {
+	Standing = 0,
+	Walking = 1,
+};
+
 class RigidBody2D;
 class Transform2D;
 class TileMapper;
@@ -25,7 +31,9 @@ public:
 	float AngleToTurn(const RayCastHit & hit, Vector2 right, Vector2 position);
 	const bool IsArtificiallyIntelligent() const;
 	void SetArtificiallyIntelligent(const bool & isAI);
-	
+	void Stand();
+	void Walk();
+	void NewRandomState();
 
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
@@ -44,6 +52,8 @@ private:
 	std::weak_ptr<Transform2D> transform;
 	std::weak_ptr<TileMapper> tileMapper;
 	bool isAI = false;
+	AIState aiState = AIState::Standing;
+	float timeUntilSwitch = 1.0f;
 	int raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
 };
 

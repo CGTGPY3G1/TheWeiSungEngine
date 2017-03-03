@@ -7,6 +7,11 @@ AudioSource::AudioSource(std::weak_ptr<GameObject> gameObject) : Component(gameO
 
 AudioSource::~AudioSource() { }
 
+void AudioSource::SetEnabled(const bool & enabled) {
+	if(!enabled) sound.stop();
+	Component::SetEnabled(enabled);
+}
+
 void AudioSource::Init(const std::string & path, const bool & play, const bool & loop) {
 	sound.setBuffer(AssetManager::GetInstance().GetSoundBuffer(path));
 	if(play) Play();
@@ -19,6 +24,14 @@ void AudioSource::SetVolume(const float & volume) {
 
 float AudioSource::GetVolume() {
 	return sound.getVolume() * (1.0f / 100.0f);
+}
+
+void AudioSource::SetAttenuation(const float & attenuation) {
+	sound.setAttenuation(attenuation);
+}
+
+float AudioSource::GetAttenuation() {
+	return sound.getAttenuation();
 }
 
 void AudioSource::SetLooping(const bool & looping) {

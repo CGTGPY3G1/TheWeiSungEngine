@@ -37,14 +37,15 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 }
 
 std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & buildingNumber, const Vector2 & position, const Vector2 & scale, const float & rotation) {
+	static int sortOffset = 0;
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	if(buildingNumber < 1 || buildingNumber > 20) return std::weak_ptr<GameObject>();
 	std::shared_ptr<GameObject> building = gameObjectManager.CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
-	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000);
+	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000 + sortOffset++, true, false);
 	std::shared_ptr<RigidBody2D> r = building->AddComponent<RigidBody2D>().lock();
-	r->Init(b2BodyType::b2_staticBody);
+	r->Init(b2BodyType::b2_kinematicBody);
 	building->SetCollisionCategory(CATEGORY_BUILDING);
 	const float gridSize = 32.0f;
 	switch(buildingNumber) {

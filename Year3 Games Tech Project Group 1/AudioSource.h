@@ -10,12 +10,13 @@ public:
 	AudioSource(std::weak_ptr<GameObject> gameObject);
 	~AudioSource();
 	const ComponentType Type() const override { return COMPONENT_AUDIO_SOURCE; }
-	//void SetEnabled(const bool & enabled) override;
+	void SetEnabled(const bool & enabled) override;
 	void Init(const std::string & path, const bool & play = false, const bool & loop = false);
 	const std::string GetName() const override { return "AudioSource"; }
-	//void Destroy() override;
 	void SetVolume(const float & volume);
 	float GetVolume();
+	void SetAttenuation(const float & attenuation);
+	float GetAttenuation();
 	void SetLooping(const bool & looping);
 	bool GetLooping();
 	bool IsPlaying();

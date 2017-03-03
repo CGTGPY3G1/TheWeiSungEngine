@@ -19,9 +19,7 @@ enum SaveFormat {
 
 class FileManager {
 public:
-	//FileManager();
-	//~FileManager();
-
+	~FileManager() {}
 	static std::string LoadTMX(const std::string path) {
 		std::ifstream is("Tilesets/" + path + ".tmx");
 		std::string toReturn = "";
@@ -100,28 +98,5 @@ private:
 		gzwrite(gz_file, (void*)(os.str().data()), file_size);
 		gzclose(gz_file);
 	}
-
-
-
-	//static bool DirectoryExists(std::string path) {
-	//	DWORD dwAttrib = GetFileAttributes((LPCTSTR)path.c_str());
-	//	return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-	//}
-
-	//static void CreateNewDirectory(std::string path) {
-	//	if(!CreateDirectory((LPCTSTR)path.c_str(), NULL)) {
-	//		Debug::PrintImmediately("Couldn't Create Directory - " + path, DebugMessageType::DEBUG_TYPE_FAILURE_CRITICAL);
-	//	}
-	//}
-
-	//static bool FileExists(std::string path) {
-	//	DWORD dwAttrib = GetFileAttributes((LPCTSTR)path.c_str());
-	//	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-	//}
 };
-//
-//FileManager::FileManager() {
-//}
-//
-//FileManager::~FileManager() {
-//}
+

@@ -54,8 +54,8 @@ private:
 	const unsigned int NUMBER_OF_MOUSE_BUTTONS = MouseButtons::MouseButton::ButtonCount, NUMBER_OF_CONTROLLER_BUTTONS = ControllerButtons::ControllerButton::ButtonCount, 
 						NUMBER_OF_CONTROLLER_AXES = ControllerButtons::ControllerAxis::AxisCount, NUMBER_OF_KEYS = KeyCodes::KeyCode::KeyCount;
 	const unsigned int NUMBER_OF_CONTROLLERS = 8;
-	bool keyStates[KeyCodes::KeyCode::KeyCount] = {0};
-	bool keyChanged[KeyCodes::KeyCode::KeyCount] = {0};
+	bool keyStates[KeyCodes::KeyCode::KeyCount] = {false};
+	bool keyChanged[KeyCodes::KeyCode::KeyCount] = {false};
 
 	bool mouseButtonStates[MouseButtons::MouseButton::ButtonCount];
 	bool mouseButtonChanged[MouseButtons::MouseButton::ButtonCount];
@@ -64,11 +64,10 @@ private:
 	bool ControllerButtonChanged[8][ControllerButtons::ControllerButton::ButtonCount];
 
 	float axisStates[8][ControllerButtons::ControllerAxis::AxisCount];
-	const float ROUNDING_RANGE = 0.0001f, DEAD_ZONE = 0.2f;
+	const float DEAD_ZONE = 0.2f;
 	Vector2 mousePosition;
 	std::mutex m;
 	bool usingController[8];
-
 	std::weak_ptr<Input> GetWeak() { return shared_from_this(); }
 };
 
