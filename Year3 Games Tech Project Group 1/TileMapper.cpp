@@ -421,6 +421,20 @@ void TileMapper::Draw() {
 	}
 }
 
+Vector2 TileMapper::GetNewTargetLocation(const Vector2 & worldPosition) {
+	Tile t = GetTile(worldPosition);
+	if(t.navInfo) {
+		std::shared_ptr<NavInfo> linked = t.navInfo->GetRandomNode().lock();
+		if(linked) {
+			return linked->worldPosition;
+		}
+		else {
+			return t.navInfo->worldPosition;
+		}
+	}
+	return GridToWorld(t.closestNode);
+}
+
 TileType TileMapper::TypeFromGID(unsigned int gid) {
 	TileType toReturn;
 	switch(gid) {
@@ -547,3 +561,7 @@ Vector2 TileMapper::GetObjectScale(const unsigned int & layerTyoe, const unsigne
 	return Vector2::One;
 }
 
+std::weak_ptr<NavInfo> NavInfo::GetRandomNode() {
+	const int index = Random::RandomInt(0, edges.size());
+	return edges[index].linked;
+}

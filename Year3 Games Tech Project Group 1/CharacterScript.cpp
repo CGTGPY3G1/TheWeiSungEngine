@@ -22,7 +22,14 @@ void CharacterScript::Start() {
 	rigidbody = GetComponent<RigidBody2D>();
 	transform = GetComponent<Transform2D>();
 	std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
-	if(tm) tileMapper = tm->GetComponent<TileMapper>();
+	if(tm) {
+		std::shared_ptr<TileMapper> map = tm->GetComponent<TileMapper>().lock();
+		if(map) {
+			tileMapper = tm->GetComponent<TileMapper>();
+			targetLocation = map->GetNewTargetLocation(transform.lock()->GetPosition());
+		}
+	}
+
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -34,7 +41,7 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 			Stand();
 			break;
 		case AIState::Walking:
-			Walk();
+			Walk(fixedDeltaTime);
 			break;
 		default:
 			break;
@@ -120,7 +127,7 @@ void CharacterScript::Stand() {
 	
 }
 
-void CharacterScript::Walk() {
+void CharacterScript::Walk(const float & deltaTime) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
 		Vector2 forward = rb->GetForward();
@@ -130,20 +137,41 @@ void CharacterScript::Walk() {
 		const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
 		const float fov = 10.0f;
 		float angle = 0.0f;
-		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f, raycastMask);
-		angle += AngleToTurn(hit, right, characterPosition);
+		bool obstacleDetected = false;
+		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.5f, false, raycastMask);
+		if(hit.hit) {
+			if(!obstacleDetected) obstacleDetected = true;
+			angle += AngleToTurn(hit, right, characterPosition);
+		}
+		
 		rayPosition += offset;
 		forward.RotateInDegrees(fov);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
-		if(hit.hit) angle -= 0.25f;
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.3f, false, raycastMask);
+		if(hit.hit) {
+			if(!obstacleDetected) obstacleDetected = true;
+			angle -= 0.25f;
+		}
 		rayPosition = characterPosition - offset;
 		forward.RotateInDegrees(fov * -2.0f);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, raycastMask);
-		if(hit.hit) angle += 0.25f;
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.3f, false, raycastMask);
+		if(hit.hit) {
+			if(!obstacleDetected) obstacleDetected = true;
+			angle += 0.25f;
+		}
+		if(!obstacleDetected) {
+			Vector2 forward = rb->GetForward();
+			Vector2 position = rb->GetPosition();
+			if((targetLocation - position).SquareMagnitude() < ((0.5f * Physics::PIXELS_PER_METRE) * (0.5f * Physics::PIXELS_PER_METRE)))
+				targetLocation = tileMapper.lock()->GetNewTargetLocation(position);
+
+			Vector2 direction = (targetLocation - position).Normalized();
+			rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
+		}
 		if(angle < -0.000001f || angle > 0.000001f) {
 			rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
 		}
 		MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
+
 	}
 }
 
@@ -156,7 +184,13 @@ void CharacterScript::NewRandomState() {
 	else {
 		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
 		aiState = AIState::Walking;
+
 	}
+}
+
+void CharacterScript::Reset() {
+	targetLocation = tileMapper.lock()->GetNewTargetLocation(transform.lock()->GetPosition());
+	NewRandomState();
 }
 
 

@@ -52,6 +52,7 @@ struct NavInfo {
 		return toReturn;
 	}
 
+	std::weak_ptr<NavInfo> GetRandomNode();
 	bool operator == (const NavInfo & other) {
 		return gridLocation == other.gridLocation;
 	}
@@ -130,6 +131,7 @@ public:
 	void SetShowNavLinks(const bool & shouldShow) { showNavNodes = shouldShow; }
 	bool GetShowGridLinks() { return showGridLinks; }
 	void SetShowGridLinks(const bool & shouldShow) { showGridLinks = shouldShow; }
+	Vector2 GetNewTargetLocation(const Vector2 & worldPosition);
 private:
 	TileType TypeFromGID(unsigned int gid);
 	Vector2 GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height);

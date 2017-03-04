@@ -20,4 +20,5 @@
 #include "PlayerScript.h"
 #include "AudioSource.h"
 #include "HealthScript.h"
+#include "DeathTimer.h"
 #endif !WS_COMPENENT_HEADERS_H

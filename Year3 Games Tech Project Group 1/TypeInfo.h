@@ -24,7 +24,7 @@ public:
 	template<> const static ComponentType GetTypeID<PlayerScript>() { return COMPONENT_PLAYER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<AudioSource>() { return COMPONENT_AUDIO_SOURCE; }
 	template<> const static ComponentType GetTypeID<HealthScript>() { return COMPONENT_HEALTH_SCRIPT; }
-	
+	template<> const static ComponentType GetTypeID<DeathTimer>() { return COMPONENT_DEATH_TIMER; }
 
 	template <typename T> const static bool AllowMultiple() { return false; };
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
@@ -44,6 +44,7 @@ public:
 	template<> const static bool IsScriptable<PlayerScript>() { return true; }
 	template<> const static bool IsScriptable<RampageScript>() { return true; }
 	template<> const static bool IsScriptable<HealthScript>() { return true; }
+	template<> const static bool IsScriptable<DeathTimer>() { return true; }
 
 	template <typename T> const static int ScriptSortOrder() { return 33; };
 	template<> const static int ScriptSortOrder<PlayerScript>() { return 0; }

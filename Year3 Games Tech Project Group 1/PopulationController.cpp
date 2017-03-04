@@ -119,13 +119,13 @@ void PopulationController::MoveCivilian(std::shared_ptr<Transform2D> targetTrans
 			TileType tileType = tileMap->GetTileType(position);
 			positionClear = ((tileType == TILE_TYPE_PAVEMENT || tileType == TILE_TYPE_GRASS || tileType == TILE_TYPE_SAND || tileType == TILE_TYPE_SAND_GRASS || tileType == TILE_TYPE_PAVEMENT_GRASS) ?
 							 !PhysicsSystem::GetInstance().CheckAABB(AABB(position - offset, position + offset)) : false);
-			int hhh = 0;
 		}
 		if(positionClear) {
 			const float rotation = Random::RandomFloat(0.0f, 360.0f);
 			std::shared_ptr<RigidBody2D> rb = targetTransform->GetComponent<RigidBody2D>().lock();
 			rb->SetPosition(position);
 			rb->SetRotation(rotation);
+			targetTransform->GetComponent<CharacterScript>().lock()->Reset();
 		}
 	}
 }

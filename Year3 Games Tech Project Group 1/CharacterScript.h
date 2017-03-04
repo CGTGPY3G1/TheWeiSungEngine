@@ -32,9 +32,9 @@ public:
 	const bool IsArtificiallyIntelligent() const;
 	void SetArtificiallyIntelligent(const bool & isAI);
 	void Stand();
-	void Walk();
+	void Walk(const float & deltaTime);
 	void NewRandomState();
-
+	void Reset();
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
 	template <class Archive>
@@ -51,6 +51,7 @@ private:
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> transform;
 	std::weak_ptr<TileMapper> tileMapper;
+	Vector2 targetLocation;
 	bool isAI = false;
 	AIState aiState = AIState::Standing;
 	float timeUntilSwitch = 1.0f;
