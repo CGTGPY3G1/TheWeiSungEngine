@@ -55,6 +55,7 @@ public:
 	template<> const static int ScriptSortOrder<RampageScript>() { return 5; }
 	template<> const static int ScriptSortOrder<BulletScript>() { return 6; }
 	template<> const static int ScriptSortOrder<HealthScript>() { return 7; }
+	template<> const static int ScriptSortOrder<DeathTimer>() { return 55; }
 	
 	template <typename T> const static bool IsCollider() { return false; };
 	template<> const static bool IsCollider<BoxCollider>() { return true; }
@@ -62,7 +63,7 @@ public:
 	template<> const static bool IsCollider<PolygonCollider>() { return true; }
 
 	const static bool IsUpdatable(const ComponentType & type) {
-		static const int mask = COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW | 
+		static const int mask = COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
 			COMPONENT_PLAYER_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_HEALTH_SCRIPT;
 		return ((mask & type) == type);
 	};

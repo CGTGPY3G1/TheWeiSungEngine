@@ -169,6 +169,7 @@
     <ClInclude Include="CivWaypointScript.h" />
     <ClInclude Include="CollisionMask.h" />
     <ClInclude Include="ComponentData.h" />
+    <ClInclude Include="DeathTimer.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EngineSettings.h" />
     <ClInclude Include="FileManager.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="CollisionData.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="DeathTimer.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="EngineSettings.cpp" />

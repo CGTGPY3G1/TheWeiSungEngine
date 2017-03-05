@@ -1,5 +1,5 @@
 #include "Time.h"
-
+#include "EngineSettings.h"
 Time::Time() {
 	startTime = std::chrono::steady_clock::now();
 	currentTime = startTime;
@@ -21,11 +21,11 @@ void Time::Update() {
 }
 
 float Time::GetDeltaTime() {
-	return deltaTime;
+	return deltaTime * EngineSettings::TIME_SCALE;
 }
 
 float Time::GetFixedDeltaTime() {
-	return FIXED_DELTA;
+	return FIXED_DELTA * EngineSettings::TIME_SCALE;
 }
 
 float Time::GetTotalTime() {

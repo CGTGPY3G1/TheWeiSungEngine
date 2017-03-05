@@ -16,8 +16,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	sr->SetTextureRect(64 * characterType, 0, 64, 64);
 	r->SetMass(10);
 	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
-	cs->Start();
 	cs->SetArtificiallyIntelligent(aiControlled);
+	cs->Start();
 	std::shared_ptr<HealthScript> hs = character->AddComponent<HealthScript>().lock();
 	if(characterType == 0) {
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_PLAYER);
