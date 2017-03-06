@@ -28,7 +28,7 @@ void BulletScript::OnCollisionEnter(const CollisionData & data) {
 	if(g) {
 		std::shared_ptr<HealthScript> hs = g->GetComponent<HealthScript>().lock();
 		if(hs) {
-			hs->AddToHealth(-Random::RandomFloat(30.0f, 60.0f));
+			hs->Hit(Random::RandomFloat(30.0f, 60.0f));
 		}
 	}
 }

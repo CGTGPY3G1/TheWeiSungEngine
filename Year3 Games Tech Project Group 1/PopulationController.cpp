@@ -126,6 +126,7 @@ void PopulationController::MoveCivilian(std::shared_ptr<Transform2D> targetTrans
 			rb->SetPosition(position);
 			rb->SetRotation(rotation);
 			targetTransform->GetComponent<CharacterScript>().lock()->Reset();
+			targetTransform->GetComponent<HealthScript>().lock()->Reset();
 		}
 	}
 }

@@ -17,6 +17,10 @@ void HealthScript::Update(const float & deltaTime) {
 	if(alive) {
 		if(health <= 0.00001f) {
 			alive = false;
+			std::shared_ptr<BloodSplatterScript> bs = GetComponent<BloodSplatterScript>().lock();
+			if(bs) {
+				bs->Pool();
+			}
 			std::shared_ptr<GameObject> g = gameObject.lock();
 			if(g) g->Destroy();
 		}
@@ -38,8 +42,34 @@ const float HealthScript::GetHealth() const {
 
 void HealthScript::SetHealth(const float newHealth) {
 	health = newHealth;
+	maxHealth = newHealth;
 }
 
 void HealthScript::AddToHealth(const float amount) {
 	health += amount;
+	if(health > maxHealth) health = maxHealth;
+}
+
+void HealthScript::Hit(const float force) {
+	health -= force;
+
+	if(health > 0.0f) {
+		std::shared_ptr<BloodSplatterScript> bs = GetComponent<BloodSplatterScript>().lock();
+		if(bs) {
+			const float rHealth = health / maxHealth;
+			if(rHealth < 0.8f)
+				bs->SetBleeding(rHealth > 0.5f ? 1 : (rHealth > 0.25f ? 2 : 3));
+		}
+	}
+	else {
+
+	}
+}
+
+void HealthScript::Reset() {
+	health = maxHealth;
+	std::shared_ptr<BloodSplatterScript> bs = GetComponent<BloodSplatterScript>().lock();
+	if(bs) {
+		bs->SetBleeding(0);
+	}
 }

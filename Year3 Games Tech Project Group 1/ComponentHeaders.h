@@ -21,4 +21,6 @@
 #include "AudioSource.h"
 #include "HealthScript.h"
 #include "DeathTimer.h"
+#include "SpriteAnimator.h"
+#include "BloodSplatterScript.h"
 #endif !WS_COMPENENT_HEADERS_H

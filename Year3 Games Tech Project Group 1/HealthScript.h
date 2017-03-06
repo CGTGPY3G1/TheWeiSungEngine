@@ -22,7 +22,8 @@ public:
 	const float GetHealth() const;
 	void SetHealth(const float newHealth);
 	void AddToHealth(const float amount);
-
+	void Hit(const float force);
+	void Reset();
 	template <class Archive>
 	void load(Archive & ar) {
 
@@ -33,7 +34,7 @@ public:
 		ScriptableComponent::save(ar);
 	}
 private:
-	float health = 50;
+	float health = 50, maxHealth = 50;
 	bool alive = true;
 };
 

@@ -25,7 +25,9 @@ public:
 	template<> const static ComponentType GetTypeID<AudioSource>() { return COMPONENT_AUDIO_SOURCE; }
 	template<> const static ComponentType GetTypeID<HealthScript>() { return COMPONENT_HEALTH_SCRIPT; }
 	template<> const static ComponentType GetTypeID<DeathTimer>() { return COMPONENT_DEATH_TIMER; }
-
+	template<> const static ComponentType GetTypeID<SpriteAnimator>() { return COMPONENT_SPRITE_ANIMATOR; }
+	template<> const static ComponentType GetTypeID<BloodSplatterScript>() { return COMPONENT_BLOOD_SPLATTER_SCRIPT; }
+	
 	template <typename T> const static bool AllowMultiple() { return false; };
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
 	template<> const static bool AllowMultiple<BoxCollider>() { return true; }
@@ -45,6 +47,8 @@ public:
 	template<> const static bool IsScriptable<RampageScript>() { return true; }
 	template<> const static bool IsScriptable<HealthScript>() { return true; }
 	template<> const static bool IsScriptable<DeathTimer>() { return true; }
+	template<> const static bool IsScriptable<SpriteAnimator>() { return true; }
+	template<> const static bool IsScriptable<BloodSplatterScript>() { return true; }
 
 	template <typename T> const static int ScriptSortOrder() { return 33; };
 	template<> const static int ScriptSortOrder<PlayerScript>() { return 0; }
@@ -55,6 +59,8 @@ public:
 	template<> const static int ScriptSortOrder<RampageScript>() { return 5; }
 	template<> const static int ScriptSortOrder<BulletScript>() { return 6; }
 	template<> const static int ScriptSortOrder<HealthScript>() { return 7; }
+	template<> const static int ScriptSortOrder<SpriteAnimator>() { return 8; }
+	template<> const static int ScriptSortOrder<BloodSplatterScript>() { return 9; }
 	template<> const static int ScriptSortOrder<DeathTimer>() { return 55; }
 	
 	template <typename T> const static bool IsCollider() { return false; };
@@ -63,7 +69,7 @@ public:
 	template<> const static bool IsCollider<PolygonCollider>() { return true; }
 
 	const static bool IsUpdatable(const ComponentType & type) {
-		static const int mask = COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
+		static const int mask = COMPONENT_BLOOD_SPLATTER_SCRIPT | COMPONENT_SPRITE_ANIMATOR | COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
 			COMPONENT_PLAYER_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_HEALTH_SCRIPT;
 		return ((mask & type) == type);
 	};

@@ -18,6 +18,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
 	cs->SetArtificiallyIntelligent(aiControlled);
 	cs->Start();
+	std::shared_ptr<BloodSplatterScript> bs = character->AddComponent<BloodSplatterScript>().lock();
+	bs->Start();
 	std::shared_ptr<HealthScript> hs = character->AddComponent<HealthScript>().lock();
 	if(characterType == 0) {
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_PLAYER);
@@ -239,5 +241,27 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNu
 	vehicle->SetTag("Vehicle");
 	std::shared_ptr<HealthScript> hs = vehicle->AddComponent<HealthScript>().lock();
 	hs->SetHealth(25000.0f);
+
 	return vehicle;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateBloodSplat(const Vector2 & position, const int & type, const int & version) {
+	static int sortOrder = -1000000;
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> splat = gameObjectManager.CreateGameObject("BloodSplat").lock();
+	const float scale = Random::RandomFloat(1.0f, 1.5f);
+	splat->Init(position, Random::RandomFloat(360.0f), Vector2(scale, scale));
+	std::shared_ptr<SpriteRenderer> sr = splat->AddComponent<SpriteRenderer>().lock();
+	sr->Init("Images/Blood.png", PivotPoint::Centre, RenderLayer::BACKGROUND_LAYER, sortOrder++);
+	if(type == 0) {
+		sr->SetTextureRect(0, 0, 64, 64);
+	}
+	else {
+		int x = (version < 0 || version > 5) ? Random::RandomInt(6) : version;
+		sr->SetTextureRect(x * 32, 64, 32, 32);
+	}
+	
+	std::shared_ptr<DeathTimer> dt = splat->AddComponent<DeathTimer>().lock();
+	dt->SetTime(45.0f);
+	return splat;
 }

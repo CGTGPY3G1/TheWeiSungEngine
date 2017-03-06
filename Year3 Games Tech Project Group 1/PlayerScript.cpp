@@ -194,6 +194,8 @@ void PlayerScript::SetCharacterEnabled(const bool & enabled) {
 		if(hs) hs->SetEnabled(enabled);
 		std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
 		if(cs) cs->SetEnabled(enabled);
+		std::shared_ptr<BloodSplatterScript> bs = p->GetComponent<BloodSplatterScript>().lock();
+		if(bs) bs->SetEnabled(enabled);
 	}
 }
 

@@ -184,7 +184,8 @@ void CharacterScript::NewRandomState() {
 	else {
 		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
 		aiState = AIState::Walking;
-		targetLocation = tileMapper.lock()->GetNewTargetLocation(rigidbody.lock()->GetPosition());
+		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+		if(rb) targetLocation = tileMapper.lock()->GetNewTargetLocation(rb->GetPosition());
 	}
 }
 
