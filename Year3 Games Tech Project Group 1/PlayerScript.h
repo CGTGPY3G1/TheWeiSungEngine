@@ -23,7 +23,7 @@ public:
 private:
 	void SetCharacterEnabled(const bool & enabled);
 	void SetDriving(const bool & driving);
-	bool driving = false;
+	bool driving = false, moving = false;
 	float reloadTime = 0.0f;
 	std::weak_ptr<VehicleController> car;
 	std::weak_ptr<GameObject> player;

@@ -58,6 +58,21 @@ void PlayerScript::Update(const float & deltaTime) {
 				}
 			}
 		}
+		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W) || 
+			input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S) ||
+		   input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A) ||
+		   input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) {
+			if(!moving) {
+				moving = true;
+				std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+				if(sa) sa->PlayAnimation("Walk");
+			}
+		}
+		else if(moving) {
+			moving = false;
+			std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+			if(sa) sa->PlayAnimation("Idle");
+		}
 	}
 	else {
 		std::shared_ptr<VehicleController> c = car.lock();

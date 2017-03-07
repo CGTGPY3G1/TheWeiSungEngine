@@ -97,7 +97,7 @@ void PopulationController::SpawnCivilians(const unsigned int number) {
 		}
 		if(positionClear) {
 			const float rotation = Random::RandomFloat(0.0f, 360.0f);
-			civs.push_back(GameObjectFactory::CreateCharacter("Character", 1, true, position, Vector2::One, rotation).lock()->GetComponent<Transform2D>());
+			civs.push_back(GameObjectFactory::CreateCharacter("Character", Random::RandomInt(1, 10), true, position, Vector2::One, rotation).lock()->GetComponent<Transform2D>());
 		}
 	}
 }

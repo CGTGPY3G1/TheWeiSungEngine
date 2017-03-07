@@ -20,16 +20,17 @@ CharacterScript::~CharacterScript() {
 void CharacterScript::Start() {
 	rigidbody = GetComponent<RigidBody2D>();
 	transform = GetComponent<Transform2D>();
-	std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
-	if(tm) {
-		std::shared_ptr<TileMapper> map = tm->GetComponent<TileMapper>().lock();
-		if(map) {
-			tileMapper = tm->GetComponent<TileMapper>();
-			targetLocation = map->GetNewTargetLocation(transform.lock()->GetPosition());
-			NewRandomState();
+	if(isAI) {
+		std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
+		if(tm) {
+			std::shared_ptr<TileMapper> map = tm->GetComponent<TileMapper>().lock();
+			if(map) {
+				tileMapper = tm->GetComponent<TileMapper>();
+				targetLocation = map->GetNewTargetLocation(transform.lock()->GetPosition());
+				NewRandomState();
+			}
 		}
 	}
-
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -138,7 +139,7 @@ void CharacterScript::Walk(const float & deltaTime) {
 		const float fov = 10.0f;
 		float angle = 0.0f;
 		bool obstacleDetected = false;
-		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, false, raycastMask);
+		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, false);
 		if(hit.hit) {
 			if(!obstacleDetected) obstacleDetected = true;
 			angle += AngleToTurn(hit, right, characterPosition);
@@ -146,14 +147,14 @@ void CharacterScript::Walk(const float & deltaTime) {
 		
 		rayPosition += offset;
 		forward.RotateInDegrees(fov);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.5f, false, raycastMask);
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.5f, false);
 		if(hit.hit) {
 			if(!obstacleDetected) obstacleDetected = true;
 			angle -= 0.25f;
 		}
 		rayPosition = characterPosition - offset;
 		forward.RotateInDegrees(fov * -2.0f);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.5f, false, raycastMask);
+		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.5f, false);
 		if(hit.hit) {
 			if(!obstacleDetected) obstacleDetected = true;
 			angle += 0.25f;
@@ -180,12 +181,16 @@ void CharacterScript::NewRandomState() {
 	if(val < 20) {
 		timeUntilSwitch = Random::RandomFloat(3.5f, 10.0f);
 		aiState = AIState::Standing;
+		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+		if(sa) sa->PlayAnimation("Idle");
 	}
 	else {
 		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
 		aiState = AIState::Walking;
 		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 		if(rb) targetLocation = tileMapper.lock()->GetNewTargetLocation(rb->GetPosition());
+		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+		if(sa) sa->PlayAnimation("Walk");
 	}
 }
 

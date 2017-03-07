@@ -1,7 +1,7 @@
 #include "SpriteAnimator.h"
 #include "TypeInfo.h"
 #include <algorithm>
-
+#include "GameObject.h"
 SpriteAnimator::SpriteAnimator() : ScriptableComponent() {
 }
 
@@ -28,12 +28,16 @@ void SpriteAnimator::PlayAnimation(const std::string & animName) {
 	for(size_t i = 0; i < anims.size(); i++) {
 		if(anims[i].name.compare(animName) == 0) {
 			currentAnim = anims[i];
+			currentAnim.currentFrameIndex = 0;
+			currentAnim.timeTilSwitch = currentAnim.frames[currentAnim.currentFrameIndex].frameTime;
+			UpdateRenderer();
 			break;
 		}
 	}
 }
 
 void SpriteAnimator::UpdateRenderer() {
+	if(renderer.use_count() == 0) renderer = GetComponent<SpriteRenderer>();
 	std::shared_ptr<SpriteRenderer> r = renderer.lock();
 	if(r) {
 		AnimationFrame frame = currentAnim.GetCurrentFrame();

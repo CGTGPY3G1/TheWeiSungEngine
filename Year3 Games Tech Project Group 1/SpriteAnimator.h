@@ -12,8 +12,8 @@ struct AnimationFrame {
 
 struct Animation {
 	std::string name;
-	int currentFrameIndex = -10;
-	float timeTilSwitch = 10.0f;
+	int currentFrameIndex = 0;
+	float timeTilSwitch = 0.2f;
 	bool playInReverse = false;
 	std::vector<AnimationFrame> frames;
 	Animation(const std::string animName = "Null Anim") : name(animName) {}
@@ -40,7 +40,7 @@ struct Animation {
 	}
 
 	const int GetCurrentFrameIndex() const { return currentFrameIndex; }
-	void SetCurrentFrame(const float & frameIndex) { currentFrameIndex = frameIndex; }
+	void SetCurrentFrame(const int & frameIndex) { currentFrameIndex = frameIndex; }
 	AnimationFrame GetCurrentFrame() const { return frames[currentFrameIndex]; }
 };
 
