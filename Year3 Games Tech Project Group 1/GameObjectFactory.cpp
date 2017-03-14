@@ -2,9 +2,9 @@
 #include <SFML\Graphics\Texture.hpp>
 std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();
+	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();	
 	character->Init(position, rotation, scale);
-	
+	std::shared_ptr<Transform2D> characterTransform = character->GetComponent<Transform2D>().lock();
 	std::shared_ptr<RigidBody2D> r = character->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody, false, 5.0f, 1.5f);
 	std::shared_ptr<CircleCollider> c = character->AddComponent<CircleCollider>().lock();
@@ -16,6 +16,12 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	const int tileSize = 64;
 	sr->SetTextureRect(tileSize * characterType, 0, tileSize, tileSize);
 	r->SetMass(10);
+
+	std::shared_ptr<GameObject> hand = gameObjectManager.CreateGameObject(name).lock();
+	hand->Init(position + (characterTransform->GetForward() * 13.0f) + characterTransform->GetRight() * 21.0f, rotation, scale);
+	hand->GetComponent<Transform2D>().lock()->SetParent(characterTransform);
+	std::shared_ptr<WeaponCache> weaponCache = hand->AddComponent<WeaponCache>().lock();
+	weaponCache->Start();
 	
 	const float animSpeed = 0.3f;
 	Animation idle = Animation("Idle");
@@ -39,9 +45,12 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	sa->AddAnimation(walkWithGun);
 	sa->PlayAnimation("Idle");
 	sa->Start();
+
+
 	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
 	cs->SetArtificiallyIntelligent(aiControlled);
 	cs->Start();
+	cs->SetGunHandTransform(hand->GetComponent<Transform2D>().lock());
 	std::shared_ptr<BloodSplatterScript> bs = character->AddComponent<BloodSplatterScript>().lock();
 	bs->Start();
 	std::shared_ptr<HealthScript> hs = character->AddComponent<HealthScript>().lock();
@@ -52,6 +61,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		hs->SetHealth(100.0f);
 		std::shared_ptr<PlayerScript> playerScript = character->AddComponent<PlayerScript>().lock();
 		playerScript->Start();
+		weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
+		weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
 	}
 	else {
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
@@ -59,6 +70,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		hs->Start();
 		hs->SetHealth(50.0f);
 	}
+	
 	return character;
 }
 
@@ -69,7 +81,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 	std::shared_ptr<GameObject> building = gameObjectManager.CreateGameObject("Building").lock();
 	building->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = building->AddComponent<SpriteRenderer>().lock();
-	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000 + sortOffset++, true, false);
+	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 100000 + sortOffset++, true, false);
 	std::shared_ptr<RigidBody2D> r = building->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_kinematicBody);
 	building->SetCollisionCategory(CATEGORY_BUILDING);
@@ -177,7 +189,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBarrier(const int & barrierTy
 	std::shared_ptr<GameObject> barrier = gameObjectManager.CreateGameObject("Barrier").lock();
 	barrier->Init(position, rotation, scale);
 	std::shared_ptr<SpriteRenderer> sprite = barrier->AddComponent<SpriteRenderer>().lock();
-	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 5000);
+	sprite->Init("Images/Buildings.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 100000);
 	sprite->SetColour(0.6f, 0.0f, 0.0f, 1.0f);
 	const int gridSize = 32;
 	switch(barrierType) {

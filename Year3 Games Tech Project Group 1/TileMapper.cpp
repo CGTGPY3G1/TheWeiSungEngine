@@ -169,14 +169,8 @@ void TileMapper::ProcessCharacters(std::shared_ptr<TmxGroup> group) {
 		std::shared_ptr<TmxObject> object = group->objects[i];
 		const size_t noOfProperties = object->properties.size();
 		Vector2 position = Vector2((object->x - halfWidth)* worldScale.x, (object->y - halfHeight) * worldScale.y) + Vector2((object->width / 2) * worldScale.x, (object->height / 2) * -worldScale.y).RotateInDegrees(object->rotation);
-		if(object->name == "Player") {
-			std::shared_ptr<GameObject> player = GameObjectFactory::CreateCharacter(object->name, object->type, false, position, Vector2::One, object->rotation).lock();
-			std::shared_ptr<CircleCollider> playerSensor = player->AddComponent<CircleCollider>().lock();
-			playerSensor->Init(Vector2(), 200.0f, true);			
-		}
-		else {
-			GameObjectFactory::CreateCharacter(object->name, object->type, true, position, Vector2::One, object->rotation).lock();
-		}
+		if(object->name == "Player") GameObjectFactory::CreateCharacter(object->name, object->type, false, position, Vector2::One, object->rotation).lock();
+		else GameObjectFactory::CreateCharacter(object->name, object->type, true, position, Vector2::One, object->rotation).lock();
 	}
 }
 

@@ -165,9 +165,6 @@
     <ClInclude Include="CollisionHandler.h">
       <Filter>Header Files\Engine\Physics</Filter>
     </ClInclude>
-    <ClInclude Include="ScriptableComponent.h">
-      <Filter>Header Files\Engine\Components</Filter>
-    </ClInclude>
     <ClInclude Include="SpriteRenderingSystem.h">
       <Filter>Header Files\Engine\Systems</Filter>
     </ClInclude>
@@ -274,6 +271,15 @@
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
     <ClInclude Include="BloodSplatterScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptableComponent.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="Weapons.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponCache.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
   </ItemGroup>
@@ -442,6 +448,12 @@
     </ClCompile>
     <ClCompile Include="SpriteAnimator.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapons.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

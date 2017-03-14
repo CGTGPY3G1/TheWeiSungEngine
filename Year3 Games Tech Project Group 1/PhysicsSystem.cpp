@@ -8,7 +8,7 @@
 #include "ComponentData.h"
 #include "CollisionData.h"
 float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, const b2Vec2 & normal, float32 fraction) {
-	if(!reportSensors && fixture->IsSensor()) return fraction;
+	if(!reportSensors && fixture->IsSensor()) return -1;
 	const int oCat = fixture->GetFilterData().categoryBits;
 	if((oCat & raycastFilter) == oCat) {
 		ComponentData * colliderData = (ComponentData *)fixture->GetUserData();
@@ -24,10 +24,11 @@ float32 PhysicsSystem::ReportFixture(b2Fixture * fixture, const b2Vec2 & point, 
 			}
 		}
 	}
-	return fraction;
+	return 1;
 }
 
 bool PhysicsSystem::ReportFixture(b2Fixture* fixture) {
+	if(!reportSensors && fixture->IsSensor()) return true;
 	const int oCat = fixture->GetFilterData().categoryBits;
 	if((oCat & aabbFilter) == oCat) {
 		if(checkMultipleAABBs) {
@@ -52,8 +53,6 @@ PhysicsSystem::PhysicsSystem(){
 	debugDraw->SetFlags(b2Draw::e_shapeBit | b2Draw::e_jointBit | b2Draw::e_centerOfMassBit);
 	world->SetDebugDraw(debugDraw);
 	world->SetContactListener(this);
-
-	settings = PhysicsSettings();
 }
 
 PhysicsSystem & PhysicsSystem::GetInstance() {
@@ -81,8 +80,10 @@ void PhysicsSystem::UpdateBodies() {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
 				if(r) {
 					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
-					t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
-					t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
+					if(t) {
+						t->SetPosition(TypeConversion::ConvertToVector2(b->GetPosition()));
+						t->SetRotation(b->GetAngle() * Math::RadiansToDegrees());
+					}
 				}
 			}
 		}
@@ -90,10 +91,14 @@ void PhysicsSystem::UpdateBodies() {
 			RigidBodyData * rb = (RigidBodyData *)b->GetUserData();
 			if(rb) {
 				std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(rb->data.lock());
-				std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
-				b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(t->GetPosition());
-				float newAngle = t->GetRotation() * Math::DegreesToRadians();
-				b->SetTransform(newPos, newAngle);
+				if(r) {
+					std::shared_ptr<Transform2D> t = r->GetComponent<Transform2D>().lock();
+					if(t) {
+						b2Vec2 newPos = TypeConversion::ConvertToB2Vector2(t->GetPosition());
+						float newAngle = t->GetRotation() * Math::DegreesToRadians();
+						b->SetTransform(newPos, newAngle);
+					}
+				}
 			}
 		}
 	}
@@ -286,10 +291,12 @@ RayCastHit PhysicsSystem::RayCast(const Vector2 & start, const Vector2 & end, co
 	raycastFilter = collisionMask;
 	hit.Reset();
 	world->RayCast(this, TypeConversion::ConvertToB2Vector2(start), TypeConversion::ConvertToB2Vector2(end));
+	if(!this->reportSensors) this->reportSensors = true;
 	return hit;
 }
 
-std::vector<std::weak_ptr<Collider>> PhysicsSystem::CircleCast(const Vector2 & position, const float & radius, const int & collisionMask) {
+std::vector<std::weak_ptr<Collider>> PhysicsSystem::CircleCast(const Vector2 & position, const float & radius, const bool & reportSensors, const int & collisionMask) {
+	this->reportSensors = reportSensors;
 	checkMultipleAABBs = true;
 	aabbFilter = collisionMask;
 	aabbHits.clear();
@@ -300,6 +307,7 @@ std::vector<std::weak_ptr<Collider>> PhysicsSystem::CircleCast(const Vector2 & p
 		if(((*it).lock()->GetComponent<Transform2D>().lock()->GetPosition() - position).SquareMagnitude() > squareRadius) it = aabbHits.erase(it);
 		else ++it;
 	}
+	if(!this->reportSensors) this->reportSensors = true;
 	return aabbHits;
 }
 

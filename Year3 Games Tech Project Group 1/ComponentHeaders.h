@@ -23,4 +23,5 @@
 #include "DeathTimer.h"
 #include "SpriteAnimator.h"
 #include "BloodSplatterScript.h"
+#include "WeaponCache.h"
 #endif !WS_COMPENENT_HEADERS_H

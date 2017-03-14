@@ -32,16 +32,22 @@ void PlayerScript::Update(const float & deltaTime) {
 			std::cout << tileMapper->GetTileTypeAsString(player.lock()->GetComponent<Transform2D>().lock()->GetPosition()) << std::endl;
 	}
 		
-	
 	if(!driving) {
 		std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
 		if(reloadTime > 0.0f) {
 			reloadTime -= deltaTime;
 		}
 		if(reloadTime <= 0.0f && input->GetMouseButton(MouseButtons::Left)) {
-			const float recoil = Random::RandomFloat(-5.0f, 5.0f);
-			GameObjectFactory::CreateBullet(t->GetPosition() + (t->GetForward() * 38.0f).RotatedInDegrees(recoil), Vector2::One, t->GetRotation() + recoil, 40.0f * Physics::PIXELS_PER_METRE, "PlayerBullet");
-			reloadTime = 0.085f;
+			std::shared_ptr<CharacterScript> cc = t->GetComponent<CharacterScript>().lock();
+			if(cc) cc->TryToFire();
+		}
+		if(input->GetKeyDown(KeyCodes::KeyCode::Num1)) {
+			std::shared_ptr<CharacterScript> cc = t->GetComponent<CharacterScript>().lock();
+			if(cc) cc->TryToSwitchWeapon(false);
+		}
+		else if(input->GetKeyDown(KeyCodes::KeyCode::Num2)) {
+			std::shared_ptr<CharacterScript> cc = t->GetComponent<CharacterScript>().lock();
+			if(cc) cc->TryToSwitchWeapon(true);
 		}
 		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
 			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(t->GetPosition(), t->GetPosition() + t->GetForward() * Physics::PIXELS_PER_METRE);
@@ -94,7 +100,6 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 	std::shared_ptr<GameObject> gameObject;
 	std::shared_ptr<GameObject> p = player.lock();
 	if(p) {
-
 		if(driving) {
 			std::shared_ptr<VehicleController> c = car.lock();
 			if(c) {
@@ -160,7 +165,6 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 							}
 							else {
 								Vector2 directionToMouse = (mousePosition - gameObject->GetComponent<RigidBody2D>().lock()->GetPosition());
-
 								gameObject->GetComponent<RigidBody2D>().lock()->SetRotation(forwardAngle + (forward.AngleToPointInDegrees(directionToMouse) * 0.1f));
 								if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W)) gameObject->GetComponent<CharacterScript>().lock()->MoveUsingPhysics(Vector2(0.0f, -moveAmount));
 								if(input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S)) gameObject->GetComponent<CharacterScript>().lock()->MoveUsingPhysics(Vector2(0.0f, moveAmount));
@@ -211,6 +215,8 @@ void PlayerScript::SetCharacterEnabled(const bool & enabled) {
 		if(cs) cs->SetEnabled(enabled);
 		std::shared_ptr<BloodSplatterScript> bs = p->GetComponent<BloodSplatterScript>().lock();
 		if(bs) bs->SetEnabled(enabled);
+		std::shared_ptr<Transform2D> hand = p->GetComponent<Transform2D>().lock()->GetChild(0).lock();
+		if(hand) hand->GetGameObject().lock()->SetEnabled(enabled);
 	}
 }
 

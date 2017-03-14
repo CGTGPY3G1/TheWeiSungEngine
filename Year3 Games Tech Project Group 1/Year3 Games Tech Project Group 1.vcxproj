@@ -226,6 +226,8 @@
     <ClInclude Include="TypeInfo.h" />
     <ClInclude Include="ScriptableComponent.h" />
     <ClInclude Include="Vector2.h" />
+    <ClInclude Include="WeaponCache.h" />
+    <ClInclude Include="Weapons.h" />
     <ClInclude Include="WheelJoint.h" />
     <ClInclude Include="WSSprite.h" />
   </ItemGroup>
@@ -285,6 +287,8 @@
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform2D.cpp" />
     <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="WeaponCache.cpp" />
+    <ClCompile Include="Weapons.cpp" />
     <ClCompile Include="WheelJoint.cpp" />
     <ClCompile Include="WSSprite.cpp" />
   </ItemGroup>

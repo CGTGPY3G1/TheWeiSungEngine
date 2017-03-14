@@ -31,6 +31,7 @@ void CharacterScript::Start() {
 			}
 		}
 	}
+	ResetAnim();
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -48,6 +49,8 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 			break;
 		}
 	}
+	ResetAnim();
+	if(moving) moving = false;
 }
 
 void CharacterScript::Render() {
@@ -75,6 +78,7 @@ void CharacterScript::Render() {
 void CharacterScript::MoveUsingPhysics(Vector2 & force, const bool & worldSpace) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
+		if(!moving) moving = true;
 		const float tileForceScale = GetForceScale(rb->GetPosition());
 		if(worldSpace) {
 			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(force.Normalized()), 0.25f);
@@ -92,6 +96,7 @@ void CharacterScript::MoveUsingPhysics(Vector2 & force, const bool & worldSpace)
 void CharacterScript::Move(Vector2 & amount, const bool & worldSpace) {
 	std::shared_ptr<Transform2D> t = transform.lock();
 	if(t) {
+		if(!moving) moving = true;
 		const float tileForceScale = GetForceScale(t->GetPosition());
 		if(worldSpace) {
 			const float scale = 1.0f + std::max<float>(transform.lock()->GetForward().Dot(amount.Normalized()), 0.4f);
@@ -118,6 +123,25 @@ float CharacterScript::AngleToTurn(const RayCastHit & hit, Vector2 right, Vector
 
 const bool CharacterScript::IsArtificiallyIntelligent() const {
 	return isAI;
+}
+
+void CharacterScript::TryToFire() {
+	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
+	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
+	if(t) {
+		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
+		if(w) w->Fire();
+	}
+}
+
+void CharacterScript::TryToSwitchWeapon(const bool & forward) {
+	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
+	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
+	if(t) {
+		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
+		if(w) w->SwitchWeapon(forward);	
+	}
+	
 }
 
 void CharacterScript::SetArtificiallyIntelligent(const bool & isAI) {
@@ -168,11 +192,10 @@ void CharacterScript::Walk(const float & deltaTime) {
 			Vector2 direction = (targetLocation - position).Normalized();
 			rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
 		}
-		if(angle < -0.000001f || angle > 0.000001f) {
+		else if(angle < -0.000001f || angle > 0.000001f) {
 			rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
 		}
 		MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
-
 	}
 }
 
@@ -180,18 +203,15 @@ void CharacterScript::NewRandomState() {
 	int val = Random::RandomInt(100);
 	if(val < 20) {
 		timeUntilSwitch = Random::RandomFloat(3.5f, 10.0f);
-		aiState = AIState::Standing;
-		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
-		if(sa) sa->PlayAnimation("Idle");
+		aiState = AIState::Standing;	
 	}
 	else {
 		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
 		aiState = AIState::Walking;
 		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
-		if(rb) targetLocation = tileMapper.lock()->GetNewTargetLocation(rb->GetPosition());
-		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
-		if(sa) sa->PlayAnimation("Walk");
+		if(rb) targetLocation = tileMapper.lock()->GetNewTargetLocation(rb->GetPosition());	
 	}
+	ResetAnim();
 }
 
 void CharacterScript::Reset() {
@@ -203,6 +223,51 @@ void CharacterScript::Reset() {
 int CharacterScript::GetSortOrder() {
 	const static int order = TypeInfo::ScriptSortOrder<CharacterScript>();
 	return order;
+}
+
+void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> hand) {
+	if(hand) {
+		gunHandTransform = hand;
+	}
+	else {
+		std::shared_ptr<Transform2D> t = transform.lock();
+		bool found = false;
+		for(size_t i = 0; i < t->GetChildCount() && !found; i++) {
+			std::shared_ptr<Transform2D> c = t->GetChild(i).lock();
+			if(c) {
+				std::shared_ptr<WeaponCache> w = c->GetComponent<WeaponCache>().lock();
+				if(w) {
+					gunHandTransform = c;
+					found = true;
+				}
+			}
+		}
+	}
+}
+
+void CharacterScript::ResetAnim() {
+	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
+	bool isArmed = false;
+	if(t) {
+		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
+		if(w) isArmed = w->IsArmed();
+	}
+	if(moving) {
+		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+		if(sa) {
+			if(!isArmed) {
+				sa->PlayAnimation("Walk");
+
+			}
+			else {
+				sa->PlayAnimation("WalkWithGun");
+			}
+		}
+	}
+	else {
+		std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
+		if(sa) sa->PlayAnimation(isArmed ? "IdleWithGun" : "Idle");
+	}
 }
 
 float CharacterScript::GetForceScale(const Vector2 & worldPosition) {

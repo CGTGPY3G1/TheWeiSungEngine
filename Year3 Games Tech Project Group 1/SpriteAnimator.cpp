@@ -25,15 +25,18 @@ void SpriteAnimator::AddAnimation(const Animation & newAnim) {
 }
 
 void SpriteAnimator::PlayAnimation(const std::string & animName) {
-	for(size_t i = 0; i < anims.size(); i++) {
-		if(anims[i].name.compare(animName) == 0) {
-			currentAnim = anims[i];
-			currentAnim.currentFrameIndex = 0;
-			currentAnim.timeTilSwitch = currentAnim.frames[currentAnim.currentFrameIndex].frameTime;
-			UpdateRenderer();
-			break;
+	if(currentAnim.name.compare(animName) != 0) {
+		for(size_t i = 0; i < anims.size(); i++) {
+			if(anims[i].name.compare(animName) == 0) {
+				currentAnim = anims[i];
+				currentAnim.currentFrameIndex = 0;
+				currentAnim.timeTilSwitch = currentAnim.frames[currentAnim.currentFrameIndex].frameTime;
+				UpdateRenderer();
+				break;
+			}
 		}
 	}
+	
 }
 
 void SpriteAnimator::UpdateRenderer() {
