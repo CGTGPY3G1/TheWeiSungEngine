@@ -38,7 +38,8 @@ public:
 	void Init();
 	bool operator == (const Weapon & other);
 protected:	
-	float reloadTime, timeTilFire;
+	void RefillWeapon();
+	float reloadTime = 0.0f, timeTilFire = 0.0f;
 	bool reloading = true;
 	Vector2 offSet;
 	unsigned int ammoInCache = 0, ammoInClip = 0;

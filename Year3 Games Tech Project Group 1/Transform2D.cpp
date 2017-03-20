@@ -146,12 +146,17 @@ void Transform2D::SetParent(std::weak_ptr<Transform2D> newParent) {
 	Vector2 oldPosition = GetPosition();
 	float oldRotation = GetRotation();
 	parent = newParent;
+	std::shared_ptr<GameObject> g = gameObject.lock();
 	if(!parent.expired()) {
-		std::shared_ptr<GameObject> g = gameObject.lock();
 		std::shared_ptr<Transform2D> p = parent.lock();
+		std::shared_ptr<GameObject> pg = p->GetGameObject().lock();
 		SetPosition(oldPosition);
 		SetRotation(oldRotation);
 		p->AddChild(GetComponent<Transform2D>());
+		g->combinedObjectID = pg->combinedObjectID;
+	}
+	else {
+		g->combinedObjectID = g->objectID;
 	}
 	SetDirty();
 }

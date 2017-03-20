@@ -1,7 +1,8 @@
 #include "Graphics.h"
 #include "TypeConversion.h"
 #include <iostream>
-
+#include "BitmapFont.h"
+#include "BitmapString.h"
 static  bool operator == (sf::ContextSettings lhs, sf::ContextSettings rhs) {
 	return lhs.antialiasingLevel == rhs.antialiasingLevel && lhs.attributeFlags == rhs.attributeFlags && lhs.depthBits == rhs.depthBits && lhs.majorVersion == rhs.majorVersion && lhs.stencilBits == rhs.stencilBits;
 }
@@ -16,9 +17,11 @@ sf::Color GetSFColour(const float & r, const float & g, const float & b, const f
 
 Graphics::Graphics() {
 	RebuildDisplay();
-	if(!font.loadFromFile("arial.ttf")) {
+	/*if(!font.loadFromFile("arial.ttf")) {
 		std::cout << "Couldn't load font" << std::endl;
-	}
+	}*/
+	font = std::make_shared<BitmapFont>();
+	font->Load();
 }
 
 Graphics::~Graphics() {
@@ -41,6 +44,7 @@ void Graphics::Update() {
 			break;
 		}
 	}
+	
 }
 
 void Graphics::End() {
@@ -122,21 +126,13 @@ void Graphics::Draw(const sf::VertexArray & vertexArray) {
 //	window.draw(toDraw);
 //}
 
-void Graphics::Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, const float & r, const float & g, const float & b, const float & a, TextAlignment alignment) {
-	sf::Text toDraw;
-	toDraw.setFont(font);
-	toDraw.setString(text);
-	toDraw.setCharacterSize(characterSize);
-	toDraw.setStyle(sf::Text::Bold);
-	toDraw.setFillColor(TypeConversion::ConvertToSFColour(r, g, b, a));
-	toDraw.setOutlineColor(sf::Color(0, 0, 0, 255));
-	if(alignment != TextAlignment::LEFT_ALIGNED) {
-		float width = toDraw.getLocalBounds().width;
-		if(alignment == TextAlignment::CENTRE_ALIGNED) toDraw.setOrigin(sf::Vector2f(width / 2, 0));
-		else if(alignment == TextAlignment::RIGHT_ALIGNED) toDraw.setOrigin(sf::Vector2f(width, 0));
-	}
-	sf::Vector2i pos = sf::Vector2i((int)(position.x * windowScale.x), (int)(position.y * windowScale.y));
-	toDraw.setPosition(window.mapPixelToCoords(pos));
+void Graphics::Draw(const std::string & text, const Vector2 & position, const Vector2 & size, const float & r, const float & g, const float & b, const float & a, TextAlignment alignment) {
+	BitmapString toDraw = BitmapString(text, font);
+	Vector2 finalPosition = position;
+	finalPosition.x += (alignment == TextAlignment::CENTRE_ALIGNED) ? -size.x * 0.5f : ((alignment == TextAlignment::RIGHT_ALIGNED) ? -size.x : 0.0f);
+	toDraw.setPosition(window.mapPixelToCoords(TypeConversion::ConvertToSFVector2i(finalPosition)));
+	toDraw.SetSize(TypeConversion::ConvertToSFVector2f(size * zoomLevel));
+	toDraw.SetColour(r, g, b, a);
 	window.draw(toDraw);
 }
 
@@ -332,7 +328,6 @@ void Graphics::RebuildDisplay() {
 	view = window.getView();
 	view.zoom(zoomLevel);
 	window.setView(view);
-	if(settings.vSync) (settings.maxFPS);
 	if(!windowOpen) windowOpen = true;
 }
 

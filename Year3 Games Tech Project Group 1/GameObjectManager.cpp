@@ -19,14 +19,10 @@ GameObjectManager::~GameObjectManager() {
 
 
 std::weak_ptr<GameObject> GameObjectManager::CreateGameObject(const std::string & name) {
-	this->gameObjects;
-	unsigned int id;
-	if(!freeIDs.empty()) {
-		id = freeIDs.back();
-		freeIDs.pop_back();
-	}
-	else id = nextID++;
-	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(id, name);
+	static unsigned int nextID = 0;
+	nextID++;
+	if(nextID == 0) nextID++;
+	std::shared_ptr<GameObject> g = std::make_shared<GameObject>(nextID, name);
 	gameObjects.push_back(g);
 	return g;
 }

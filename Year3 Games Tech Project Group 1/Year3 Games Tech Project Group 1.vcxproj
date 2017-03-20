@@ -110,11 +110,14 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -150,6 +153,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,11 +161,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AudioSource.h" />
+    <ClInclude Include="BitmapFont.h" />
+    <ClInclude Include="BitmapString.h" />
     <ClInclude Include="BloodSplatterScript.h" />
     <ClInclude Include="BulletScript.h" />
     <ClInclude Include="CameraFollowScript.h" />
@@ -170,6 +178,7 @@
     <ClInclude Include="CivWaypointScript.h" />
     <ClInclude Include="CollisionMask.h" />
     <ClInclude Include="ComponentData.h" />
+    <ClInclude Include="DamageScript.h" />
     <ClInclude Include="DeathTimer.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="EngineSettings.h" />
@@ -237,6 +246,8 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="AudioSource.cpp" />
+    <ClCompile Include="BitmapFont.cpp" />
+    <ClCompile Include="BitmapString.cpp" />
     <ClCompile Include="BloodSplatterScript.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="BulletScript.cpp" />
@@ -248,6 +259,7 @@
     <ClCompile Include="CollisionData.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentManager.cpp" />
+    <ClCompile Include="DamageScript.cpp" />
     <ClCompile Include="DeathTimer.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
@@ -271,7 +283,6 @@
     <ClCompile Include="PopulationController.cpp" />
     <ClCompile Include="Random.cpp" />
     <ClCompile Include="SpriteAnimator.cpp" />
-    <ClCompile Include="TileInfo.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />
     <ClCompile Include="RampageScript.cpp" />

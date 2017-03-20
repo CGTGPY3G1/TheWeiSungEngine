@@ -20,7 +20,7 @@ CharacterScript::~CharacterScript() {
 void CharacterScript::Start() {
 	rigidbody = GetComponent<RigidBody2D>();
 	transform = GetComponent<Transform2D>();
-	if(isAI) {
+	
 		std::shared_ptr<GameObject> tm = GameObjectManager::GetInstance().GetGameObject("Tileset").lock();
 		if(tm) {
 			std::shared_ptr<TileMapper> map = tm->GetComponent<TileMapper>().lock();
@@ -29,8 +29,8 @@ void CharacterScript::Start() {
 				targetLocation = map->GetNewTargetLocation(transform.lock()->GetPosition());
 				NewRandomState();
 			}
-		}
 	}
+
 	ResetAnim();
 }
 
@@ -146,6 +146,7 @@ void CharacterScript::TryToSwitchWeapon(const bool & forward) {
 
 void CharacterScript::SetArtificiallyIntelligent(const bool & isAI) {
 	this->isAI = isAI;
+	if(isAI) NewRandomState();
 }
 
 void CharacterScript::Stand() {
@@ -243,6 +244,14 @@ void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> han
 			}
 		}
 	}
+}
+
+void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
+	
+}
+
+void CharacterScript::OnSensorExit(const std::weak_ptr<Collider>& collider) {
+
 }
 
 void CharacterScript::ResetAnim() {

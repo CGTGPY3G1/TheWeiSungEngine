@@ -55,9 +55,6 @@
     <Filter Include="Header Files\Engine\Systems">
       <UniqueIdentifier>{258fc3bb-879d-49f1-9020-13da590b4ea0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Shaders">
-      <UniqueIdentifier>{5c3bf852-0d33-4ffa-9479-8e3f0ba3454b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine\Parser">
       <UniqueIdentifier>{be561d30-1932-4651-881a-4f91e10490e8}</UniqueIdentifier>
     </Filter>
@@ -282,6 +279,15 @@
     <ClInclude Include="WeaponCache.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
+    <ClInclude Include="DamageScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapFont.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BitmapString.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -419,9 +425,6 @@
     <ClCompile Include="EngineSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TileInfo.cpp">
-      <Filter>Header Files\Engine\Parser</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
@@ -450,9 +453,18 @@
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
     <ClCompile Include="WeaponCache.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
     <ClCompile Include="Weapons.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="DamageScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BitmapString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

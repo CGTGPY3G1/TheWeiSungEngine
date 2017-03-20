@@ -19,7 +19,7 @@ private:
 	Vector2 mousePosition;
 	bool oldInputStyle = true;
 	bool driving = false;
-	
+	bool printBMF = false;
 };
 
 #endif // !WS_TEST_SCENE_H+

@@ -53,11 +53,11 @@ struct NavInfo {
 	}
 
 	std::weak_ptr<NavInfo> GetRandomNode();
-	bool operator == (const NavInfo & other) {
+	const bool operator == (const NavInfo & other) const {
 		return gridLocation == other.gridLocation;
 	}
 
-	bool operator == (const std::shared_ptr<NavInfo> & other) {
+	const bool operator == (const std::shared_ptr<NavInfo> & other) const {
 		return gridLocation == other->gridLocation;
 	}
 };

@@ -93,11 +93,13 @@ void PopulationController::SpawnCivilians(const unsigned int number) {
 			position *= dist;
 			position += graphics->GetCameraPosition();
 			std::shared_ptr<TileMapper> tileMap = map.lock();
-			positionClear = tileMap->GetTileType(position) == TILE_TYPE_PAVEMENT ? !PhysicsSystem::GetInstance().CheckAABB(AABB(position - offset, position + offset)) : false;
+			TileType tileType = tileMap->GetTileType(position);
+			positionClear = ((tileType == TILE_TYPE_PAVEMENT || tileType == TILE_TYPE_GRASS || tileType == TILE_TYPE_SAND || tileType == TILE_TYPE_SAND_GRASS || tileType == TILE_TYPE_PAVEMENT_GRASS) ?
+							 !PhysicsSystem::GetInstance().CheckAABB(AABB(position - offset, position + offset)) : false);
 		}
 		if(positionClear) {
 			const float rotation = Random::RandomFloat(0.0f, 360.0f);
-			civs.push_back(GameObjectFactory::CreateCharacter("Character", Random::RandomInt(1, 10), true, position, Vector2::One, rotation).lock()->GetComponent<Transform2D>());
+			civs.push_back(GameObjectFactory::CreateCharacter("Character", Random::RandomInt(1, 9), true, position, Vector2::One, rotation).lock()->GetComponent<Transform2D>());
 		}
 	}
 }

@@ -1,9 +1,11 @@
 #include "GameObjectFactory.h"
 #include <SFML\Graphics\Texture.hpp>
 std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale, const float & rotation) {
+	if(characterType > 8) std::cout << "Invalid Character ID!" << std::endl;
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	std::shared_ptr<GameObject> character = gameObjectManager.CreateGameObject(name).lock();	
 	character->Init(position, rotation, scale);
+	
 	std::shared_ptr<Transform2D> characterTransform = character->GetComponent<Transform2D>().lock();
 	std::shared_ptr<RigidBody2D> r = character->AddComponent<RigidBody2D>().lock();
 	r->Init(b2BodyType::b2_dynamicBody, false, 5.0f, 1.5f);
@@ -17,12 +19,22 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	sr->SetTextureRect(tileSize * characterType, 0, tileSize, tileSize);
 	r->SetMass(10);
 
-	std::shared_ptr<GameObject> hand = gameObjectManager.CreateGameObject(name).lock();
+	
+
+	std::shared_ptr<GameObject> hand = gameObjectManager.CreateGameObject("GunHand").lock();
 	hand->Init(position + (characterTransform->GetForward() * 13.0f) + characterTransform->GetRight() * 21.0f, rotation, scale);
 	hand->GetComponent<Transform2D>().lock()->SetParent(characterTransform);
 	std::shared_ptr<WeaponCache> weaponCache = hand->AddComponent<WeaponCache>().lock();
 	weaponCache->Start();
-	
+
+	std::shared_ptr<GameObject> sensor = gameObjectManager.CreateGameObject("CharacterSensor").lock();
+	sensor->Init(position, rotation, scale);
+	std::shared_ptr<RigidBody2D> sensorRB = sensor->AddComponent<RigidBody2D>().lock();
+	sensorRB->Init();
+	std::shared_ptr<CircleCollider> cc = sensor->AddComponent<CircleCollider>().lock();
+	cc->Init(Vector2(0.0f, 0.0f), 8.0f * Physics::PIXELS_PER_METRE, true);
+	sensor->GetComponent<Transform2D>().lock()->SetParent(characterTransform);
+
 	const float animSpeed = 0.3f;
 	Animation idle = Animation("Idle");
 	idle.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, 0, tileSize, tileSize));
@@ -70,7 +82,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		hs->Start();
 		hs->SetHealth(50.0f);
 	}
-	
+	character->AddComponent<DamageScript>().lock()->Start();
 	return character;
 }
 
@@ -180,6 +192,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBuilding(const int & building
 	default:
 		break;
 	}
+	building->AddComponent<DamageScript>().lock()->Start();
 	return building;
 }
 
@@ -237,6 +250,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBarrier(const int & barrierTy
 		break;
 	}
 	barrier->SetCollisionCategory(CATEGORY_BUILDING);
+	barrier->AddComponent<DamageScript>().lock()->Start();
 	return barrier;
 }
 
@@ -257,6 +271,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const Vector2 & positi
 	as->SetVolume(0.5f);
 	std::shared_ptr<BulletScript> bs = bullet->AddComponent<BulletScript>().lock();
 	bs->Start();
+	bullet->AddComponent<DamageScript>().lock()->Start();
 	return bullet;
 }
 
@@ -277,7 +292,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNu
 	vehicle->SetTag("Vehicle");
 	std::shared_ptr<HealthScript> hs = vehicle->AddComponent<HealthScript>().lock();
 	hs->SetHealth(25000.0f);
-
+	vehicle->AddComponent<DamageScript>().lock()->Start();
 	return vehicle;
 }
 

@@ -10,7 +10,7 @@ void Weapon::UpdateTimers(const float & delta) {
 	if(reloading) {
 		if(ammoInCache > 0) {
 			reloadTime -= delta;
-			if(reloadTime <= 0.0f) Reload();
+			if(reloadTime <= 0.0f) RefillWeapon();
 		}
 	}
 	else if (ammoInClip > 0) {
@@ -23,11 +23,6 @@ void Weapon::Fire() {
 		if(ammoInClip) {
 			ammoInClip--;
 			if(ammoInClip <= 0) {
-				if(ammoInCache > 0) {
-					reloadTime = GetReloadTime();
-
-				}
-				reloading = true;
 			}
 			timeTilFire = GetFireRate();
 		}
@@ -39,19 +34,9 @@ void Weapon::Fire() {
 }
 
 void Weapon::Reload() {
-	if(enabled) {
-		if(ammoInCache > 0) {
-			const unsigned int rpc = GetRoundsPerClip();
-			if(ammoInCache >= rpc) {
-				ammoInClip = rpc;
-				ammoInCache -= rpc;
-			}
-			else {
-				ammoInClip = ammoInCache;
-				ammoInCache = 0;
-			}
-			reloading = false;
-		}
+	if(enabled && ammoInCache > 0 && ammoInClip < GetRoundsPerClip()) {
+		reloading = true;
+		reloadTime = GetReloadTime();
 	}
 }
 
@@ -72,7 +57,7 @@ const bool Weapon::NeedsReloading() const {
 }
 
 const bool Weapon::CanFire() const {
-	return enabled && !reloading && ammoInClip > 0 && timeTilFire <= 0;
+	return enabled && !reloading && ammoInClip > 0 && timeTilFire <= 0.0f;
 }
 
 const unsigned int Weapon::GetAmmoInCache() const {
@@ -92,6 +77,19 @@ bool Weapon::operator==(const Weapon & other) {
 	return GetType() == other.GetType();
 }
 
+void Weapon::RefillWeapon() {
+	const unsigned int rpc = GetRoundsPerClip();
+	if(ammoInCache >= rpc) {
+		ammoInClip = rpc;
+		ammoInCache -= rpc;
+	}
+	else {
+		ammoInClip = ammoInCache;
+		ammoInCache = 0;
+	}
+	reloading = false;
+}
+
 Pistol::Pistol() : Weapon(){
 	enabled = true;
 }
@@ -100,7 +98,7 @@ Pistol::~Pistol() {
 }
 
 const sf::IntRect Pistol::GetTextureRect() {
-	static const sf::IntRect toReturn = sf::IntRect(38, 57, 24, 11);
+	static const sf::IntRect toReturn = sf::IntRect(38, 57, 24, 13);
 	return toReturn;
 }
 
@@ -118,7 +116,7 @@ const float Pistol::GetReloadTime() const {
 }
 
 const Vector2 Pistol::GetImageOffset() const {
-	return Vector2(5.0f, 0.0f);
+	return Vector2(5.0f, 4.0f);
 }
 
 const float Pistol::DistanceToFirePoint() const {
@@ -137,7 +135,7 @@ Uzi::~Uzi() {
 }
 
 const sf::IntRect Uzi::GetTextureRect() {
-	static const sf::IntRect toReturn = sf::IntRect(2, 58, 32, 11);
+	static const sf::IntRect toReturn = sf::IntRect(2, 58, 32, 13);
 	return toReturn;
 }
 
@@ -155,7 +153,7 @@ const float Uzi::GetReloadTime() const {
 }
 
 const Vector2 Uzi::GetImageOffset() const {
-	return Vector2(6.0f, 0.0f);
+	return Vector2(6.0f, 4.0f);
 }
 
 const float Uzi::DistanceToFirePoint() const {

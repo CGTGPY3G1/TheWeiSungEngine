@@ -10,6 +10,7 @@ public:
 	friend class GameObjectManager;
 	friend class ComponentManager;
 	friend class PhysicsSystem;
+	friend class Transform2D;
 	friend class cereal::access;
 	GameObject(const std::string & goName = "New GameObject");
 	GameObject(const unsigned int & objectID, const std::string & goName = "New GameObject");
@@ -32,7 +33,6 @@ public:
 	template <typename T> bool HasComponent();
 	bool HasComponents(const unsigned int & mask);
 	unsigned int GetObjectID();
-	void SetObjectID(const unsigned int & newID);
 	unsigned int GetComponentMask();
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();
@@ -43,7 +43,6 @@ public:
 	void OnCollisionStay(const CollisionData & data) override;
 	void OnCollisionExit(const CollisionData & data) override;
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
-	void OnSensorStay(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 	void SetCollisionFilter(const int & collisionCategory, const int & collisionMask);
 	void SetCollisionCategory(const int & collisionCategory);
@@ -77,8 +76,8 @@ protected:
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> int IterateComponentCount(const bool & increase);
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }
 	std::vector<std::pair<unsigned int, int>> componentCounter;
-	unsigned int objectID;
-	unsigned int componentMask = 0;
+	const unsigned int objectID = 0;	
+	unsigned int componentMask = 0, combinedObjectID = 0;
 	bool enabled = true;
 	int collisionCategory = CATEGORY_DEFAULT, collisionMask = CATEGORY_ALL;
 	ComponentManager componentManager;

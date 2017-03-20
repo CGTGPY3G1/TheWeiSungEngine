@@ -28,6 +28,7 @@ public:
 	template<> const static ComponentType GetTypeID<SpriteAnimator>() { return COMPONENT_SPRITE_ANIMATOR; }
 	template<> const static ComponentType GetTypeID<BloodSplatterScript>() { return COMPONENT_BLOOD_SPLATTER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<WeaponCache>() { return COMPONENT_WEAPON_CACHE; }
+	template<> const static ComponentType GetTypeID<DamageScript>() { return COMPONENT_DAMAGE_SCRIPT; }
 	
 	
 	template <typename T> const static bool AllowMultiple() { return false; };
@@ -52,6 +53,7 @@ public:
 	template<> const static bool IsScriptable<SpriteAnimator>() { return true; }
 	template<> const static bool IsScriptable<BloodSplatterScript>() { return true; }
 	template<> const static bool IsScriptable<WeaponCache>() { return true; }
+	template<> const static bool IsScriptable<DamageScript>() { return true; }
 
 	template <typename T> const static int ScriptSortOrder() { return 33; };
 	template<> const static int ScriptSortOrder<PlayerScript>() { return 0; }
@@ -65,6 +67,7 @@ public:
 	template<> const static int ScriptSortOrder<SpriteAnimator>() { return 8; }
 	template<> const static int ScriptSortOrder<BloodSplatterScript>() { return 9; }
 	template<> const static int ScriptSortOrder<WeaponCache>() { return 10; }
+	template<> const static int ScriptSortOrder<DamageScript>() { return 11; }
 	template<> const static int ScriptSortOrder<DeathTimer>() { return 55; }
 	
 	template <typename T> const static bool IsCollider() { return false; };

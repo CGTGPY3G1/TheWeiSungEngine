@@ -33,6 +33,10 @@ void PlayerScript::Update(const float & deltaTime) {
 	}
 		
 	if(!driving) {
+		if(input->GetKeyDown(KeyCodes::KeyCode::K)) {
+			std::shared_ptr<CharacterScript> cc = player.lock()->GetComponent<CharacterScript>().lock();
+			cc->SetArtificiallyIntelligent(!cc->IsArtificiallyIntelligent());
+		}
 		std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
 		if(reloadTime > 0.0f) {
 			reloadTime -= deltaTime;
@@ -82,15 +86,18 @@ void PlayerScript::Update(const float & deltaTime) {
 	}
 	else {
 		std::shared_ptr<VehicleController> c = car.lock();
-		std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
-		std::shared_ptr<GameObject> p = player.lock();
-		std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
-		if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetKeyDown(KeyCodes::KeyCode::Space) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
-			if(c) SetDriving(false);
+		if(c) {
+			std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
+			std::shared_ptr<GameObject> p = player.lock();
+			std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
+			if(input->GetKeyDown(KeyCodes::KeyCode::E) || input->GetControllerButtonDown(0, ControllerButtons::ControllerButton::Y)) {
+				SetDriving(false);
+			}
+			else {
+				rb->SetPosition(carRB->GetPosition());
+			}
 		}
-		else {
-			rb->SetPosition(carRB->GetPosition());
-		}
+		else SetDriving(false);
 	}
 }
 
@@ -127,6 +134,7 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 			float newZoom = (speed / maxVelocity) * 0.4f;
 			engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.5f + newZoom) * fixedDeltaTime))));
 			std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
+
 			if(cc) {
 				if(!cc->IsArtificiallyIntelligent()) {
 					if(driving) {
@@ -230,12 +238,14 @@ void PlayerScript::SetDriving(const bool & driving) {
 		std::shared_ptr<VehicleController> c = car.lock();
 		std::shared_ptr<GameObject> p = player.lock();
 		this->driving = false;
-		if(p) {
-			std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
-			if(c) {
-				std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
-				rb->SetPosition(carRB->GetPosition() - (carRB->GetRight() * Physics::PIXELS_PER_METRE) + (carRB->GetForward() * Physics::PIXELS_PER_METRE));
-				rb->AddForce(carRB->GetVelocity().RotatedInDegrees(-45.0f) * 0.1f);
+		if(c) {
+			if(p) {
+				std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
+				if(c) {
+					std::shared_ptr<RigidBody2D> carRB = c->GetComponent<RigidBody2D>().lock();
+					rb->SetPosition(carRB->GetPosition() - (carRB->GetRight() * Physics::PIXELS_PER_METRE) + (carRB->GetForward() * Physics::PIXELS_PER_METRE));
+					rb->AddForce(carRB->GetVelocity().RotatedInDegrees(-45.0f) * 0.1f);
+				}
 			}
 		}
 	}

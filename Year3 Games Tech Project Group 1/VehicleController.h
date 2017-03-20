@@ -37,7 +37,6 @@ public:
 	/// <param name="steerValue">A value between -1 and 1 indicating the steering angle.</param>
 	void Steer(const float & steerValue = 0.0f);
 	const std::string GetName() const override { return "VehicleController"; }
-	void OnCollisionEnter(const CollisionData & data) override;
 	int GetSortOrder() override;
 
 	template <class Archive>

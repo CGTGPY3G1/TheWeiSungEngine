@@ -3,11 +3,6 @@
 #define WS_CHARACTER_SCRIPT_H
 #include "ScriptableComponent.h"
 
-#include "cereal\cereal.hpp"
-#include "cereal\access.hpp"
-#include "cereal\details\traits.hpp"
-#include <cereal\types\polymorphic.hpp>
-
 enum AIState {
 	Standing = 0,
 	Walking = 1,
@@ -41,15 +36,8 @@ public:
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
 	void SetGunHandTransform(const std::shared_ptr<Transform2D> hand);
-	template <class Archive>
-	void load(Archive & ar) {
-
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		ScriptableComponent::save(ar);
-	}
+	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
+	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 private:
 	void ResetAnim();
 	float GetForceScale(const Vector2 & worldPosition);

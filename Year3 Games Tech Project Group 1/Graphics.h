@@ -7,14 +7,17 @@
 #include "Vector2.h"
 #include <cstdarg>
 #include <memory>
+
+
 enum TextAlignment {
 	LEFT_ALIGNED = 0,
 	CENTRE_ALIGNED,
 	RIGHT_ALIGNED
 };
 
+
 struct GraphicsSettings {
-	std::string windowTitle = "Unnamed Window";
+	std::string windowTitle = "Wai Sung Engine";
 	Vector2 screenPosition = {500.0f, 20.0f}, resolution = {1280.0f, 720.0f};
 	unsigned int depthBits = 24, antialiasingLevel = 0, stencilBits = 8, minorVersion = 2, majorversion = 2, maxFPS = 60;
 	bool fullScreen = false, resizeable = true, vSync = false;
@@ -28,6 +31,7 @@ struct GraphicsSettings {
 	}
 };
 
+class BitmapFont;
 class Graphics : public std::enable_shared_from_this<Graphics> {
 public:
 	friend class sf::Text;
@@ -48,7 +52,7 @@ public:
 	void Draw(const sf::Sprite & sprite);
 	void Draw(const sf::Shape & shape);
 	void Draw(const sf::VertexArray & vertexArray);
-	void Draw(const std::string & text, const Vector2 & position, const unsigned int & characterSize, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
+	void Draw(const std::string & text, const Vector2 & position, const Vector2 & size, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
 	void DrawCircle(const sf::CircleShape & c);
 	void Draw(const sf::Drawable & d, const sf::Transform & t);
 	void Draw(const sf::Drawable & d, const sf::RenderStates & r);
@@ -88,13 +92,13 @@ private:
 	sf::RenderWindow window;
 	sf::View & view = sf::View();
 	sf::ContextSettings sfSettings;
-	sf::Font font;
+	//sf::Font font;
 	GraphicsSettings settings;
 	bool windowOpen = false;
 	sf::VertexArray buffer;
 	sf::Vector2f camPos = sf::Vector2f(0.0f, 0.0f);
 	float zoomLevel = 1.5f;
-
+	std::shared_ptr<BitmapFont> font;
 	Vector2 windowScale = Vector2(1, 1);
 };
 

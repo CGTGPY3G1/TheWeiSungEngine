@@ -98,37 +98,31 @@ void ComponentManager::HandleMessage(const Message & message) {
 }
 
 void ComponentManager::OnCollisionEnter(const CollisionData & data) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnCollisionEnter(data);
-	}
+	std::shared_ptr<Transform2D> parentTransform = std::static_pointer_cast<Transform2D>(components[0])->GetParent().lock();
+	if(parentTransform) parentTransform->GetGameObject().lock()->OnCollisionEnter(data);
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) (*i)->OnCollisionEnter(data);
 }
 
 void ComponentManager::OnCollisionStay(const CollisionData & data) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnCollisionStay(data);
-	}
+	std::shared_ptr<Transform2D> parentTransform = std::static_pointer_cast<Transform2D>(components[0])->GetParent().lock();
+	if(parentTransform) parentTransform->GetGameObject().lock()->OnCollisionStay(data);
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) (*i)->OnCollisionStay(data);
 }
 
 void ComponentManager::OnCollisionExit(const CollisionData & data) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnCollisionExit(data);
-	}
+	std::shared_ptr<Transform2D> parentTransform = std::static_pointer_cast<Transform2D>(components[0])->GetParent().lock();
+	if(parentTransform) parentTransform->GetGameObject().lock()->OnCollisionExit(data);
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) (*i)->OnCollisionExit(data);
 }
 
 void ComponentManager::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnSensorEnter(collider);
-	}
-}
-
-void ComponentManager::OnSensorStay(const std::weak_ptr<Collider>& collider) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnSensorStay(collider);
-	}
+	std::shared_ptr<Transform2D> parentTransform = std::static_pointer_cast<Transform2D>(components[0])->GetParent().lock();
+	if(parentTransform) parentTransform->GetGameObject().lock()->OnSensorEnter(collider);
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) (*i)->OnSensorEnter(collider);
 }
 
 void ComponentManager::OnSensorExit(const std::weak_ptr<Collider> & collider) {
-	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) {
-		(*i)->OnSensorExit(collider);
-	}
+	std::shared_ptr<Transform2D> parentTransform = std::static_pointer_cast<Transform2D>(components[0])->GetParent().lock();
+	if(parentTransform) parentTransform->GetGameObject().lock()->OnSensorExit(collider);
+	for(std::vector<std::shared_ptr<ScriptableComponent>>::iterator i = scriptableComponents.begin(); i != scriptableComponents.end(); ++i) (*i)->OnSensorExit(collider);
 }

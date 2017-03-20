@@ -42,15 +42,13 @@ public:
 	~PhysicsSystem();
 	void Update(const float & deltaTime);
 	void UpdateBodies();
-	b2Body * CreateBody(const Vector2 & position, const PhysicsBodyType & type);
-	void CreateBox(const float & x, const float & y, const float & width, const float & height);
 	void SetGravity(const float & x, const float & y);
 	void BeginContact(b2Contact* contact);
 	void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse);
 	void EndContact(b2Contact* contact);
 	RayCastHit RayCast(const Vector2 & start, const Vector2 & end, const bool & reportSensors = false, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
 	std::vector<std::weak_ptr<Collider>> CircleCast(const Vector2 & position, const float & radius, const bool & reportSensors = false, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
-	bool CheckAABB(const AABB & aabb, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
+	bool CheckAABB(const AABB & aabb, const bool & reportSensors = false, const int & collisionMask = (int)CollisionCategory::CATEGORY_ALL);
 	void HandleMessage(const Message & message);
 	void Draw();
 private:
@@ -65,6 +63,7 @@ private:
 	bool dirty = false, reportSensors = true;
 	int raycastFilter, aabbFilter;
 	bool aabbHit = false, checkMultipleAABBs = false;
+	unsigned int collidingID1 = 0, collidingID2 = 0;
 };
 
 #endif // !WS_PHYSICS_SYSTEM_H

@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "PhysicsSystem.h"
 #include "CollisionData.h"
-GameObject::GameObject(const unsigned int & id, const std::string & goName) : objectID(id), name(goName) {
+GameObject::GameObject(const unsigned int & id, const std::string & goName) : objectID(id), combinedObjectID(id), name(goName) {
 }
 
 GameObject::~GameObject() {
@@ -47,10 +47,6 @@ unsigned int GameObject::GetObjectID() {
 	return objectID;
 }
 
-void GameObject::SetObjectID(const unsigned int & newID) {
-	objectID = newID;
-}
-
 void GameObject::SetComponentMask(const unsigned int & newMask) {
 	componentMask = newMask;
 }
@@ -80,7 +76,6 @@ void GameObject::HandleMessage(const Message & message) {
 }
 
 void GameObject::OnCollisionEnter(const CollisionData & data) {
-	//std::cout << GetName() + " Started Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
 	componentManager.OnCollisionEnter(data);
 }
 
@@ -89,21 +84,14 @@ void GameObject::OnCollisionStay(const CollisionData & data) {
 }
 
 void GameObject::OnCollisionExit(const CollisionData & data) {
-	//std::cout << GetName() + " Stopped Colliding With " + data.gameObject.lock()->GetName() << std::endl << "Normal = " << data.normal << std::endl << "Relative Velocity = " << data.relativeVelocity << std::endl;
 	componentManager.OnCollisionExit(data);
 }
 
 void GameObject::OnSensorEnter(const std::weak_ptr<Collider> & collider) {
-	//std::cout << GetName() + " Started Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorEnter(collider);
 }
 
-void GameObject::OnSensorStay(const std::weak_ptr<Collider>& collider) {
-	componentManager.OnSensorStay(collider);
-}
-
 void GameObject::OnSensorExit(const std::weak_ptr<Collider> & collider) {
-	//std::cout << GetName() + " Stopped Colliding With " + collider.lock()->GetGameObject().lock()->GetName() + (collider.lock()->IsSensor() ? " Sensor" : "") << std::endl;
 	componentManager.OnSensorExit(collider);
 }
 

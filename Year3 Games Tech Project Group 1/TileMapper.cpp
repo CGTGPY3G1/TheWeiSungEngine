@@ -199,6 +199,16 @@ void TileMapper::ProcessNavigationLayer(std::shared_ptr<TmxGroup> group) {
 		tiles[g.y][g.x].closestNode = g;
 		nodes.push_back(node);
 	}
+	for(std::vector<std::shared_ptr<NavInfo>>::iterator i = nodes.begin(); i != nodes.end() - 1;) {
+		for(std::vector<std::shared_ptr<NavInfo>>::iterator j = i + 1; j != nodes.end();) {
+			if((*i)->gridLocation.x == (*j)->gridLocation.x && (*i)->gridLocation.y == (*j)->gridLocation.y) {
+				i = nodes.erase(i);
+			}
+			else {
+				++j;  ++i;
+			}
+		}
+	}
 
 	const float maxDistance = (Physics::PIXELS_PER_METRE * 50.0f) * (Physics::PIXELS_PER_METRE * 50.0f);
 	const size_t noOfNodes = nodes.size();
@@ -206,9 +216,9 @@ void TileMapper::ProcessNavigationLayer(std::shared_ptr<TmxGroup> group) {
 		std::shared_ptr<NavInfo> n1 = nodes[i];
 		for(size_t j = i + 1; j < noOfNodes; j++) {
 			std::shared_ptr<NavInfo> n2 = nodes[j];
-			if(n1 == n2)
+			if(!(n1 && n2) || n1 == n2)
 				continue;
-			if((n1->worldPosition - n2->worldPosition).SquareMagnitude() < maxDistance) {
+			if((n2->worldPosition - n1->worldPosition).SquareMagnitude() < maxDistance) {
 				RayCastHit hit = PhysicsSystem::GetInstance().RayCast(n1->worldPosition, n2->worldPosition, true);
 				if(!hit.hit) {
 					Edge e1, e2;

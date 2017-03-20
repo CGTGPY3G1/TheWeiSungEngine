@@ -69,11 +69,8 @@ const unsigned int WeaponCache::NumberOfWeapons() const {
 
 void WeaponCache::SwitchWeapon(const bool & forward) {
 	const unsigned int noOfWeapons = NumberOfWeapons();
-	if(noOfWeapons > 0) {
-		if(currentWeapon.use_count() == 0) {
-			selectedWeapon = 0;
-		}
-		else if(forward) {
+	if(noOfWeapons > 0) {	
+		if(forward) {
 			selectedWeapon++;
 			if(selectedWeapon >= noOfWeapons) selectedWeapon = 0;
 		}
@@ -82,9 +79,6 @@ void WeaponCache::SwitchWeapon(const bool & forward) {
 			if(selectedWeapon < 0) selectedWeapon = noOfWeapons - 1;
 		}
 		currentWeapon = weapons[selectedWeapon];
-	}
-	else {
-		if(currentWeapon.use_count() > 0) currentWeapon = std::weak_ptr<Weapon>();
 	}
 	UpdateSprite();
 }
@@ -148,18 +142,11 @@ void WeaponCache::UpdateSprite() {
 		renderer = GetComponent<SpriteRenderer>();
 	}
 	const unsigned int noOfWeapons = NumberOfWeapons();
-	if(noOfWeapons > 0 && (selectedWeapon >= 0 && selectedWeapon < noOfWeapons)) {
+	if(noOfWeapons >= 0 && (selectedWeapon >= 0 && selectedWeapon < noOfWeapons)) {
 		currentWeapon = weapons[selectedWeapon];
 		std::shared_ptr<SpriteRenderer> sr = renderer.lock();
 		const sf::IntRect rect = currentWeapon.lock()->GetTextureRect();
 		sr->SetTextureRect(rect.left, rect.top, rect.width, rect.height);
 		sr->SetPivotManually(currentWeapon.lock()->GetImageOffset());
-	}
-	else {
-		std::shared_ptr<SpriteRenderer> sr = renderer.lock();
-		if(sr) {
-			sr->SetTextureRect(49, 27, 1, 1);
-			sr->SetPivot(PivotPoint::Centre);
-		}	
 	}
 }

@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "Time.h"
 
+
 Game::Game() {
 }
 
@@ -22,6 +23,7 @@ bool Game::GameOver() {
 void Game::Start() {
 	running = true;
 	gameOver = false;
+	
 }
 
 void Game::Update(const float & deltaTime) {
@@ -39,7 +41,7 @@ void Game::Update(const float & deltaTime) {
 			scene->Render();
 			scene->FinaliseFrame();
 		}
-		else Engine::GetInstance().GetGraphics().lock()->Draw("No Scene Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
+		//else Engine::GetInstance().GetGraphics().lock()->Draw("No Scene Loaded!", Vector2(640.0f, 360.0f), 50, TextAlignment::CENTRE_ALIGNED);
 	}
 }
 
@@ -65,7 +67,6 @@ int Game::GetActiveScene() {
 void Game::SetActiveScene(unsigned int index) {
 	if(activeScene != index) {
 		if(index < scenes.size()) activeScene = index;
-		if(index >= 0) scenes[activeScene]->Start();
-		
+		if(index >= 0) scenes[activeScene]->Start();	
 	}
 }

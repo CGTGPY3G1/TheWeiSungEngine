@@ -49,7 +49,7 @@ void RampageScript::Render() {
 	if(activated) {
 		const float zoom = graphics->GetCameraZoom();
 		const bool rampageOver = finalKillCount >= requiredKills || runTime <= 0.0001f;
-		if(!rampageOver)   graphics->Draw("Kill Count = " + std::to_string(kills) + "	Required = " + std::to_string(requiredKills) + " |	Time = " + std::to_string(runTime), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
+		/*if(!rampageOver)   graphics->Draw("Kill Count = " + std::to_string(kills) + "	Required = " + std::to_string(requiredKills) + " |	Time = " + std::to_string(runTime), Vector2(100.0f, 650.0f), (unsigned int)(30.0f * zoom));
 		else if(endTimer > 0.0f) {
 			Vector2 position = Vector2(640.0f, 250.0f);
 			graphics->Draw(((kills >= requiredKills) ? "You Win!" : "You Lose!"), position, (unsigned int)(80.0f * zoom), 1.0f, 1.0f, 1.0f, 1.0f, TextAlignment::CENTRE_ALIGNED);
@@ -59,7 +59,7 @@ void RampageScript::Render() {
 			std::stringstream ss;
 			ss << std::fixed << std::setprecision(2) << (runTimerReset - std::max(runTime, 0.0f));
 			graphics->Draw("Time Taken = " + ss.str() + " seconds", position, (unsigned int)(80.0f * zoom), 1.0f, 1.0f, 1.0f, 1.0f, TextAlignment::CENTRE_ALIGNED);
-		}
+		}*/
 	}
 	else {
 		std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
