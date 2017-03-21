@@ -2,10 +2,10 @@
 #include "GameObject.h"
 #include "GameObjectFactory.h"
 #include "SpriteRenderer.h"
+#include "CharacterScript.h"
 #include "Transform2D.h"
 #include <algorithm>
 #include "Weapons.h"
-
 WeaponCache::WeaponCache() {
 }
 
@@ -42,8 +42,10 @@ void WeaponCache::Fire() {
 			switch(type) {
 			case WeaponType::WeaponTypePistol:
 			case WeaponType::WeaponTypeUzi:
-				GameObjectFactory::CreateBullet(transform.lock()->GetPosition() + transform.lock()->GetForward() * w->DistanceToFirePoint(), Vector2::One, transform.lock()->GetForward().AngleInDegrees() + Random::RandomFloat(-4.0f, 4.0f), 40.0f * Physics::PIXELS_PER_METRE, gameObject.lock()->GetTag()+"Bullet");
+			{
+				GameObjectFactory::CreateBullet(gameObject, shooterName, transform.lock()->GetPosition() + transform.lock()->GetForward() * w->DistanceToFirePoint(), Vector2::One, transform.lock()->GetForward().AngleInDegrees() + Random::RandomFloat(-4.0f, 4.0f), 40.0f * Physics::PIXELS_PER_METRE, gameObject.lock()->GetTag() + "Bullet");
 				w->Fire();
+			}
 				break;
 			default:
 				break;
@@ -135,6 +137,11 @@ const bool WeaponCache::IsArmed() const {
 
 const WeaponType WeaponCache::CurrentWeaponType() {
 	return IsArmed() ? currentWeapon.lock()->GetType() : WeaponType::WeaponTypeNull;
+}
+
+void WeaponCache::SetShooter(std::weak_ptr<CharacterScript> shooter) {
+	this->shooter = shooter;
+	shooterName = (shooter.use_count() > 0) ? shooter.lock()->GetCharacterName() : "";
 }
 
 void WeaponCache::UpdateSprite() {

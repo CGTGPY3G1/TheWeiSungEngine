@@ -55,7 +55,7 @@ Vector2 Vector2::operator - (const Vector2 & toSubtract) {
 	return Vector2(x - toSubtract.x, y - toSubtract.y);
 }
 
-Vector2 Vector2::operator - () {
+const Vector2 Vector2::operator - () const {
 	return Vector2(-x, -y);
 }
 
@@ -121,11 +121,11 @@ float Vector2::Cross(const float & x, const float & y) {
 	return this->x * y - this->y * x;
 }
 
-float Vector2::SquareMagnitude() {
+const float Vector2::SquareMagnitude() const{
 	return x * x + y * y;
 }
 
-float Vector2::Magnitude() {
+const float Vector2::Magnitude() const{
 	float sqr = SquareMagnitude();
 	return (sqr == 0.0 || sqr == 1.0) ? sqr : sqrt(sqr);
 }
@@ -139,7 +139,7 @@ Vector2 Vector2::Normalize() {
 	return *this;
 }
 
-Vector2 Vector2::Normalized() {
+const Vector2 Vector2::Normalized() const {
 	return Vector2(x, y).Normalize();
 }
 

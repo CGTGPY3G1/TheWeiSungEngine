@@ -174,6 +174,7 @@
     <ClInclude Include="BulletScript.h" />
     <ClInclude Include="CameraFollowScript.h" />
     <ClInclude Include="CerealTypeRegistration.h" />
+    <ClInclude Include="NameGenerator.h" />
     <ClInclude Include="CharacterScript.h" />
     <ClInclude Include="CivWaypointScript.h" />
     <ClInclude Include="CollisionMask.h" />
@@ -196,7 +197,7 @@
     <ClInclude Include="VehicleController.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="RampageScript.h" />
+    <ClInclude Include="AttackerIdentityScript.h" />
     <ClInclude Include="ScriptManagementSystem.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="BoxCollider.h" />
@@ -275,6 +276,7 @@
     <ClCompile Include="Joint.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="NameGenerator.cpp" />
     <ClCompile Include="ParsedTMX.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
@@ -285,7 +287,7 @@
     <ClCompile Include="SpriteAnimator.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />
-    <ClCompile Include="RampageScript.cpp" />
+    <ClCompile Include="AttackerIdentityScript.cpp" />
     <ClCompile Include="RigidBody2D.cpp" />
     <ClCompile Include="RunShootDrive.cpp" />
     <ClCompile Include="Scene.cpp" />

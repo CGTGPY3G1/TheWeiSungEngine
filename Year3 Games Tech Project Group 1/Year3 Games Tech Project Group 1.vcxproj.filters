@@ -252,9 +252,6 @@
     <ClInclude Include="AABB.h">
       <Filter>Header Files\Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="RampageScript.h">
-      <Filter>Header Files\Engine\Components\Scripted</Filter>
-    </ClInclude>
     <ClInclude Include="HealthScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
@@ -287,6 +284,12 @@
     </ClInclude>
     <ClInclude Include="BitmapString.h">
       <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AttackerIdentityScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="NameGenerator.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -431,9 +434,6 @@
     <ClCompile Include="CharacterScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
-    <ClCompile Include="RampageScript.cpp">
-      <Filter>Source Files\Engine\Components\Scripted</Filter>
-    </ClCompile>
     <ClCompile Include="HealthScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
@@ -461,11 +461,17 @@
     <ClCompile Include="DamageScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
+    <ClCompile Include="AttackerIdentityScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
     <ClCompile Include="BitmapFont.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="BitmapString.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="NameGenerator.cpp">
+      <Filter>Source Files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

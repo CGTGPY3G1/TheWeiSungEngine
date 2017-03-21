@@ -6,11 +6,23 @@
 #include <limits>
 #include "Engine.h"
 #include "Graphics.h"
+#include "NameGenerator.h"
+#include "AttackerIdentityScript.h"
+#include <algorithm>
+
 CharacterScript::CharacterScript() {
 }
 
 CharacterScript::CharacterScript(std::weak_ptr<GameObject> gameObject) : ScriptableComponent(gameObject) {
-	raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);	
+	raycastMask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
+	if(gameObject.use_count() > 0) {
+		characterName = (gameObject.lock()->GetName().compare("Player") == 0) ? "Player" : NameGenerator::GetInstance().GetRandomName();
+		characterID = gameObject.lock()->GetCombinedObjectID();
+	}
+	else {
+		characterName = NameGenerator::GetInstance().GetRandomName();
+		characterID = 0;
+	}	
 }
 
 CharacterScript::~CharacterScript() {
@@ -35,15 +47,20 @@ void CharacterScript::Start() {
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
-	if(isAI) {
-		timeUntilSwitch -= fixedDeltaTime;
-		if(timeUntilSwitch <= 0.0f) NewRandomState();
+	if(isAI) {	
 		switch(aiState) {
 		case AIState::Standing:
 			Stand();
+			timeUntilSwitch -= fixedDeltaTime;
+			if(timeUntilSwitch <= 0.0f) NewRandomState();
 			break;
 		case AIState::Walking:
 			Walk(fixedDeltaTime);
+			timeUntilSwitch -= fixedDeltaTime;
+			if(timeUntilSwitch <= 0.0f) NewRandomState();
+			break;
+		case AIState::RunAway:
+			RunAway(fixedDeltaTime);
 			break;
 		default:
 			break;
@@ -116,7 +133,7 @@ float CharacterScript::AngleToTurn(const RayCastHit & hit, Vector2 right, Vector
 		float distance = std::numeric_limits<float>::max();
 		size_t index = 0;
 		const float dot = right.Dot(hit.normal);
-		return (dot < 0.0f ? -1.0f : 1.0f) - dot;
+		return (dot < 0.0f ? -0.5f : 0.5f);
 	}	
 	return 0.0f;
 }
@@ -156,35 +173,7 @@ void CharacterScript::Stand() {
 void CharacterScript::Walk(const float & deltaTime) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
-		Vector2 forward = rb->GetForward();
-		const Vector2 right = rb->GetRight();
-		const Vector2 characterPosition = rb->GetPosition();
-		Vector2 rayPosition = characterPosition;
-		const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
-		const float fov = 10.0f;
-		float angle = 0.0f;
-		bool obstacleDetected = false;
-		RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f, false);
-		if(hit.hit) {
-			if(!obstacleDetected) obstacleDetected = true;
-			angle += AngleToTurn(hit, right, characterPosition);
-		}
-		
-		rayPosition += offset;
-		forward.RotateInDegrees(fov);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * 0.5f, false);
-		if(hit.hit) {
-			if(!obstacleDetected) obstacleDetected = true;
-			angle -= 0.25f;
-		}
-		rayPosition = characterPosition - offset;
-		forward.RotateInDegrees(fov * -2.0f);
-		hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.5f, false);
-		if(hit.hit) {
-			if(!obstacleDetected) obstacleDetected = true;
-			angle += 0.25f;
-		}
-		if(!obstacleDetected) {
+		if(!AvoidObstacles(deltaTime, 0.8f)) {
 			Vector2 forward = rb->GetForward();
 			Vector2 position = rb->GetPosition();
 			if((targetLocation - position).SquareMagnitude() < ((0.5f * Physics::PIXELS_PER_METRE) * (0.5f * Physics::PIXELS_PER_METRE)))
@@ -193,10 +182,27 @@ void CharacterScript::Walk(const float & deltaTime) {
 			Vector2 direction = (targetLocation - position).Normalized();
 			rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
 		}
-		else if(angle < -0.000001f || angle > 0.000001f) {
-			rb->AddTorque(angle * 5.0f * rb->GetMass(), ForceType::FORCE);
-		}
 		MoveUsingPhysics((Vector2(rb->GetMass(), 0.0f)), false);
+	}
+}
+
+void CharacterScript::RunAway(const float & deltaTime) {
+	AttackerInfo currentHostile = GetCurrentHostile();
+	if(currentHostile.IsAlive()) {
+		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+		if(rb) {
+			if(!AvoidObstacles(deltaTime, 2.0f)) {
+				Vector2 forward = rb->GetForward();
+				Vector2 position = rb->GetPosition();
+				Vector2 hostilePosition = currentHostile.GetPosition();
+				Vector2 runDirection = (position - hostilePosition);
+				rb->AddTorque(forward.AngleToPointInRadians(runDirection) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
+			}
+			MoveUsingPhysics((Vector2(rb->GetMass() * 2.5f, 0.0f)), false);
+		}
+	}
+	else {
+		NewRandomState();
 	}
 }
 
@@ -205,18 +211,88 @@ void CharacterScript::NewRandomState() {
 	if(val < 20) {
 		timeUntilSwitch = Random::RandomFloat(3.5f, 10.0f);
 		aiState = AIState::Standing;	
+		aiMentality = AIMentality::Calm;
 	}
 	else {
 		timeUntilSwitch = Random::RandomFloat(10.0f, 40.0f);
 		aiState = AIState::Walking;
 		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 		if(rb) targetLocation = tileMapper.lock()->GetNewTargetLocation(rb->GetPosition());	
+		aiMentality = AIMentality::Calm;
 	}
 	ResetAnim();
 }
 
 void CharacterScript::Reset() {
 	NewRandomState();
+}
+
+const std::string CharacterScript::GetCharacterName() const {
+	return characterName;
+}
+
+const unsigned int CharacterScript::GetCharacterID() const {
+	return characterID;
+}
+
+const bool CharacterScript::ReactToFire() {
+	SetCurrentHostile();
+	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
+	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
+	if(t) {
+		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
+		if(w && w->IsArmed()) {
+			if(aiMentality != AIMentality::Angry) aiMentality = AIMentality::Angry;
+			if(aiState != AIState::Attack) aiState = AIState::Attack;
+		}
+		else {
+			if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
+			if(aiState != AIState::RunAway) aiState = AIState::RunAway;
+		}	
+	}
+	else {
+		if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
+		if(aiState != AIState::RunAway) aiState = AIState::RunAway;
+	}
+	return true;
+}
+
+bool CharacterScript::AvoidObstacles(const float & delta, const float & rayLengthInMetres) {
+	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+	Vector2 forward = rb->GetForward();
+	const Vector2 right = rb->GetRight();
+	const Vector2 characterPosition = rb->GetPosition();
+	Vector2 rayPosition = characterPosition;
+	const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
+	const float fov = 10.0f;
+	float angle = 0.0f;
+	bool obstacleDetected = false;
+	bool sideHit = false;
+	RayCastHit hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * rayLengthInMetres, false);
+	if(hit.hit) {
+		if(!obstacleDetected) obstacleDetected = true;
+		angle += AngleToTurn(hit, right, characterPosition);
+	}
+
+	rayPosition += offset;
+	forward.RotateInDegrees(fov);
+	hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * rayLengthInMetres * 0.75f, false);
+	if(hit.hit) {
+		if(!obstacleDetected) obstacleDetected = true;
+		angle -= 1.0f;
+	}
+	rayPosition = characterPosition - offset;
+	forward.RotateInDegrees(fov * -2.0f);
+	hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * rayLengthInMetres * 0.75f, false);
+	if(hit.hit) {
+		if(!obstacleDetected) obstacleDetected = true;
+		if(!sideHit) angle += 1.0f;
+	}
+	if(obstacleDetected) {
+		if(angle < -0.000001f || angle > 0.000001f) rb->AddTorque(angle * rb->GetMass(), ForceType::FORCE);
+		return true;
+	}
+	return false;
 }
 
 
@@ -227,8 +303,12 @@ int CharacterScript::GetSortOrder() {
 }
 
 void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> hand) {
-	if(hand) {
-		gunHandTransform = hand;
+	if(hand) {		
+		std::shared_ptr<WeaponCache> w = hand->GetComponent<WeaponCache>().lock();
+		if(w) {
+			gunHandTransform = hand;
+			w->SetShooter(std::static_pointer_cast<CharacterScript>(shared_from_this()));
+		}
 	}
 	else {
 		std::shared_ptr<Transform2D> t = transform.lock();
@@ -238,6 +318,7 @@ void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> han
 			if(c) {
 				std::shared_ptr<WeaponCache> w = c->GetComponent<WeaponCache>().lock();
 				if(w) {
+					w->SetShooter(std::static_pointer_cast<CharacterScript>(shared_from_this()));
 					gunHandTransform = c;
 					found = true;
 				}
@@ -247,7 +328,26 @@ void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> han
 }
 
 void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
-	
+	if(isAI) {
+		if(collider.use_count() > 0) {
+			std::shared_ptr<Collider> c = collider.lock();
+			std::shared_ptr<DamageScript> ds = c->GetComponent<DamageScript>().lock();
+			if(ds) {
+				std::shared_ptr<AttackerIdentityScript> ais = c->GetComponent<AttackerIdentityScript>().lock();
+				if(ais) {
+					if(ais->IsValid()) {
+						AttackerInfo info = ais->GetInfo();
+						if(info.iD != characterID) {
+							if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) != hostiles.end()) {
+								hostiles.push_back(info);
+								ReactToFire();
+							}							
+						}
+					}		    
+				}
+			}		
+		}
+	}
 }
 
 void CharacterScript::OnSensorExit(const std::weak_ptr<Collider>& collider) {
@@ -287,4 +387,31 @@ float CharacterScript::GetForceScale(const Vector2 & worldPosition) {
 		if(tm) tileMapper = tm->GetComponent<TileMapper>();
 	}
 	return tileForceScale;
+}
+
+void CharacterScript::SetCurrentHostile() {
+	std::shared_ptr<Transform2D> t = transform.lock();
+	const Vector2 myPosition = t->GetPosition();
+	float nearestDistance = std::numeric_limits<float>().max();
+	unsigned int nearestIndex = 0;
+
+	for(std::vector<AttackerInfo>::iterator it = hostiles.begin(); it != hostiles.end(); ) {
+		if((*it).IsAlive()) {
+			const float sqrDistance = (myPosition - (*it).GetPosition()).SquareMagnitude();
+			if(sqrDistance < nearestDistance) {
+				nearestDistance = sqrDistance;
+				nearestIndex = (it - hostiles.begin());
+			}
+			++it;
+		}
+		else {
+			it = hostiles.erase(it);
+		}
+	}
+	currentHostileIndex = nearestIndex;
+}
+
+AttackerInfo CharacterScript::GetCurrentHostile() {
+	if(currentHostileIndex >= hostiles.size()) return AttackerInfo();
+	return hostiles[currentHostileIndex];
 }

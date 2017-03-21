@@ -4,6 +4,11 @@
 
 #include "ScriptableComponent.h"
 
+struct KillData {
+	unsigned int killerId = 0;
+	std::string killerName = "";
+};
+
 class TileMapper;
 class Transform2D;
 class PopulationController {

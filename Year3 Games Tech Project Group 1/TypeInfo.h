@@ -14,7 +14,7 @@ public:
 	template<> const static ComponentType GetTypeID<CircleCollider>() { return COMPONENT_CIRCLE_COLLIDER; }
 	template<> const static ComponentType GetTypeID<PolygonCollider>() { return COMPONENT_POLYGON_COLLIDER_2D; }
 	template<> const static ComponentType GetTypeID<WheelJoint>() { return COMPONENT_WHEEL_JOINT; }
-	template<> const static ComponentType GetTypeID<RampageScript>() { return COMPONENT_RAMPAGE_SCRIPT; }
+	template<> const static ComponentType GetTypeID<AttackerIdentityScript>() { return COMPONENT_ATTACKER_IDENTITY_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CharacterScript>() { return COMPONENT_CHARACTER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CameraFollowScript>() { return COMPONENT_CAMERA_FOLLOW; }
 	template<> const static ComponentType GetTypeID<CivWaypointScript>() { return COMPONENT_CIV_WAYPOINT; }
@@ -47,7 +47,7 @@ public:
 	template<> const static bool IsScriptable<VehicleController>() { return true; }
 	template<> const static bool IsScriptable<BulletScript>() { return true; }
 	template<> const static bool IsScriptable<PlayerScript>() { return true; }
-	template<> const static bool IsScriptable<RampageScript>() { return true; }
+	template<> const static bool IsScriptable<AttackerIdentityScript>() { return true; }
 	template<> const static bool IsScriptable<HealthScript>() { return true; }
 	template<> const static bool IsScriptable<DeathTimer>() { return true; }
 	template<> const static bool IsScriptable<SpriteAnimator>() { return true; }
@@ -61,7 +61,7 @@ public:
 	template<> const static int ScriptSortOrder<VehicleController>() { return 2; }
 	template<> const static int ScriptSortOrder<CivWaypointScript>() { return 3; }	
 	template<> const static int ScriptSortOrder<CameraFollowScript>() { return 4; }
-	template<> const static int ScriptSortOrder<RampageScript>() { return 5; }
+	template<> const static int ScriptSortOrder<AttackerIdentityScript>() { return 5; }
 	template<> const static int ScriptSortOrder<BulletScript>() { return 6; }
 	template<> const static int ScriptSortOrder<HealthScript>() { return 7; }
 	template<> const static int ScriptSortOrder<SpriteAnimator>() { return 8; }
@@ -77,7 +77,7 @@ public:
 
 	const static bool IsUpdatable(const ComponentType & type) {
 		static const int mask = COMPONENT_BLOOD_SPLATTER_SCRIPT | COMPONENT_SPRITE_ANIMATOR | COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
-			COMPONENT_PLAYER_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_RAMPAGE_SCRIPT | COMPONENT_HEALTH_SCRIPT | COMPONENT_WEAPON_CACHE;
+			COMPONENT_PLAYER_SCRIPT | COMPONENT_HEALTH_SCRIPT | COMPONENT_WEAPON_CACHE;
 		return ((mask & type) == type);
 	};
 	
@@ -94,7 +94,7 @@ public:
 	};
 
 	const static bool IsRenderable(const ComponentType & type) {
-		static const int mask = COMPONENT_SPRITE_RENDERER | COMPONENT_RAMPAGE_SCRIPT;// | COMPONENT_VEHICLE_CONTROLLER;
+		static const int mask = COMPONENT_SPRITE_RENDERER;// | COMPONENT_VEHICLE_CONTROLLER;
 		return ((mask & type) == type);
 	};
 

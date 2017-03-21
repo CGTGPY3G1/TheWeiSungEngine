@@ -3,6 +3,8 @@
 #define WS_WEAPON_CACHE_H
 #include "ScriptableComponent.h"
 #include "Weapons.h"
+
+class CharacterScript;
 class Transform2D;
 class SpriteRenderer;
 class WeaponCache : public ScriptableComponent {
@@ -24,12 +26,15 @@ public:
 	void AddWeapon(const WeaponType & weaponType, const int & ammo);
 	const bool IsArmed() const;
 	const WeaponType CurrentWeaponType();
+	void SetShooter(std::weak_ptr<CharacterScript> shooter);
 private:
 	void UpdateSprite();
 	std::weak_ptr<Weapon> currentWeapon;
+	std::weak_ptr<CharacterScript> shooter;
 	std::weak_ptr<SpriteRenderer> renderer;
 	std::weak_ptr<Transform2D> transform;
 	std::vector<std::shared_ptr<Weapon>> weapons;
 	int selectedWeapon = 0;
+	std::string shooterName = "";
 };
 #endif // !WS_WEAPON_CACHE_H

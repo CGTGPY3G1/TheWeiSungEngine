@@ -10,7 +10,7 @@
 #include "PolygonCollider.h"
 #include "WheelJoint.h"
 #include "ScriptableComponent.h"
-#include "RampageScript.h"
+#include "AttackerIdentityScript.h"
 #include "CharacterScript.h"
 #include "CameraFollowScript.h"
 #include "CivWaypointScript.h"

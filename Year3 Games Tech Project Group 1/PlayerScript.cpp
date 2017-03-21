@@ -230,15 +230,33 @@ void PlayerScript::SetCharacterEnabled(const bool & enabled) {
 
 void PlayerScript::SetDriving(const bool & driving) {
 	if(driving) {
-		if(!this->driving) {
-			this->driving = true;
+		std::shared_ptr<VehicleController> c = car.lock();
+		if(c) {
+			
+			if(!this->driving) {
+				this->driving = true;
+			}
+			std::shared_ptr<GameObject> p = player.lock();
+			if(p) {
+				std::shared_ptr<AttackerIdentityScript> ais = car.lock()->GetComponent<AttackerIdentityScript>().lock();
+				std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
+				if(ais && cs) {
+					ais->SetAttacker(cs->GetGameObject(), cs->GetCharacterName());
+				}
+			}
+			
 		}
+		
 	}
 	else if(this->driving) {
 		std::shared_ptr<VehicleController> c = car.lock();
 		std::shared_ptr<GameObject> p = player.lock();
 		this->driving = false;
 		if(c) {
+			std::shared_ptr<AttackerIdentityScript> ais = c->GetComponent<AttackerIdentityScript>().lock();
+			if(ais) {
+				ais->SetAttacker();
+			}
 			if(p) {
 				std::shared_ptr<RigidBody2D> rb = p->GetComponent<RigidBody2D>().lock();
 				if(c) {

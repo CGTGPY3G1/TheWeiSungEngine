@@ -40,7 +40,7 @@ public:
 	Vector2 operator += (const Vector2 & toAdd);
 	Vector2 Subtract(const float & x, const float & y);
 	Vector2 operator - (const Vector2 & toSubtract);
-	Vector2 operator - ();
+	const Vector2 operator - () const;
 	const Vector2 operator - (const Vector2 & toSubtract) const;
 	Vector2 operator -= (const Vector2 & toSubtract);
 	Vector2 Scale(const float & scalar);
@@ -57,9 +57,9 @@ public:
 	float Cross(const Vector2 & other);
 	float Cross(const float & x, const float & y);
 	Vector2 Normalize();
-	Vector2 Normalized();
-	float SquareMagnitude();
-	float Magnitude();
+	const Vector2 Normalized() const;
+	const float SquareMagnitude() const;
+	const float Magnitude() const;
 	float AngleInRadians();
 	float AngleInDegrees();
 	Vector2 RotateInRadians(const float & angle);

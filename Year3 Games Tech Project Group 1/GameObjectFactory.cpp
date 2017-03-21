@@ -254,7 +254,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBarrier(const int & barrierTy
 	return barrier;
 }
 
-std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag) {
+std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const std::weak_ptr<GameObject> & creator, const std::string & creatorName, const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	std::shared_ptr<GameObject> bullet = gameObjectManager.CreateGameObject("Bullet").lock();
 	bullet->Init(position, rotation, scale);
@@ -272,6 +272,11 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const Vector2 & positi
 	std::shared_ptr<BulletScript> bs = bullet->AddComponent<BulletScript>().lock();
 	bs->Start();
 	bullet->AddComponent<DamageScript>().lock()->Start();
+	if(creator.use_count() > 0) {
+		std::shared_ptr<AttackerIdentityScript> ais = bullet->AddComponent<AttackerIdentityScript>().lock();
+		ais->SetAttacker(creator, creatorName);
+		ais->Start();
+	}
 	return bullet;
 }
 
@@ -293,6 +298,9 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNu
 	std::shared_ptr<HealthScript> hs = vehicle->AddComponent<HealthScript>().lock();
 	hs->SetHealth(25000.0f);
 	vehicle->AddComponent<DamageScript>().lock()->Start();
+	std::shared_ptr<AttackerIdentityScript> ais = vehicle->AddComponent<AttackerIdentityScript>().lock();
+	ais->SetAttacker();
+	ais->Start();
 	return vehicle;
 }
 

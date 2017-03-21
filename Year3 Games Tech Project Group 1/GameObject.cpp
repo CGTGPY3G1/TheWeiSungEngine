@@ -43,12 +43,16 @@ bool GameObject::HasComponents(const unsigned int & mask) {
 	return (componentMask & mask) == mask;
 }
 
-unsigned int GameObject::GetObjectID() {
+const unsigned int GameObject::GetObjectID() const {
 	return objectID;
 }
 
 void GameObject::SetComponentMask(const unsigned int & newMask) {
 	componentMask = newMask;
+}
+
+const unsigned int GameObject::GetCombinedObjectID() const {
+	return combinedObjectID;
 }
 
 unsigned int GameObject::GetComponentMask() {

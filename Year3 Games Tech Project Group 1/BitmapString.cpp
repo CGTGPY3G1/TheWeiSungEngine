@@ -46,7 +46,13 @@ sf::Vector2f BitmapString::GetSize() const {
 
 void BitmapString::SetSize(const sf::Vector2f & newSize) {
 	sf::Vector2f currentSize = GetSize();
-	scale(sf::Vector2f(newSize.x / currentSize.x, newSize.y / currentSize.y));
+	scale(newSize.x / currentSize.x, newSize.y / currentSize.y);
+}
+
+void BitmapString::SetUniformSize(const float & newSize, const bool & x) {
+	sf::Vector2f currentSize = GetSize();
+	float newScale = x ? newSize / currentSize.x : newSize / currentSize.y;
+	scale(newScale, newScale);
 }
 
 sf::FloatRect BitmapString::getLocalBounds() const {
@@ -55,9 +61,6 @@ sf::FloatRect BitmapString::getLocalBounds() const {
 
 sf::FloatRect BitmapString::getGlobalBounds() const {
 	return getTransform().transformRect(getLocalBounds());
-}
-
-void BitmapString::BuildBitmapString() {
 }
 
 void BitmapString::draw(sf::RenderTarget & target, sf::RenderStates states) const {

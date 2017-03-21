@@ -32,7 +32,8 @@ public:
 	void SetEnabled(const bool & enabled);
 	template <typename T> bool HasComponent();
 	bool HasComponents(const unsigned int & mask);
-	unsigned int GetObjectID();
+	const unsigned int GetObjectID() const;
+	const unsigned int GetCombinedObjectID() const;
 	unsigned int GetComponentMask();
 	void SetComponentMask(const unsigned int & newMask);
 	virtual void Init();

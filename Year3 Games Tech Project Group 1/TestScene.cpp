@@ -55,12 +55,6 @@ void TestScene::Start() {
 
 	Engine::GetInstance().GetGraphics().lock()->SetCameraPosition(gameObjectManager.GetGameObject("Player").lock()->GetComponent<Transform2D>().lock()->GetPosition());
 	Vector2 rampagePosition = Vector2(26000.0f, 6100.0f);
-	std::shared_ptr<GameObject> rampage = gameObjectManager.CreateGameObject("Rampage").lock();
-	rampage->Init(rampagePosition, 0.0f, scale);
-	std::shared_ptr<RampageScript> rs = rampage->AddComponent<RampageScript>().lock();
-	rs->Start();
-	rs->SetRequiredKills(50);
-	rs->SetRunTime(60.0f);
 
 	/*static const std::string vertShader = \
 		"void main(){"\
@@ -125,20 +119,6 @@ void TestScene::Update(const float & deltaTime) {
 	Scene::Update(deltaTime);
 	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
 	mousePosition = input->GetMousePosition();
-	if(input->GetKeyDown(KeyCodes::KeyCode::E)) {
-		std::shared_ptr<GameObject> player = gameObjectManager.GetGameObject("Player").lock(), rampage = gameObjectManager.GetGameObject("Rampage").lock();
-		if(player && rampage) {
-			std::shared_ptr<Transform2D> pt = player->GetComponent<Transform2D>().lock(), rt = rampage->GetComponent<Transform2D>().lock();
-			if(pt && rt) {
-				if((rt->GetPosition() - pt->GetPosition()).Magnitude() < 160.0f) {
-					std::shared_ptr<RampageScript> rs = rampage->GetComponent<RampageScript>().lock();
-					if(rs && !rs->IsActive()) {
-						rs->Activate(pt);
-					}
-				}
-			}
-		}
-	}
 	if(input->GetKeyDown(KeyCodes::KeyCode::F)) printBMF = !printBMF;
 	if(input->GetMouseButtonDown(MouseButtons::Right)) Detonate(mousePosition, 5 * Physics::PIXELS_PER_METRE, 10.0f, 100.0f);
 	if(input->GetKeyDown(KeyCodes::KeyCode::C)) drawColliders = !drawColliders;

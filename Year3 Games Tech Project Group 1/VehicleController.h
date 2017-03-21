@@ -2,10 +2,7 @@
 #ifndef WS_VEHICLE_CONTROLLER_SCRIPT_H
 #define WS_VEHICLE_CONTROLLER_SCRIPT_H
 #include "ScriptableComponent.h"
-#include "cereal\cereal.hpp"
-#include "cereal\access.hpp"
-#include "cereal\details\traits.hpp"
-#include <cereal\types\polymorphic.hpp>
+
 enum Wheel {
 	FrontLeft = 0,
 	FrontRight = 1,
@@ -38,16 +35,6 @@ public:
 	void Steer(const float & steerValue = 0.0f);
 	const std::string GetName() const override { return "VehicleController"; }
 	int GetSortOrder() override;
-
-	template <class Archive>
-	void load(Archive & ar) {
-
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		ScriptableComponent::save(ar);
-	}
 private:
 	float GetForceScale(const Vector2 & worldPosition);
 	Vector2 GetVelocityDampening(std::shared_ptr<RigidBody2D> r);
