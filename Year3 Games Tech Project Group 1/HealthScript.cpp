@@ -38,6 +38,11 @@ const float HealthScript::GetHealth() const {
 	return health;
 }
 
+const float HealthScript::GetHealthAsPercentage() const {
+	if(maxHealth <= 0.0f) return 0.0f;
+	return (health / maxHealth) * 100.0f;
+}
+
 void HealthScript::SetHealth(const float newHealth) {
 	health = newHealth;
 	maxHealth = newHealth;

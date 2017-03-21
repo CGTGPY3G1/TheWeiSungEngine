@@ -70,7 +70,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_PLAYER);
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_PLAYER, mask);
 		hs->Start();
-		hs->SetHealth(100.0f);
+		hs->SetHealth(1000000.0);
 		std::shared_ptr<PlayerScript> playerScript = character->AddComponent<PlayerScript>().lock();
 		playerScript->Start();
 		weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
@@ -81,6 +81,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
 		hs->Start();
 		hs->SetHealth(50.0f);
+		if(Random::RandomBool()) weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
+		else weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
 	}
 	character->AddComponent<DamageScript>().lock()->Start();
 	return character;

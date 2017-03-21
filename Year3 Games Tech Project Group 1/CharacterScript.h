@@ -21,6 +21,7 @@ enum AIMentality {
 class RigidBody2D;
 class Transform2D;
 class TileMapper;
+class WeaponCache;
 struct RayCastHit;
 
 class CharacterScript : public ScriptableComponent{
@@ -43,15 +44,17 @@ public:
 	void Stand();
 	void Walk(const float & deltaTime);
 	void RunAway(const float & deltaTime);
+	void Attack(const float & deltaTime);
 	void NewRandomState();
 	void Reset();
 	const std::string GetCharacterName() const;
 	const unsigned int GetCharacterID() const;
-	const bool ReactToFire();
+	const bool React();
+	const bool HasWeapons();
 	bool AvoidObstacles(const float & delta, const float & rayLengthInMetres);
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
-	void SetGunHandTransform(const std::shared_ptr<Transform2D> hand);
+	void SetGunHandTransform(const std::shared_ptr<Transform2D> hand = std::shared_ptr<Transform2D>());
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 	void OnCollisionEnter(const CollisionData & data) override {}
@@ -63,7 +66,7 @@ private:
 	std::weak_ptr<RigidBody2D> rigidbody;
 	std::weak_ptr<Transform2D> transform, gunHandTransform;	
 	std::weak_ptr<TileMapper> tileMapper;
-	
+	std::weak_ptr<WeaponCache> weapons;
 	std::string characterName = "";
 	unsigned int characterID = 0;
 	float reactionTime = 0.0f;

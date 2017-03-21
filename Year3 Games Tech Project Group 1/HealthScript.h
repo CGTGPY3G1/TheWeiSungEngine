@@ -2,10 +2,6 @@
 #ifndef WS_HEALTH_SCRIPT_H
 #define WS_HEALTH_SCRIPT_H
 #include "ScriptableComponent.h"
-#include "cereal\cereal.hpp"
-#include "cereal\access.hpp"
-#include "cereal\details\traits.hpp"
-#include <cereal\types\polymorphic.hpp>
 
 class HealthScript : public ScriptableComponent {
 public:
@@ -20,19 +16,12 @@ public:
 
 	float GetHealth();
 	const float GetHealth() const;
+	const float GetHealthAsPercentage() const;
 	void SetHealth(const float newHealth);
 	void AddToHealth(const float amount);
 	void Hit(const float force);
 	void Reset();
-	template <class Archive>
-	void load(Archive & ar) {
 
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		ScriptableComponent::save(ar);
-	}
 private:
 	float health = 50, maxHealth = 50;
 	bool alive = true;

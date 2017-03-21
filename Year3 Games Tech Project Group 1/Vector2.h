@@ -53,9 +53,9 @@ public:
 	bool operator == (const Vector2 & other);
 	float Dot(const Vector2 & other);
 	const float Dot(const Vector2 & other) const;
-	float Dot(const float & x, const float & y);
-	float Cross(const Vector2 & other);
-	float Cross(const float & x, const float & y);
+	const float Dot(const float & x, const float & y) const;
+	const float Cross(const Vector2 & other) const;
+	const float Cross(const float & x, const float & y) const;
 	Vector2 Normalize();
 	const Vector2 Normalized() const;
 	const float SquareMagnitude() const;
@@ -67,8 +67,8 @@ public:
 	Vector2 RotateInDegrees(const float & angle);
 	Vector2 RotatedInDegrees(const float & angle);
 	Vector2 Flip90(const bool & clockwise);
-	float AngleToPointInDegrees(const Vector2 & point);
-	float AngleToPointInRadians(const Vector2 & point);
+	const float AngleToPointInDegrees(const Vector2 & point) const;
+	const float AngleToPointInRadians(const Vector2 & point) const;
 	Vector2 RotateToPoint(const Vector2 & point);
 	Vector2 RotateToInDegrees(const float & angle);
 	Vector2 RotateToInRadians(const float & angle);

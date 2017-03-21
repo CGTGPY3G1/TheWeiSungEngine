@@ -109,15 +109,15 @@ const float Vector2::Dot(const Vector2 & other) const {
 	return (this->x * other.x) + (this->y * other.y);
 }
 
-float Vector2::Dot(const float & x, const float & y) {
+const float Vector2::Dot(const float & x, const float & y) const {
 	return (this->x * x) + (this->y * y);
 }
 
-float Vector2::Cross(const Vector2 & other) {
+const float Vector2::Cross(const Vector2 & other) const {
 	return Cross(other.x, other.y);
 }
 
-float Vector2::Cross(const float & x, const float & y) {
+const float Vector2::Cross(const float & x, const float & y) const {
 	return this->x * y - this->y * x;
 }
 
@@ -177,11 +177,11 @@ Vector2 Vector2::Flip90(const bool & clockwise) {
 	return *this;
 }
 
-float Vector2::AngleToPointInDegrees(const Vector2 & point) {
+const float Vector2::AngleToPointInDegrees(const Vector2 & point) const {
 	return AngleToPointInRadians(point) * Math::RadiansToDegrees();
 }
 
-float Vector2::AngleToPointInRadians(const Vector2 & point) {
+const float Vector2::AngleToPointInRadians(const Vector2 & point) const {
 	return atan2f(Cross(point), Dot(point));
 }
 

@@ -13,13 +13,14 @@ WeaponCache::WeaponCache(std::weak_ptr<GameObject> gameObject) : ScriptableCompo
 	std::shared_ptr<SpriteRenderer> sr = AddComponent<SpriteRenderer>().lock();
 	sr->Init("Images/Weapons.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 40000);
 	transform = GetComponent<Transform2D>();
+	AddWeapon(WeaponType::WeaponTypeNull, 0);
 }
 
 WeaponCache::~WeaponCache() {
 }
 
 void WeaponCache::Start() {
-	AddWeapon(WeaponType::WeaponTypeNull, 0);
+	
 	UpdateSprite();
 }
 
@@ -131,8 +132,19 @@ void WeaponCache::AddWeapon(const WeaponType & weaponType, const int & ammo) {
 
 }
 
+const unsigned int WeaponCache::GetAmmo() const {
+	return currentWeapon.use_count() > 0 ? currentWeapon.lock()->GetAmmoInCache() : 0;
+}
+
 const bool WeaponCache::IsArmed() const {
 	return currentWeapon.use_count() > 0 && currentWeapon.lock()->GetType() != WeaponType::WeaponTypeNull;
+}
+
+const bool WeaponCache::HasWeapons() {
+	for(std::vector<std::shared_ptr<Weapon>>::iterator it = weapons.begin(); it != weapons.end(); ++it) {
+		if((*it)->GetType() != WeaponType::WeaponTypeNull) return true;
+	}
+	return false;
 }
 
 const WeaponType WeaponCache::CurrentWeaponType() {

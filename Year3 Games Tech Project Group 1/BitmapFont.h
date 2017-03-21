@@ -13,7 +13,7 @@ struct BitmapGlyph {
 	std::vector<sf::Vertex> verts;
 };
 
-class BitmapFont : std::enable_shared_from_this<BitmapFont> {
+class BitmapFont : public std::enable_shared_from_this<BitmapFont> {
 public:
 	BitmapFont();
 	~BitmapFont();

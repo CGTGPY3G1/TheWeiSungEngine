@@ -62,6 +62,9 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 		case AIState::RunAway:
 			RunAway(fixedDeltaTime);
 			break;
+		case AIState::Attack:
+			Attack(fixedDeltaTime);
+			break;
 		default:
 			break;
 		}
@@ -144,11 +147,8 @@ const bool CharacterScript::IsArtificiallyIntelligent() const {
 
 void CharacterScript::TryToFire() {
 	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
-	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
-	if(t) {
-		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
-		if(w) w->Fire();
-	}
+	std::shared_ptr<WeaponCache> w = weapons.lock();
+	if(w) w->Fire();
 }
 
 void CharacterScript::TryToSwitchWeapon(const bool & forward) {
@@ -206,6 +206,44 @@ void CharacterScript::RunAway(const float & deltaTime) {
 	}
 }
 
+void CharacterScript::Attack(const float & deltaTime) {
+	AttackerInfo currentHostile = GetCurrentHostile();
+	if(currentHostile.IsAlive()) {
+		std::shared_ptr<WeaponCache> w = weapons.lock();
+		if(w && w->HasWeapons() && !w->IsArmed()) TryToSwitchWeapon(true);
+		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
+		if(rb) {
+			const Vector2 characterPosition = rb->GetPosition();
+			const Vector2 hostilePosition = currentHostile.GetPosition();
+			const Vector2 displacement = hostilePosition - characterPosition;
+			const Vector2 forward = rb->GetForward();
+			Vector2 direction = (hostilePosition - characterPosition).Normalized();
+			const float angleToTarget = forward.AngleToPointInRadians(direction);
+			rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
+			
+			bool moving = false;
+			Vector2 moveDirection = Vector2(0.0f, 0.0f);
+			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
+			if(hit.hit) {
+				const Vector2 right = rb->GetRight();
+				moveDirection += right * right.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+				moving = true;
+				hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
+				if(hit.hit) {			
+					moveDirection += forward * -forward.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+				}
+				MoveUsingPhysics(moveDirection, false);
+			}
+			else {
+				if(angleToTarget < 0.001f && angleToTarget > -0.001f && w && w->HasWeapons() && w->IsArmed()) w->Fire();
+			}
+		}
+	}
+	else {
+		NewRandomState();
+	}
+}
+
 void CharacterScript::NewRandomState() {
 	int val = Random::RandomInt(100);
 	if(val < 20) {
@@ -235,26 +273,38 @@ const unsigned int CharacterScript::GetCharacterID() const {
 	return characterID;
 }
 
-const bool CharacterScript::ReactToFire() {
+const bool CharacterScript::React() {
 	SetCurrentHostile();
 	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
 	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
-	if(t) {
-		std::shared_ptr<WeaponCache> w = t->GetComponent<WeaponCache>().lock();
-		if(w && w->IsArmed()) {
-			if(aiMentality != AIMentality::Angry) aiMentality = AIMentality::Angry;
-			if(aiState != AIState::Attack) aiState = AIState::Attack;
+	std::shared_ptr<HealthScript> hs = GetComponent<HealthScript>().lock();
+	if(hs && hs->GetHealthAsPercentage() < 60.0f) {
+		if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
+		if(aiState != AIState::RunAway) aiState = AIState::RunAway;
+	}
+	else {
+		if(t) {
+			std::shared_ptr<WeaponCache> w = weapons.lock();
+			if(w && w->HasWeapons()) {
+				if(aiMentality != AIMentality::Angry) aiMentality = AIMentality::Angry;
+				if(aiState != AIState::Attack) aiState = AIState::Attack;
+			}
+			else {
+				if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
+				if(aiState != AIState::RunAway) aiState = AIState::RunAway;
+			}
 		}
 		else {
 			if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
 			if(aiState != AIState::RunAway) aiState = AIState::RunAway;
-		}	
-	}
-	else {
-		if(aiMentality != AIMentality::Panicking) aiMentality = AIMentality::Panicking;
-		if(aiState != AIState::RunAway) aiState = AIState::RunAway;
+		}
 	}
 	return true;
+}
+
+const bool CharacterScript::HasWeapons() {
+	if(weapons.use_count() == 0) SetGunHandTransform();
+	return weapons.use_count() > 0 && weapons.lock()->HasWeapons();
 }
 
 bool CharacterScript::AvoidObstacles(const float & delta, const float & rayLengthInMetres) {
@@ -303,10 +353,11 @@ int CharacterScript::GetSortOrder() {
 }
 
 void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> hand) {
-	if(hand) {		
+	if(hand) {	
+		gunHandTransform = hand;
 		std::shared_ptr<WeaponCache> w = hand->GetComponent<WeaponCache>().lock();
-		if(w) {
-			gunHandTransform = hand;
+		if(w) {		
+			weapons = w;
 			w->SetShooter(std::static_pointer_cast<CharacterScript>(shared_from_this()));
 		}
 	}
@@ -318,6 +369,7 @@ void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> han
 			if(c) {
 				std::shared_ptr<WeaponCache> w = c->GetComponent<WeaponCache>().lock();
 				if(w) {
+					weapons = w;
 					w->SetShooter(std::static_pointer_cast<CharacterScript>(shared_from_this()));
 					gunHandTransform = c;
 					found = true;
@@ -340,7 +392,7 @@ void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 						if(info.iD != characterID) {
 							if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) != hostiles.end()) {
 								hostiles.push_back(info);
-								ReactToFire();
+								React();
 							}							
 						}
 					}		    
@@ -366,7 +418,6 @@ void CharacterScript::ResetAnim() {
 		if(sa) {
 			if(!isArmed) {
 				sa->PlayAnimation("Walk");
-
 			}
 			else {
 				sa->PlayAnimation("WalkWithGun");

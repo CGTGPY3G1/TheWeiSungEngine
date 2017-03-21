@@ -24,7 +24,9 @@ public:
 	const unsigned int NumberOfWeapons() const;
 	void SwitchWeapon(const bool & forward);
 	void AddWeapon(const WeaponType & weaponType, const int & ammo);
+	const unsigned int GetAmmo() const;
 	const bool IsArmed() const;
+	const bool HasWeapons();
 	const WeaponType CurrentWeaponType();
 	void SetShooter(std::weak_ptr<CharacterScript> shooter);
 private:
