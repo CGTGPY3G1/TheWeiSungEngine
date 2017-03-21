@@ -34,7 +34,7 @@ public:
 	void Start() override;
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Render() override;
-	void MoveUsingPhysics(Vector2 & force, const bool & worldSpace = true);
+	void MoveUsingPhysics(const Vector2 & force, const bool & worldSpace = true);
 	void Move(Vector2 & amount, const bool & worldSpace = true);
 	float AngleToTurn(const RayCastHit & hit, Vector2 right, Vector2 position);
 	const bool IsArtificiallyIntelligent() const;
@@ -49,15 +49,16 @@ public:
 	void Reset();
 	const std::string GetCharacterName() const;
 	const unsigned int GetCharacterID() const;
-	const bool React();
+	const bool React(const bool & nearestContact);
 	const bool HasWeapons();
+	const bool IsArmed();
 	bool AvoidObstacles(const float & delta, const float & rayLengthInMetres);
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
 	void SetGunHandTransform(const std::shared_ptr<Transform2D> hand = std::shared_ptr<Transform2D>());
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
-	void OnCollisionEnter(const CollisionData & data) override {}
+	void OnCollisionEnter(const CollisionData & data) override;
 	void OnCollisionStay(const CollisionData & data) override {}
 	void OnCollisionExit(const CollisionData & data) override {}
 private:
@@ -77,11 +78,11 @@ private:
 
 	AIState aiState = AIState::Standing;
 	AIMentality aiMentality = AIMentality::Calm;
-	void SetCurrentHostile();
+	void SetCurrentHostile(const AttackerInfo & hostile);
+	void SetClosestHostileAsCurrent();
 	AttackerInfo GetCurrentHostile();
 	unsigned int currentHostileIndex = 0;
 	std::vector<AttackerInfo> hostiles;
 };
-
 
 #endif // !WS_CHARACTER_SCRIPT_H

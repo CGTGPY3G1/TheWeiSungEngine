@@ -95,7 +95,7 @@ void CharacterScript::Render() {
 	}
 }
 
-void CharacterScript::MoveUsingPhysics(Vector2 & force, const bool & worldSpace) {
+void CharacterScript::MoveUsingPhysics(const Vector2 & force, const bool & worldSpace) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	if(rb) {
 		if(!moving) moving = true;
@@ -188,6 +188,8 @@ void CharacterScript::Walk(const float & deltaTime) {
 
 void CharacterScript::RunAway(const float & deltaTime) {
 	AttackerInfo currentHostile = GetCurrentHostile();
+	std::shared_ptr<WeaponCache> w = weapons.lock();
+	if(IsArmed()) TryToSwitchWeapon(false);
 	if(currentHostile.IsAlive()) {
 		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 		if(rb) {
@@ -216,27 +218,39 @@ void CharacterScript::Attack(const float & deltaTime) {
 			const Vector2 characterPosition = rb->GetPosition();
 			const Vector2 hostilePosition = currentHostile.GetPosition();
 			const Vector2 displacement = hostilePosition - characterPosition;
-			const Vector2 forward = rb->GetForward();
-			Vector2 direction = (hostilePosition - characterPosition).Normalized();
-			const float angleToTarget = forward.AngleToPointInRadians(direction);
-			rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
-			
-			bool moving = false;
-			Vector2 moveDirection = Vector2(0.0f, 0.0f);
-			RayCastHit hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
-			if(hit.hit) {
-				const Vector2 right = rb->GetRight();
-				moveDirection += right * right.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
-				moving = true;
-				hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
-				if(hit.hit) {			
-					moveDirection += forward * -forward.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+			const bool inRange = displacement.SquareMagnitude() < (Physics::PIXELS_PER_METRE * Physics::PIXELS_PER_METRE * 100.0f);
+			if(!inRange) {
+				if(!AvoidObstacles(deltaTime, 1.5f)) {
+					Vector2 forward = rb->GetForward();
+					Vector2 runDirection = (hostilePosition - characterPosition);
+					rb->AddTorque(forward.AngleToPointInRadians(runDirection) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
 				}
-				MoveUsingPhysics(moveDirection, false);
+				MoveUsingPhysics((Vector2(rb->GetMass() * 2.5f, 0.0f)), false);
 			}
 			else {
-				if(angleToTarget < 0.001f && angleToTarget > -0.001f && w && w->HasWeapons() && w->IsArmed()) w->Fire();
+				const Vector2 forward = rb->GetForward();
+				Vector2 direction = (hostilePosition - characterPosition).Normalized();
+				const float angleToTarget = forward.AngleToPointInRadians(direction);
+				rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
+
+				bool moving = false;
+				Vector2 moveDirection = Vector2(0.0f, 0.0f);
+				RayCastHit hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
+				if(hit.hit) {
+					const Vector2 right = rb->GetRight();
+					moveDirection += right * right.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+					moving = true;
+					hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
+					if(hit.hit) {
+						moveDirection += forward * -forward.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+					}
+					MoveUsingPhysics(moveDirection, false);
+				}
+				else if(inRange) {
+					if(angleToTarget < 0.01f && angleToTarget > -0.01f && w && w->HasWeapons() && w->IsArmed()) w->Fire();
+				}
 			}
+			
 		}
 	}
 	else {
@@ -273,8 +287,8 @@ const unsigned int CharacterScript::GetCharacterID() const {
 	return characterID;
 }
 
-const bool CharacterScript::React() {
-	SetCurrentHostile();
+const bool CharacterScript::React(const bool & nearestContact) {
+	if(nearestContact) SetClosestHostileAsCurrent();
 	if(gunHandTransform.use_count() == 0) SetGunHandTransform(std::weak_ptr<Transform2D>().lock());
 	std::shared_ptr<Transform2D> t = gunHandTransform.lock();
 	std::shared_ptr<HealthScript> hs = GetComponent<HealthScript>().lock();
@@ -307,6 +321,11 @@ const bool CharacterScript::HasWeapons() {
 	return weapons.use_count() > 0 && weapons.lock()->HasWeapons();
 }
 
+const bool CharacterScript::IsArmed() {
+	if(weapons.use_count() == 0) SetGunHandTransform();
+	return weapons.use_count() > 0 && weapons.lock()->IsArmed();
+}
+
 bool CharacterScript::AvoidObstacles(const float & delta, const float & rayLengthInMetres) {
 	std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
 	Vector2 forward = rb->GetForward();
@@ -326,7 +345,7 @@ bool CharacterScript::AvoidObstacles(const float & delta, const float & rayLengt
 
 	rayPosition += offset;
 	forward.RotateInDegrees(fov);
-	hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward* Physics::PIXELS_PER_METRE * rayLengthInMetres * 0.75f, false);
+	hit = PhysicsSystem::GetInstance().RayCast(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * rayLengthInMetres * 0.75f, false);
 	if(hit.hit) {
 		if(!obstacleDetected) obstacleDetected = true;
 		angle -= 1.0f;
@@ -389,11 +408,15 @@ void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 				if(ais) {
 					if(ais->IsValid()) {
 						AttackerInfo info = ais->GetInfo();
-						if(info.iD != characterID) {
-							if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) != hostiles.end()) {
+						if(info.iD != characterID) {							
+							if((c->GetComponent<Transform2D>().lock()->GetPosition() - transform.lock()->GetPosition()).SquareMagnitude() < (Physics::PIXELS_PER_METRE * Physics::PIXELS_PER_METRE)) {
+								SetCurrentHostile(info);
+								React(false);
+							}
+							else if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) != hostiles.end()) {
 								hostiles.push_back(info);
-								React();
-							}							
+								React(true);
+							}
 						}
 					}		    
 				}
@@ -404,6 +427,27 @@ void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 
 void CharacterScript::OnSensorExit(const std::weak_ptr<Collider>& collider) {
 
+}
+
+void CharacterScript::OnCollisionEnter(const CollisionData & data) {
+	if(isAI) {
+		if(data.gameObject.use_count() > 0) {
+			std::shared_ptr<GameObject> c = data.gameObject.lock();
+			std::shared_ptr<DamageScript> ds = c->GetComponent<DamageScript>().lock();
+			if(ds) {
+				std::shared_ptr<AttackerIdentityScript> ais = c->GetComponent<AttackerIdentityScript>().lock();
+				if(ais) {
+					if(ais->IsValid()) {
+						AttackerInfo info = ais->GetInfo();
+						if(info.iD != characterID) {
+							SetCurrentHostile(info);
+							React(false);
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 void CharacterScript::ResetAnim() {
@@ -440,7 +484,12 @@ float CharacterScript::GetForceScale(const Vector2 & worldPosition) {
 	return tileForceScale;
 }
 
-void CharacterScript::SetCurrentHostile() {
+void CharacterScript::SetCurrentHostile(const AttackerInfo & hostile) {
+	hostiles.push_back(hostile);
+	currentHostileIndex = hostiles.size() - 1;
+}
+
+void CharacterScript::SetClosestHostileAsCurrent() {
 	std::shared_ptr<Transform2D> t = transform.lock();
 	const Vector2 myPosition = t->GetPosition();
 	float nearestDistance = std::numeric_limits<float>().max();
@@ -459,7 +508,6 @@ void CharacterScript::SetCurrentHostile() {
 			it = hostiles.erase(it);
 		}
 	}
-	currentHostileIndex = nearestIndex;
 }
 
 AttackerInfo CharacterScript::GetCurrentHostile() {
