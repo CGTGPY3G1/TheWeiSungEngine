@@ -238,13 +238,14 @@ void CharacterScript::Attack(const float & deltaTime) {
 				RayCastHit hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
 				if(hit.hit) {
 					const Vector2 right = rb->GetRight();
-					moveDirection += right * right.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+					moveDirection += right * right.Dot(hit.normal) * 2.5f;
 					moving = true;
+					
 					hit = PhysicsSystem::GetInstance().RayCast(characterPosition, characterPosition + displacement, false, CollisionCategory::CATEGORY_BUILDING);
 					if(hit.hit) {
-						moveDirection += forward * -forward.Dot(hit.normal) * 2.5f * Physics::PIXELS_PER_METRE;
+						moveDirection += forward * -forward.Dot(hit.normal) * 2.5f;
 					}
-					MoveUsingPhysics(moveDirection, false);
+					MoveUsingPhysics(moveDirection * rb->GetMass(), false);
 				}
 				else if(inRange) {
 					if(angleToTarget < 0.01f && angleToTarget > -0.01f && w && w->HasWeapons() && w->IsArmed()) w->Fire();
@@ -413,8 +414,11 @@ void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 								SetCurrentHostile(info);
 								React(false);
 							}
-							else if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) != hostiles.end()) {
+							else if(hostiles.size() == 0 || std::find(hostiles.begin(), hostiles.end(), info) == hostiles.end()) {
 								hostiles.push_back(info);
+								React(true);
+							}
+							else {
 								React(true);
 							}
 						}
