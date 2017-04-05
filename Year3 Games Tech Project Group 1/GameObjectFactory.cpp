@@ -1,5 +1,7 @@
 #include "GameObjectFactory.h"
 #include <SFML\Graphics\Texture.hpp>
+#include "Math.h"
+
 std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	if(characterType > 8) std::cout << "Invalid Character ID!" << std::endl;
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
@@ -75,6 +77,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		playerScript->Start();
 		weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
 		weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
+		weaponCache->AddWeapon(WeaponType::WeaponTypeGrenade, 100);
 	}
 	else {
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
@@ -280,6 +283,29 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const std::weak_ptr<Ga
 		ais->Start();
 	}
 	return bullet;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateGrenade(const std::weak_ptr<GameObject>& creator, const std::string & creatorName, const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag) {
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> grenade = gameObjectManager.CreateGameObject("Grenade").lock();
+	grenade->Init(position, rotation, scale);
+	grenade->SetTag(tag);
+	std::shared_ptr<RigidBody2D> rb = grenade->AddComponent<RigidBody2D>().lock();
+	rb->Init(b2_dynamicBody, true, 0.3f, 0.6f);
+	rb->SetVelocity(grenade->GetComponent<Transform2D>().lock()->GetForward() * speed);
+	std::shared_ptr<CircleCollider> cc = grenade->AddComponent<CircleCollider>().lock();
+	cc->Init(Vector2(), 10, false, 100.0f, 0.3f, 0.5f);
+	rb->SetAngularVelocity(Math::TAU());
+	grenade->AddComponent<GrenadeScript>().lock()->Start();
+	std::shared_ptr<SpriteRenderer> sprite = grenade->AddComponent<SpriteRenderer>().lock();
+	sprite->Init("Images/Weapons.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, 0);
+	sprite->SetTextureRect(100, 60, 14, 8);
+	if(creator.use_count() > 0) {
+		std::shared_ptr<AttackerIdentityScript> ais = grenade->AddComponent<AttackerIdentityScript>().lock();
+		ais->SetAttacker(creator, creatorName);
+		ais->Start();
+	}
+	return grenade;
 }
 
 std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNumber, const Vector2 & position, const Vector2 & scale, const float & rotation) {

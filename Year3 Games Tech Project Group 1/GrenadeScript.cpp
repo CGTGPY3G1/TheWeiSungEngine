@@ -15,17 +15,18 @@ GrenadeScript::~GrenadeScript() {
 void GrenadeScript::Detonate() {
 	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
 	const Vector2 position = transform->GetPosition();
-	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
+	const float r = radius * Physics::PIXELS_PER_METRE;
+	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, r);
 	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
 		std::shared_ptr<Collider> c = (*it).lock();
 		if(c) {
 			if(c->GetGameObjectID() == GetGameObjectID()) continue;
 			std::shared_ptr<RigidBody2D> rb = c->GetComponent<RigidBody2D>().lock();
-			if(rb) {
+			if(rb) {				
 				Vector2 cPosition = rb->GetPosition();
 				const float distance = (cPosition - position).Magnitude();
 				Vector2 direction = (cPosition - position).Normalized();
-				const float distanceScale = (radius / (distance != 0 ? distance : radius));
+				const float distanceScale = 1.0f - (distance / r);
 				rb->AddForce(direction * distanceScale * explosionForce, ForceType::IMPULSE_FORCE);
 				std::shared_ptr<HealthScript> healthScript = c->GetComponent<HealthScript>().lock();
 				if(healthScript) {
@@ -65,4 +66,10 @@ const float GrenadeScript::GetDamage() const {
 
 void GrenadeScript::SetDamage(const float & damage) {
 	this->damage = damage;
+}
+
+void GrenadeScript::OnCollisionEnter(const CollisionData & data) {
+	if(data.gameObject.use_count() > 0) {
+		if(data.gameObject.lock()->GetName().compare("Bullet") == 0) Detonate();
+	}
 }

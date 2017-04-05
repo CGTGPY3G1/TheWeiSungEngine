@@ -404,7 +404,8 @@ void CharacterScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
 		if(collider.use_count() > 0) {
 			std::shared_ptr<Collider> c = collider.lock();
 			std::shared_ptr<DamageScript> ds = c->GetComponent<DamageScript>().lock();
-			if(ds) {
+			std::shared_ptr<GrenadeScript> gs = c->GetComponent<GrenadeScript>().lock();
+			if(ds || gs) {
 				std::shared_ptr<AttackerIdentityScript> ais = c->GetComponent<AttackerIdentityScript>().lock();
 				if(ais) {
 					if(ais->IsValid()) {

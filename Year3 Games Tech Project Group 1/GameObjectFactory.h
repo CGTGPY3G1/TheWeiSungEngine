@@ -12,6 +12,7 @@ public:
 	static std::weak_ptr<GameObject> CreateBuilding(const int & buildingNumber, const Vector2 & position, const Vector2 & scale, const float & rotation = 0.0f);
 	static std::weak_ptr<GameObject> CreateBarrier(const int & barrierType, const Vector2 & position, const Vector2 & scale, const float & rotation = 0.0f);
 	static std::weak_ptr<GameObject> CreateBullet(const std::weak_ptr<GameObject> & creator, const std::string & creatorName, const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag);
+	static std::weak_ptr<GameObject> CreateGrenade(const std::weak_ptr<GameObject> & creator, const std::string & creatorName, const Vector2 & position, const Vector2 & scale, const float & rotation, const float & speed, const std::string & tag);
 	static std::weak_ptr<GameObject> CreateVehicle(const int & vehicleNumber, const Vector2 & position, const Vector2 & scale, const float & rotation = 0.0f);
 	static std::weak_ptr<GameObject> CreateBloodSplat(const Vector2 & position, const int & type, const int & version = -1);
 };

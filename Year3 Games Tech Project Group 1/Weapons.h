@@ -11,6 +11,7 @@ enum WeaponType {
 	WeaponTypeNull = 0,
 	WeaponTypePistol = 1,
 	WeaponTypeUzi = 2,
+	WeaponTypeGrenade = 3,
 	WeaponTypeNumberOfWeaponTypes
 };
 
@@ -78,6 +79,19 @@ class Uzi : public Weapon {
 public:
 	Uzi();
 	~Uzi();
+	const sf::IntRect GetTextureRect() override;
+	const WeaponType GetType() const override;
+	const float GetFireRate() const override;
+	const float GetReloadTime() const override;
+	const Vector2 GetImageOffset() const override;
+	const float DistanceToFirePoint() const override;
+	const unsigned int GetRoundsPerClip() const override;
+};
+
+class Grenade : public Weapon {
+public:
+	Grenade();
+	~Grenade();
 	const sf::IntRect GetTextureRect() override;
 	const WeaponType GetType() const override;
 	const float GetFireRate() const override;

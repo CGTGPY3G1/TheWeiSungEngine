@@ -48,6 +48,12 @@ void WeaponCache::Fire() {
 				w->Fire();
 			}
 				break;
+			case WeaponType::WeaponTypeGrenade:
+			{
+				GameObjectFactory::CreateGrenade(gameObject, shooterName, transform.lock()->GetPosition() + transform.lock()->GetForward() * w->DistanceToFirePoint(), Vector2::One, transform.lock()->GetForward().AngleInDegrees() + Random::RandomFloat(-4.0f, 4.0f), 5.0f * Physics::PIXELS_PER_METRE, gameObject.lock()->GetTag() + "Grenade");
+				w->Fire();
+			}
+			break;
 			default:
 				break;
 			}
@@ -96,6 +102,9 @@ void WeaponCache::AddWeapon(const WeaponType & weaponType, const int & ammo) {
 			case WeaponType::WeaponTypeUzi:
 				weapon = std::static_pointer_cast<Weapon>(std::make_shared<Uzi>());
 				break;
+			case WeaponType::WeaponTypeGrenade:
+				weapon = std::static_pointer_cast<Weapon>(std::make_shared<Grenade>());
+				break;
 			case WeaponType::WeaponTypeNull:
 				weapon = std::static_pointer_cast<Weapon>(std::make_shared<NullWeapon>());
 				break;
@@ -114,6 +123,9 @@ void WeaponCache::AddWeapon(const WeaponType & weaponType, const int & ammo) {
 					break;
 				case WeaponType::WeaponTypeUzi:
 					weapon = std::static_pointer_cast<Weapon>(std::make_shared<Uzi>());
+					break;
+				case WeaponType::WeaponTypeGrenade:
+					weapon = std::static_pointer_cast<Weapon>(std::make_shared<Grenade>());
 					break;
 				case WeaponType::WeaponTypeNull:
 					weapon = std::static_pointer_cast<Weapon>(std::make_shared<NullWeapon>());

@@ -198,3 +198,38 @@ const float NullWeapon::DistanceToFirePoint() const {
 const unsigned int NullWeapon::GetRoundsPerClip() const {
 	return 0;
 }
+
+Grenade::Grenade() : Weapon() {
+	enabled = true;
+}
+
+Grenade::~Grenade() {
+}
+
+const sf::IntRect Grenade::GetTextureRect() {
+	return sf::IntRect(100, 60, 14, 8);
+}
+
+const WeaponType Grenade::GetType() const {
+	return WeaponType::WeaponTypeGrenade;
+}
+
+const float Grenade::GetFireRate() const {
+	return 0.0f;
+}
+
+const float Grenade::GetReloadTime() const {
+	return 6.0f;
+}
+
+const Vector2 Grenade::GetImageOffset() const {
+	return Vector2(0.0f, 0.0f);
+}
+
+const float Grenade::DistanceToFirePoint() const {
+	return 0.0f;
+}
+
+const unsigned int Grenade::GetRoundsPerClip() const {
+	return 1;
+}

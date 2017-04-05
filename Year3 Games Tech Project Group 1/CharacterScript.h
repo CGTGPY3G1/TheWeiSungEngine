@@ -59,8 +59,7 @@ public:
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 	void OnCollisionEnter(const CollisionData & data) override;
-	void OnCollisionStay(const CollisionData & data) override {}
-	void OnCollisionExit(const CollisionData & data) override {}
+
 private:
 	void ResetAnim();
 	float GetForceScale(const Vector2 & worldPosition);

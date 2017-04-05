@@ -29,7 +29,7 @@ public:
 	template<> const static ComponentType GetTypeID<BloodSplatterScript>() { return COMPONENT_BLOOD_SPLATTER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<WeaponCache>() { return COMPONENT_WEAPON_CACHE; }
 	template<> const static ComponentType GetTypeID<DamageScript>() { return COMPONENT_DAMAGE_SCRIPT; }
-	
+	template<> const static ComponentType GetTypeID<GrenadeScript>() { return COMPONENT_GRENADE_SCRIPT; }
 	
 	template <typename T> const static bool AllowMultiple() { return false; };
 	template<> const static bool AllowMultiple<SpriteRenderer>() { return true; }
@@ -54,6 +54,7 @@ public:
 	template<> const static bool IsScriptable<BloodSplatterScript>() { return true; }
 	template<> const static bool IsScriptable<WeaponCache>() { return true; }
 	template<> const static bool IsScriptable<DamageScript>() { return true; }
+	template<> const static bool IsScriptable<GrenadeScript>() { return true; }
 
 	template <typename T> const static int ScriptSortOrder() { return 33; };
 	template<> const static int ScriptSortOrder<PlayerScript>() { return 0; }
@@ -68,6 +69,7 @@ public:
 	template<> const static int ScriptSortOrder<BloodSplatterScript>() { return 9; }
 	template<> const static int ScriptSortOrder<WeaponCache>() { return 10; }
 	template<> const static int ScriptSortOrder<DamageScript>() { return 11; }
+	template<> const static int ScriptSortOrder<GrenadeScript>() { return 12; };
 	template<> const static int ScriptSortOrder<DeathTimer>() { return 55; }
 	
 	template <typename T> const static bool IsCollider() { return false; };
@@ -77,7 +79,7 @@ public:
 
 	const static bool IsUpdatable(const ComponentType & type) {
 		static const int mask = COMPONENT_BLOOD_SPLATTER_SCRIPT | COMPONENT_SPRITE_ANIMATOR | COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
-			COMPONENT_PLAYER_SCRIPT | COMPONENT_HEALTH_SCRIPT | COMPONENT_WEAPON_CACHE;
+			COMPONENT_PLAYER_SCRIPT | COMPONENT_HEALTH_SCRIPT | COMPONENT_WEAPON_CACHE | COMPONENT_GRENADE_SCRIPT;
 		return ((mask & type) == type);
 	};
 	

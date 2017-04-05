@@ -21,10 +21,11 @@ public:
 	void SetBlastRadius(const float & radius);
 	const float GetDamage() const;
 	void SetDamage(const float & damage);
+	void OnCollisionEnter(const CollisionData & data) override;
 private:
 	float lifeTime = 3.0f;
 	bool alive = true;
-	float radius = 10.0f, explosionForce = 400.0f, damage = 200.0f;
+	float radius = 5.0f, explosionForce = 100.0f, damage = 200.0f;
 };
 
 #endif // !WS_GRENADE_SCRIPT_H
