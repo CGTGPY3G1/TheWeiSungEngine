@@ -21,6 +21,7 @@ private:
 	bool driving = false;
 	bool printBMF = false;
 	int playerHealthPercentage = 100;
+	Vector2 playerPosition;
 };
 
 #endif // !WS_TEST_SCENE_H+

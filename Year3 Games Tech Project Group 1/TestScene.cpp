@@ -137,6 +137,9 @@ void TestScene::Update(const float & deltaTime) {
 	PopulationController::GetInstance().Update();
 	std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player", true).lock();
 	if(p) playerHealthPercentage = std::min(100, std::max((int)0, (int)std::ceill(p->GetComponent<HealthScript>().lock()->GetHealthAsPercentage())));
+	else {
+		if(input->GetKeyDown(KeyCodes::KeyCode::R)) GameObjectFactory::CreateCharacter("Player", 0, false, playerPosition, Vector2::One, 0.0f);
+	}
 }
 
 TileType oldTile = TileType::TILE_TYPE_NULL;
@@ -156,6 +159,7 @@ void TestScene::Render() {
 	graphics->DrawToGUI(weaponOverlay, Vector2(1100.0f, 20.0f), Vector2(160.0f, 160.0f));
 	std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player", true).lock();
 	if(p) {
+		playerPosition = p->GetComponent<Transform2D>().lock()->GetPosition();
 		std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
 		if(cs->IsArmed()) {
 			std::shared_ptr<WeaponCache> wc = cs->GetWeaponCache().lock();
