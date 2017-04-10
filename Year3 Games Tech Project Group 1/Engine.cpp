@@ -53,7 +53,7 @@ void Engine::Run() {
 			fpsTimer += deltaTime;
 			if(fpsTimer > 1.0f) {
 				fps = framesThisSecond;
-				std::cout << "FPS = " + std::to_string(fps) << std::endl;
+				//std::cout << "FPS = " + std::to_string(fps) << std::endl;
 				framesThisSecond = 0;
 				fpsTimer -= 1.0f;
 			}

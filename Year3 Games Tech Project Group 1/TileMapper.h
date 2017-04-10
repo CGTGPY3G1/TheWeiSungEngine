@@ -134,7 +134,7 @@ public:
 	Vector2 GetNewTargetLocation(const Vector2 & worldPosition);
 private:
 	TileType TypeFromGID(unsigned int gid);
-	Vector2 GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height);
+	Vector2 GetObjectScale(const unsigned int & layerType, const unsigned int & objectType, const float & width, const float & height);
 	std::shared_ptr<TmxMap> map;
 	std::vector<std::vector<Tile>> tiles;
 	std::weak_ptr<Transform2D> myTransform;

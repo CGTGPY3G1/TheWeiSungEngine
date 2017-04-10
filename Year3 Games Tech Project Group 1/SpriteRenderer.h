@@ -4,9 +4,7 @@
 #include"Component.h"
 #include "WSSprite.h"
 #include "RenderLayer.h"
-
-enum PivotPoint { TopLeft, Top, TopRight, Left, Centre, Right, BottomLeft, Bottom, BottomRight };
-
+#include "PivotPoint.h"
 class SpriteRenderer : public Component {
 public:
 	SpriteRenderer();
@@ -28,14 +26,9 @@ public:
 	void SetPivot(PivotPoint pivot);
 	void SetPivotManually(const float & x, const float & y);
 	void SetPivotManually(const Vector2 & pivotPoint);
-	//void Init(const WSSprite & sprite, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	//void Init(const WSSprite & sprite, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
-	
+	void Init(const std::string & path, const PivotPoint & pivot = PivotPoint::Centre, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);	
 	void Init(const std::string & path, const Vector2 & pivot, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
 	void UpdateOrigin();
-	//void Init(const WSSprite & sprite, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
-	//void Init(const std::string path, const int & tx, const int & tY, const int & tWidth, const int &  tHeight, const RenderLayer & sortLayer = RenderLayer::MIDGROUND_LAYER, const int & sortOrder = 0);
 	void SetSprite(const WSSprite & sprite);
 	void SetTextureRect(const int & x, const int & y, const int & width, const int & height);
 	void LoadSprite(const std::string path, const bool & generateMipMaps = true, const bool & setSmooth = true, const bool & setSRGB = false);
@@ -44,21 +37,6 @@ public:
 	void SetShader(std::shared_ptr<sf::Shader> shader);
 	const std::string GetName() const override { return "SpriteRenderer"; }
 
-	template <class Archive>
-	void load(Archive & ar) {
-
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		Component::save(ar);
-		ar(cereal::make_nvp("PathToTexture", path),
-		   cereal::make_nvp("FragShader", fragName),
-		   cereal::make_nvp("VertShader", vertName),
-		   cereal::make_nvp("Pivot", pivot),
-		   cereal::make_nvp("RenderLayer", sortLayer),
-		   cereal::make_nvp("SortOrder", sortOrder));
-	}
 private:
 	WSSprite sprite;
 	std::shared_ptr<sf::Shader> shader;

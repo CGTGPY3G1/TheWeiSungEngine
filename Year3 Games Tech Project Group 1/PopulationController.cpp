@@ -6,6 +6,8 @@
 #include "Engine.h"
 #include "Graphics.h"
 #include "Math.h"
+#include "AttackerIdentityScript.h"
+
 PopulationController & PopulationController::GetInstance() {
 	static PopulationController instance;
 	return instance;
@@ -30,6 +32,17 @@ unsigned int PopulationController::GetKills() {
 
 float PopulationController::GetSpawnRadius() {
 	return spawnRadius;
+}
+
+void PopulationController::RegisterKill(const AttackerInfo & attacker, const unsigned int & victimID, const std::string & victimName) {
+	KillerData killerData;
+	killerData.killerId = attacker.iD;
+	killerData.killerName = attacker.name;
+	KillData killData;
+	killData.killType = attacker.attackType;
+	killData.victimId = victimID;
+	killData.victimName = victimName;
+	std::cout << attacker.name + " killed " + victimName << std::endl;
 }
 
 void PopulationController::SetSpawnRadius(const float & radius) {

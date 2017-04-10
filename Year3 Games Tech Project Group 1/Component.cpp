@@ -6,12 +6,11 @@ int IDManager::compCount = 0;
 int IDManager::getNewCompID() { return ++compCount; }
 
 Component::Component() {
-	Init(true);
 }
 
 Component::Component(std::weak_ptr<GameObject> gameObject) {
 	this->gameObject = gameObject;
-	Init(enabled);
+	Init(true);
 }
 
 Component::~Component() {
@@ -63,7 +62,7 @@ void Component::OnDisable() {
 }
 
 void Component::Destroy() {
-
+	
 }
 
 void Component::Init(const bool & enabled) {

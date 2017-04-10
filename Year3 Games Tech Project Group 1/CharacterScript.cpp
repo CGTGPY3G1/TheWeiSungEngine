@@ -42,8 +42,7 @@ void CharacterScript::Start() {
 				NewRandomState();
 			}
 	}
-
-	ResetAnim();
+	ResetAnim();	
 }
 
 void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
@@ -71,28 +70,6 @@ void CharacterScript::FixedUpdate(const float & fixedDeltaTime) {
 	}
 	ResetAnim();
 	if(moving) moving = false;
-}
-
-void CharacterScript::Render() {
-	if(isAI) {
-		std::shared_ptr<RigidBody2D> rb = rigidbody.lock();
-		if(rb) {
-			Vector2 forward = rb->GetForward();
-			const Vector2 right = rb->GetRight();
-			const Vector2 characterPosition = rb->GetPosition();
-			Vector2 rayPosition = characterPosition;
-			const Vector2 offset = (right * Physics::PIXELS_PER_METRE * 0.2f);
-			float fov = 10.0f;
-			std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
-			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 1.6f);
-			rayPosition += offset;
-			forward.RotateInDegrees(fov);
-			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f);
-			rayPosition = characterPosition - offset;
-			forward.RotateInDegrees(-fov * 2.0f);
-			graphics->DrawLine(rayPosition, rayPosition + forward * Physics::PIXELS_PER_METRE * 0.8f);
-		}
-	}
 }
 
 void CharacterScript::MoveUsingPhysics(const Vector2 & force, const bool & worldSpace) {
@@ -136,7 +113,7 @@ float CharacterScript::AngleToTurn(const RayCastHit & hit, Vector2 right, Vector
 		float distance = std::numeric_limits<float>::max();
 		size_t index = 0;
 		const float dot = right.Dot(hit.normal);
-		return (dot < 0.0f ? -0.5f : 0.5f);
+		return dot;
 	}	
 	return 0.0f;
 }
@@ -229,7 +206,7 @@ void CharacterScript::Attack(const float & deltaTime) {
 			}
 			else {
 				const Vector2 forward = rb->GetForward();
-				Vector2 direction = (hostilePosition - characterPosition).Normalized();
+				Vector2 direction = displacement.Normalized();
 				const float angleToTarget = forward.AngleToPointInRadians(direction);
 				rb->AddTorque(forward.AngleToPointInRadians(direction) * 10.0f * deltaTime * rb->GetMass(), ForceType::FORCE);
 
@@ -314,6 +291,9 @@ const bool CharacterScript::React(const bool & nearestContact) {
 			if(aiState != AIState::RunAway) aiState = AIState::RunAway;
 		}
 	}
+	if(aiState != AIState::Attack) {
+		while(IsArmed()) TryToSwitchWeapon(true);
+	}
 	return true;
 }
 
@@ -370,6 +350,11 @@ bool CharacterScript::AvoidObstacles(const float & delta, const float & rayLengt
 int CharacterScript::GetSortOrder() {
 	const static int order = TypeInfo::ScriptSortOrder<CharacterScript>();
 	return order;
+}
+
+std::weak_ptr<WeaponCache> CharacterScript::GetWeaponCache() {
+	if(weapons.use_count() == 0) SetGunHandTransform();
+	return weapons;
 }
 
 void CharacterScript::SetGunHandTransform(const std::shared_ptr<Transform2D> hand) {

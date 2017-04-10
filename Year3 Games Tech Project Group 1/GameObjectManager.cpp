@@ -32,15 +32,23 @@ std::vector<std::shared_ptr<GameObject>> GameObjectManager::GetGameObjects() {
 }
 
 
-std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const unsigned int & id) {
+std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const unsigned int & id, const bool retrieveDeleted) {
 	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasGameObjectID(id));
 	if(it != gameObjects.end()) return (*it);
+	if(retrieveDeleted) {
+		it = std::find_if(toDelete.begin(), toDelete.end(), HasGameObjectID(id));
+		if(it != toDelete.end()) return (*it);
+	}
 	return std::weak_ptr<GameObject>();
 }
 
-std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const std::string & name) {
+std::weak_ptr<GameObject> GameObjectManager::GetGameObject(const std::string & name, const bool retrieveDeleted) {
 	std::vector<std::shared_ptr<GameObject>>::iterator it = std::find_if(gameObjects.begin(), gameObjects.end(), HasName(name));
 	if(it != gameObjects.end()) return (*it);
+	if(retrieveDeleted) {
+		it = std::find_if(toDelete.begin(), toDelete.end(), HasName(name));
+		if(it != toDelete.end()) return (*it);
+	}
 	return std::weak_ptr<GameObject>();
 }
 

@@ -18,6 +18,7 @@ public:
 	BitmapFont();
 	~BitmapFont();
 	void Load(const std::string & fileName = "FontData");
+	const bool IsValid() const;
 	void SetGlyph(const unsigned int index, const BitmapGlyph & glyph);
 	BitmapGlyph GetGlyph(const unsigned int index);
 	void SetSpacing(const unsigned int spacing);
@@ -28,6 +29,7 @@ public:
 	std::string ToString();
 private:
 	sf::Texture * texture;
+	bool valid = false;
 	sf::RenderStates renderState;
 	unsigned int width = 0, height = 0, tileWidth = 0, tileHeight = 0, startIndex = 0, spacing = 0;
 	std::string name = "";

@@ -518,8 +518,8 @@ TileType TileMapper::TypeFromGID(unsigned int gid) {
 	return toReturn;
 }
 
-Vector2 TileMapper::GetObjectScale(const unsigned int & layerTyoe, const unsigned int & objectType, const float & width, const float & height) {
-	if(layerTyoe == 0) {
+Vector2 TileMapper::GetObjectScale(const unsigned int & layerType, const unsigned int & objectType, const float & width, const float & height) {
+	if(layerType == 0) {
 		switch(objectType) {
 		case 1:
 			return Vector2(width / 64.0f, height / 64.0f);
@@ -560,7 +560,7 @@ Vector2 TileMapper::GetObjectScale(const unsigned int & layerTyoe, const unsigne
 		}
 	}
 	else {
-
+		// is anything else that's scalable getting added to the editor?
 	}
 	return Vector2::One;
 }

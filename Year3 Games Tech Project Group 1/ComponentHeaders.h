@@ -26,4 +26,5 @@
 #include "WeaponCache.h"
 #include "DamageScript.h"
 #include "GrenadeScript.h"
+#include "SelfDestructingAnimScript.h"
 #endif !WS_COMPENENT_HEADERS_H

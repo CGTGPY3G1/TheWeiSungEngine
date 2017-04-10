@@ -19,7 +19,9 @@
 #include "EngineSettings.h"
 #include "PopulationController.h"
 #include <SFML\Audio\Listener.hpp>
-
+#include "AssetManager.h"
+#include "WeaponCache.h"
+sf::Sprite healthSprite, weaponOverlay, weaponSprite;
 void TestScene::Detonate(Vector2 position, float radius, float explosionForce, float damage) {
 	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
 	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
@@ -46,7 +48,11 @@ void TestScene::Start() {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	Scene::Start();
 	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, false);
-
+	
+	
+	healthSprite.setTexture(AssetManager::GetInstance().GetTexture("Images/health.png"));
+	weaponOverlay.setTexture(AssetManager::GetInstance().GetTexture("Images/WeaponOverlay.png"));
+	weaponSprite.setTexture(AssetManager::GetInstance().GetTexture("Images/Items.png"));
 	Vector2 scale = Vector2(4.0f, 4.0f);
 	std::shared_ptr<GameObject> tileset = gameObjectManager.CreateGameObject("Tileset").lock();
 	tileset->Init(Vector2(0, 0), 0, scale);
@@ -129,6 +135,8 @@ void TestScene::Update(const float & deltaTime) {
 	if(input->GetKeyDown(KeyCodes::KeyCode::N)) tileset->SetShowNavLinks(!tileset->GetShowNavLinks());
 	if(input->GetKeyDown(KeyCodes::KeyCode::L)) tileset->SetShowGridLinks(!tileset->GetShowGridLinks());
 	PopulationController::GetInstance().Update();
+	std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player", true).lock();
+	if(p) playerHealthPercentage = std::min(100, std::max((int)0, (int)std::ceill(p->GetComponent<HealthScript>().lock()->GetHealthAsPercentage())));
 }
 
 TileType oldTile = TileType::TILE_TYPE_NULL;
@@ -140,25 +148,37 @@ void TestScene::Render() {
 		
 		std::shared_ptr<TileMapper> tileMapper = tileset->GetComponent<TileMapper>().lock();
 		tileMapper->Draw();
-		std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player").lock();
-		if(p) {
-			std::shared_ptr<Transform2D> t = p->GetComponent<Transform2D>().lock();
-			sf::Listener::setPosition(1, 0, -5);
-			if(t) {
-				const Vector2 pos = t->GetPosition();
-				TileType currentTile = tileMapper->GetTileType(pos);
-				if(oldTile != currentTile) {
-					oldTile = currentTile;
-					std::cout << tileMapper->GetTileTypeAsString(pos) << std::endl;
-					tileMapper->PrintTile(pos);
+	}
+	Scene::Render();
+	std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
+	std::string healthSring = std::to_string(playerHealthPercentage) + "%";
+	graphics->DrawToGUI(healthSprite, Vector2(20.0f, 20.0f), Vector2(80.0f, 80.0f));
+	graphics->DrawToGUI(weaponOverlay, Vector2(1100.0f, 20.0f), Vector2(160.0f, 160.0f));
+	std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player", true).lock();
+	if(p) {
+		std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
+		if(cs->IsArmed()) {
+			std::shared_ptr<WeaponCache> wc = cs->GetWeaponCache().lock();
+			if(wc) {
+				WeaponType wType = wc->GetWeaponType();
+				switch(wType) {
+				case WeaponTypePistol:
+					weaponSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+					break;
+				case WeaponTypeUzi:
+					weaponSprite.setTextureRect(sf::IntRect(32, 0, 32, 32));
+					break;
+				case WeaponTypeGrenade:
+					weaponSprite.setTextureRect(sf::IntRect(64, 0, 32, 32));
+					break;
+				default:
+					break;
 				}
-				sf::Listener::setPosition(pos.x, pos.y, 0);
+				graphics->DrawToGUI(weaponSprite, Vector2(1120.0f, 40.0f), Vector2(120.0f, 120.0f));
+				std::string ammo = std::to_string(wc->GetAmmoInClip()) + "/" + std::to_string(wc->GetAmmo());
+				graphics->Draw(ammo, Vector2(1250.0f, 150.0f), Vector2(ammo.size() * 15.0f, 20.0f), 1.0f, 1.0f, 1.0f, 1.0f, RIGHT_ALIGNED);
 			}
 		}
 	}
-	Scene::Render();
-	if(printBMF) {
-		std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
-		graphics->Draw("Where's the fucking font?", Vector2(640.0f, 360.0f), Vector2(640.0f, 100.0f), 1.0f, 1.0f, 1.0f, 1.0f, CENTRE_ALIGNED);
-	}	
+	graphics->Draw(healthSring, Vector2(100.0f, 20.0f), Vector2(healthSring.size() * 60.0f, 80.0f), 1.0f, 0.0f, 0.0f, 1.0f, LEFT_ALIGNED);
 }

@@ -60,12 +60,6 @@ public:
 		   cereal::make_nvp("RetargetTimer", retargetTimer));
 	}
 	int GetSortOrder() override;
-	template <class Archive>
-	void save(Archive & ar) const {
-		ScriptableComponent::save(ar);
-		ar(cereal::make_nvp("Target", target),
-		   cereal::make_nvp("RetargetTimer", retargetTimer));
-	}
 private:
 	std::weak_ptr<RigidBody2D> myRigidBody;
 	std::weak_ptr<CharacterScript> movementScript;

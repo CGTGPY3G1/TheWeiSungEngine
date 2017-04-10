@@ -144,6 +144,18 @@ void WeaponCache::AddWeapon(const WeaponType & weaponType, const int & ammo) {
 
 }
 
+const unsigned int WeaponCache::GetAmmoInClip() const {
+	return currentWeapon.use_count() > 0 ? currentWeapon.lock()->GetAmmoInClip() : 0;
+}
+
+const unsigned int WeaponCache::GetClipCapacity() const {
+	return currentWeapon.use_count() > 0 ? currentWeapon.lock()->GetRoundsPerClip() : 0;
+}
+
+const WeaponType WeaponCache::GetWeaponType() const {
+	return currentWeapon.use_count() > 0 ? currentWeapon.lock()->GetType() : WeaponType::WeaponTypeNull;
+}
+
 const unsigned int WeaponCache::GetAmmo() const {
 	return currentWeapon.use_count() > 0 ? currentWeapon.lock()->GetAmmoInCache() : 0;
 }

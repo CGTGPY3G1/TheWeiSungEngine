@@ -11,7 +11,6 @@ public:
 	friend class ComponentManager;
 	friend class PhysicsSystem;
 	friend class Transform2D;
-	friend class cereal::access;
 	GameObject(const std::string & goName = "New GameObject");
 	GameObject(const unsigned int & objectID, const std::string & goName = "New GameObject");
 	~GameObject();
@@ -53,26 +52,6 @@ public:
 	void AllowCollisionsWith(const int & category, const bool & allowCollisions);
 	const bool CollidesWith(const int & collisionMask);
 	void Destroy();
-	template <class Archive>
-	void load(Archive & ar) {
-		ar(cereal::make_nvp("Name", name),
-		   cereal::make_nvp("Tag", tag),
-		   cereal::make_nvp("Enabled", enabled),
-		   cereal::make_nvp("CollisionCategory", collisionCategory),
-		   cereal::make_nvp("CollisionMask", collisionMask),
-		   cereal::make_nvp("ComponentManager", componentManager));
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		ar(cereal::make_nvp("Type", std::string("GameObject")), 
-			cereal::make_nvp("Name", name),
-			cereal::make_nvp("Tag", tag),
-			cereal::make_nvp("Enabled", enabled),
-			cereal::make_nvp("CollisionCategory", collisionCategory),
-			cereal::make_nvp("CollisionMask", collisionMask),
-			cereal::make_nvp("ComponentManager", componentManager));
-	}
 protected:	
 	template <typename T = std::enable_if<std::is_base_of<Component, T>::value>::type> int IterateComponentCount(const bool & increase);
 	std::weak_ptr<GameObject> GetWeak() { return shared_from_this(); }

@@ -24,6 +24,9 @@ public:
 	const unsigned int NumberOfWeapons() const;
 	void SwitchWeapon(const bool & forward);
 	void AddWeapon(const WeaponType & weaponType, const int & ammo);
+	const unsigned int GetAmmoInClip() const;
+	const unsigned int GetClipCapacity() const;
+	const WeaponType GetWeaponType() const;
 	const unsigned int GetAmmo() const;
 	const bool IsArmed() const;
 	const bool HasWeapons();

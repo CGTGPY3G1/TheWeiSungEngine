@@ -19,10 +19,10 @@ public:
 	sf::FloatRect GetBounds();
 	sf::Vector2f GetSize() const;
 	void SetSize(const sf::Vector2f & newSize);
-	void SetUniformSize(const float & newSize, const bool & x = false);
 private:
 	sf::FloatRect getLocalBounds() const;
 	sf::FloatRect getGlobalBounds() const;
+	void BuildBitmapString();
 	void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
 	std::shared_ptr<BitmapFont> drawFont;

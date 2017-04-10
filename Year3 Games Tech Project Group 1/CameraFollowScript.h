@@ -18,16 +18,7 @@ public:
 	const std::string GetName() const override { return "CameraFollowScript"; }
 	void SetTarget(std::weak_ptr<RigidBody2D> target);
 	int GetSortOrder() override;
-	template <class Archive>
-	void load(Archive & ar) {
-		ar(cereal::make_nvp("ZoomLevel", zoomLevel));
-	}
 
-	template <class Archive>
-	void save(Archive & ar) const {
-		ScriptableComponent::save(ar);
-		ar(cereal::make_nvp("ZoomLevel", zoomLevel));
-	}
 private:
 	std::weak_ptr<RigidBody2D> myTarget;
 	std::weak_ptr<Transform2D> myTransform;

@@ -25,12 +25,12 @@ void PlayerScript::Start() {
 void PlayerScript::Update(const float & deltaTime) {
 	if(player.use_count() < 1) player = GameObjectManager::GetInstance().GetGameObject("Player");
 	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
-	const std::shared_ptr<GameObject> tileMap = GameObjectManager::GetInstance().GetGameObject("BackgroundTileset").lock();
+	/*const std::shared_ptr<GameObject> tileMap = GameObjectManager::GetInstance().GetGameObject("BackgroundTileset").lock();
 	if(tileMap) {
 		const std::shared_ptr<TileMapper> tileMapper = tileMap->GetComponent<TileMapper>().lock();
 		if(tileMapper)
 			std::cout << tileMapper->GetTileTypeAsString(player.lock()->GetComponent<Transform2D>().lock()->GetPosition()) << std::endl;
-	}
+	}*/
 		
 	if(!driving) {
 		if(input->GetKeyDown(KeyCodes::KeyCode::K)) {
@@ -67,21 +67,6 @@ void PlayerScript::Update(const float & deltaTime) {
 					}
 				}
 			}
-		}
-		if(input->GetKey(KeyCodes::KeyCode::Up) || input->GetKey(KeyCodes::KeyCode::W) || 
-			input->GetKey(KeyCodes::KeyCode::Down) || input->GetKey(KeyCodes::KeyCode::S) ||
-		   input->GetKey(KeyCodes::KeyCode::Left) || input->GetKey(KeyCodes::KeyCode::A) ||
-		   input->GetKey(KeyCodes::KeyCode::Right) || input->GetKey(KeyCodes::KeyCode::D)) {
-			if(!moving) {
-				moving = true;
-				std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
-				if(sa) sa->PlayAnimation("Walk");
-			}
-		}
-		else if(moving) {
-			moving = false;
-			std::shared_ptr<SpriteAnimator> sa = GetComponent<SpriteAnimator>().lock();
-			if(sa) sa->PlayAnimation("Idle");
 		}
 	}
 	else {
@@ -241,7 +226,7 @@ void PlayerScript::SetDriving(const bool & driving) {
 				std::shared_ptr<AttackerIdentityScript> ais = car.lock()->GetComponent<AttackerIdentityScript>().lock();
 				std::shared_ptr<CharacterScript> cs = p->GetComponent<CharacterScript>().lock();
 				if(ais && cs) {
-					ais->SetAttacker(cs->GetGameObject(), cs->GetCharacterName());
+					ais->SetAttacker(cs->GetGameObject(), cs->GetCharacterName(), AttackType::VehicleHit);
 				}
 			}
 			

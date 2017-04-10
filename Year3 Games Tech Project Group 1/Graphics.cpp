@@ -1,8 +1,8 @@
 #include "Graphics.h"
 #include "TypeConversion.h"
 #include <iostream>
-#include "BitmapFont.h"
 #include "BitmapString.h"
+#include "BitmapFont.h"
 static  bool operator == (sf::ContextSettings lhs, sf::ContextSettings rhs) {
 	return lhs.antialiasingLevel == rhs.antialiasingLevel && lhs.attributeFlags == rhs.attributeFlags && lhs.depthBits == rhs.depthBits && lhs.majorVersion == rhs.majorVersion && lhs.stencilBits == rhs.stencilBits;
 }
@@ -129,10 +129,20 @@ void Graphics::Draw(const sf::VertexArray & vertexArray) {
 void Graphics::Draw(const std::string & text, const Vector2 & position, const Vector2 & size, const float & r, const float & g, const float & b, const float & a, TextAlignment alignment) {
 	BitmapString toDraw = BitmapString(text, font);
 	Vector2 finalPosition = position;
-	finalPosition.x += (alignment == TextAlignment::CENTRE_ALIGNED) ? -size.x * 0.5f : ((alignment == TextAlignment::RIGHT_ALIGNED) ? -size.x : 0.0f);
-	toDraw.setPosition(window.mapPixelToCoords(TypeConversion::ConvertToSFVector2i(finalPosition)));
+	finalPosition.x += (alignment == TextAlignment::LEFT_ALIGNED) ? 0.0f: ((alignment == TextAlignment::RIGHT_ALIGNED) ? -size.x : -size.x * 0.5f);
+	toDraw.setPosition(window.mapPixelToCoords(sf::Vector2i(finalPosition.x * windowScale.x, finalPosition.y * windowScale.y)));
 	toDraw.SetSize(TypeConversion::ConvertToSFVector2f(size * zoomLevel));
 	toDraw.SetColour(r, g, b, a);
+	window.draw(toDraw);
+}
+
+void Graphics::DrawToGUI(const sf::Sprite & sprite, const Vector2 & position, const Vector2 & size, const float & r, const float & g, const float & b, const float & a) {
+	sf::Sprite toDraw = sprite;
+	toDraw.setPosition(window.mapPixelToCoords(sf::Vector2i(position.x * windowScale.x, position.y * windowScale.y)));
+	sf::FloatRect bounds = toDraw.getGlobalBounds();
+	sf::Vector2f s = sf::Vector2f(bounds.width, bounds.height);
+	toDraw.setScale((size.x / s.x) * zoomLevel, (size.y / s.y) * zoomLevel);
+	toDraw.setColor(TypeConversion::ConvertToSFColour(r, g, b, a));
 	window.draw(toDraw);
 }
 

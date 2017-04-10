@@ -4,11 +4,15 @@
 
 #include "ScriptableComponent.h"
 
-struct KillData {
+struct KillerData {
 	unsigned int killerId = 0;
 	std::string killerName = "";
 };
-
+namespace std {
+	template <> struct hash<KillerData> { std::size_t operator()(const KillerData& data) const { return ((hash<string>()(data.killerName) ^ (hash<unsigned int>()(data.killerId) << 1)) >> 1); } };
+}
+struct KillData;
+struct AttackerInfo;
 class TileMapper;
 class Transform2D;
 class PopulationController {
@@ -19,18 +23,10 @@ public:
 	void Update();
 	unsigned int GetKills();
 	float GetSpawnRadius();
+	void RegisterKill(const AttackerInfo & attacker, const unsigned int & victimID, const std::string & victimName);
 	void SetSpawnRadius(const float & radius);
 	void SetMaxCivs(const unsigned int & max);
 	unsigned int GetMaxCivs();
-	template <class Archive>
-	void load(Archive & ar) {
-
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-
-	}
 private:
 	PopulationController();
 	int maxCivs = 10;
@@ -41,6 +37,7 @@ private:
 	void SpawnCivilians(const unsigned int number = 1);
 	void MoveCivilian(std::shared_ptr<Transform2D> targetTransform);
 	std::vector<std::weak_ptr<Transform2D>> civs;
+	std::unordered_map<KillerData, std::vector<KillData>> killRegister;
 };
 
 #endif // !WS_POPULATION_CONTROL_SCRIPT_H

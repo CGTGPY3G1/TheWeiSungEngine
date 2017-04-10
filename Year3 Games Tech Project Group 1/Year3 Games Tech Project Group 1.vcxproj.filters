@@ -294,6 +294,12 @@
     <ClInclude Include="GrenadeScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
+    <ClInclude Include="SelfDestructingAnimScript.h">
+      <Filter>Header Files\Engine\Components\Scripted</Filter>
+    </ClInclude>
+    <ClInclude Include="PivotPoint.h">
+      <Filter>Header Files\Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -304,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="Vector2.cpp">
       <Filter>Source Files\Engine\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
       <Filter>Source Files\Engine\Core</Filter>
@@ -341,14 +344,8 @@
     <ClCompile Include="Time.cpp">
       <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\Engine\Core</Filter>
@@ -364,9 +361,6 @@
     </ClCompile>
     <ClCompile Include="Collider.cpp">
       <Filter>Source Files\Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugDraw.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="RunShootDrive.cpp">
       <Filter>Source Files\Game</Filter>
@@ -386,9 +380,6 @@
     <ClCompile Include="SpriteBatch.cpp">
       <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
-    <ClCompile Include="AssetManager.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
     <ClCompile Include="WSSprite.cpp">
       <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
@@ -402,12 +393,6 @@
       <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Random.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug.cpp">
-      <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObjectFactory.cpp">
       <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="ParsedTMX.cpp">
@@ -467,17 +452,41 @@
     <ClCompile Include="AttackerIdentityScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
+    <ClCompile Include="NameGenerator.cpp">
+      <Filter>Source Files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="SelfDestructingAnimScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
+    <ClCompile Include="GrenadeScript.cpp">
+      <Filter>Source Files\Engine\Components\Scripted</Filter>
+    </ClCompile>
     <ClCompile Include="BitmapFont.cpp">
       <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="BitmapString.cpp">
       <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="NameGenerator.cpp">
-      <Filter>Source Files\Game</Filter>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="GrenadeScript.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDraw.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Source Files\Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

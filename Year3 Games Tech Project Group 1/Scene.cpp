@@ -41,8 +41,8 @@ void Scene::Update(const float & deltaTime) {
 	scriptManagementSystem->LoadScripts(gameObjects);
 	scriptManagementSystem->Update(deltaTime);
 	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
-		if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) != ComponentType::COMPONENT_SPRITE_RENDERER)
-			(*i)->ProcessComponents(gameObjects);
+		//if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) != ComponentType::COMPONENT_SPRITE_RENDERER)
+		//	(*i)->ProcessComponents(gameObjects);
 	}
 }
 

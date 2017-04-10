@@ -101,7 +101,11 @@ void Transform2D::Rotate(const float & angle) {
 	SetDirty();
 }
 
-void Transform2D::Scale(Vector2 toScale) {
+void Transform2D::Scale(const float & scaleBy) {
+	SetScale(GetScale() * scaleBy);
+}
+
+void Transform2D::Scale(const Vector2 & toScale) {
 	scale(TypeConversion::ConvertToSFVector2f(toScale));
 	SetDirty();
 }

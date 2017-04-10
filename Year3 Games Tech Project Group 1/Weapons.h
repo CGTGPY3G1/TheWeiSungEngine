@@ -27,6 +27,7 @@ public:
 	virtual const Vector2 GetImageOffset() const = 0;
 	virtual const unsigned int GetRoundsPerClip() const = 0;
 	virtual const float DistanceToFirePoint() const = 0;
+	virtual const unsigned int GetMaxAmmo() const = 0;
 	virtual void UpdateTimers(const float & delta);
 	virtual void Fire();
 	virtual void Reload();
@@ -58,6 +59,7 @@ public:
 	const Vector2 GetImageOffset() const override;
 	const float DistanceToFirePoint() const override;
 	const unsigned int GetRoundsPerClip() const override;
+	const unsigned int GetMaxAmmo() const override;
 };
 
 class Pistol : public Weapon {
@@ -71,8 +73,7 @@ public:
 	const Vector2 GetImageOffset() const override;
 	const float DistanceToFirePoint() const override;
 	const unsigned int GetRoundsPerClip() const override;
-private:
-
+	const unsigned int GetMaxAmmo() const override;
 };
 
 class Uzi : public Weapon {
@@ -86,6 +87,7 @@ public:
 	const Vector2 GetImageOffset() const override;
 	const float DistanceToFirePoint() const override;
 	const unsigned int GetRoundsPerClip() const override;
+	const unsigned int GetMaxAmmo() const override;
 };
 
 class Grenade : public Weapon {
@@ -99,6 +101,7 @@ public:
 	const Vector2 GetImageOffset() const override;
 	const float DistanceToFirePoint() const override;
 	const unsigned int GetRoundsPerClip() const override;
+	const unsigned int GetMaxAmmo() const override;
 };
 
 struct WeaponIsOfType {

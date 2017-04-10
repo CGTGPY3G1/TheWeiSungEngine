@@ -7,7 +7,7 @@
 #include "Vector2.h"
 #include <cstdarg>
 #include <memory>
-
+#include "PivotPoint.h"
 
 enum TextAlignment {
 	LEFT_ALIGNED = 0,
@@ -53,6 +53,7 @@ public:
 	void Draw(const sf::Shape & shape);
 	void Draw(const sf::VertexArray & vertexArray);
 	void Draw(const std::string & text, const Vector2 & position, const Vector2 & size, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f, TextAlignment alignment = TextAlignment::LEFT_ALIGNED);
+	void DrawToGUI(const sf::Sprite & sprite, const Vector2 & position, const Vector2 & size, const float & r = 1.0f, const float & g = 1.0f, const float & b = 1.0f, const float & a = 1.0f);
 	void DrawCircle(const sf::CircleShape & c);
 	void Draw(const sf::Drawable & d, const sf::Transform & t);
 	void Draw(const sf::Drawable & d, const sf::RenderStates & r);

@@ -1,4 +1,5 @@
 #include "GrenadeScript.h"
+#include "GameObjectFactory.h"
 #include "PhysicsSystem.h"
 #include "Transform2D.h"
 #include "GameObject.h"
@@ -13,9 +14,10 @@ GrenadeScript::~GrenadeScript() {
 }
 
 void GrenadeScript::Detonate() {
-	std::shared_ptr<Transform2D> transform = GetComponent<Transform2D>().lock();
-	const Vector2 position = transform->GetPosition();
+	transform = GetComponent<Transform2D>().lock();
+	const Vector2 position = transform.lock()->GetPosition();
 	const float r = radius * Physics::PIXELS_PER_METRE;
+	std::shared_ptr<AttackerIdentityScript> ais = GetComponent<AttackerIdentityScript>().lock();
 	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, r);
 	for(std::vector<std::weak_ptr<Collider>>::iterator it = colliders.begin(); it != colliders.end(); ++it) {
 		std::shared_ptr<Collider> c = (*it).lock();
@@ -23,18 +25,21 @@ void GrenadeScript::Detonate() {
 			if(c->GetGameObjectID() == GetGameObjectID()) continue;
 			std::shared_ptr<RigidBody2D> rb = c->GetComponent<RigidBody2D>().lock();
 			if(rb) {				
-				Vector2 cPosition = rb->GetPosition();
-				const float distance = (cPosition - position).Magnitude();
-				Vector2 direction = (cPosition - position).Normalized();
+				const Vector2 cPosition = rb->GetPosition();
+				const Vector2 displacement = (cPosition - position);
+				const float distance = displacement.Magnitude();
+				const Vector2 direction = displacement.Normalized();
 				const float distanceScale = 1.0f - (distance / r);
-				rb->AddForce(direction * distanceScale * explosionForce, ForceType::IMPULSE_FORCE);
+				const Vector2 force = direction * distanceScale * explosionForce;
+				rb->AddForce(force, ForceType::IMPULSE_FORCE);
 				std::shared_ptr<HealthScript> healthScript = c->GetComponent<HealthScript>().lock();
 				if(healthScript) {
-					healthScript->Hit(damage * distanceScale);
+					healthScript->ExplosionHit(force, damage * distanceScale, 1.0f + distanceScale, ais->GetInfo());
 				}
 			}
 		}
 	}
+	GameObjectFactory::CreateExplosionAnim(transform.lock()->GetPosition(), transform.lock()->GetRotation());
 	gameObject.lock()->Destroy();
 	alive = false;
 }

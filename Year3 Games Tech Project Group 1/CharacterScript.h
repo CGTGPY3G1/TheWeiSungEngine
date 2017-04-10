@@ -33,7 +33,6 @@ public:
 	const ComponentType Type() const override { return COMPONENT_CHARACTER_SCRIPT; }
 	void Start() override;
 	void FixedUpdate(const float & fixedDeltaTime) override;
-	void Render() override;
 	void MoveUsingPhysics(const Vector2 & force, const bool & worldSpace = true);
 	void Move(Vector2 & amount, const bool & worldSpace = true);
 	float AngleToTurn(const RayCastHit & hit, Vector2 right, Vector2 position);
@@ -41,10 +40,7 @@ public:
 	void TryToFire();
 	void TryToSwitchWeapon(const bool & forward);
 	void SetArtificiallyIntelligent(const bool & isAI);
-	void Stand();
-	void Walk(const float & deltaTime);
-	void RunAway(const float & deltaTime);
-	void Attack(const float & deltaTime);
+	
 	void NewRandomState();
 	void Reset();
 	const std::string GetCharacterName() const;
@@ -55,12 +51,17 @@ public:
 	bool AvoidObstacles(const float & delta, const float & rayLengthInMetres);
 	const std::string GetName() const override { return "CharacterScript"; }
 	int GetSortOrder() override;
+	std::weak_ptr<WeaponCache> GetWeaponCache();
 	void SetGunHandTransform(const std::shared_ptr<Transform2D> hand = std::shared_ptr<Transform2D>());
 	void OnSensorEnter(const std::weak_ptr<Collider> & collider) override;
 	void OnSensorExit(const std::weak_ptr<Collider> & collider) override;
 	void OnCollisionEnter(const CollisionData & data) override;
 
 private:
+	void Stand();
+	void Walk(const float & deltaTime);
+	void RunAway(const float & deltaTime);
+	void Attack(const float & deltaTime);
 	void ResetAnim();
 	float GetForceScale(const Vector2 & worldPosition);
 	std::weak_ptr<RigidBody2D> rigidbody;

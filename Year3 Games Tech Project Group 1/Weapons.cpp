@@ -45,6 +45,7 @@ void Weapon::AddAmmo(const int & amount) {
 		if(amount == 0) return;
 		ammoInCache += amount;
 		if(ammoInCache < 0) ammoInCache = 0;
+		else if(ammoInCache > GetMaxAmmo()) ammoInCache = GetMaxAmmo();
 	}
 }
 
@@ -127,6 +128,10 @@ const unsigned int Pistol::GetRoundsPerClip() const {
 	return 12;
 }
 
+const unsigned int Pistol::GetMaxAmmo() const {
+	return 9999;
+}
+
 Uzi::Uzi() : Weapon(){
 	enabled  = true;
 }
@@ -164,6 +169,10 @@ const unsigned int Uzi::GetRoundsPerClip() const {
 	return 50;
 }
 
+const unsigned int Uzi::GetMaxAmmo() const {
+	return 9999;
+}
+
 NullWeapon::NullWeapon() : Weapon() {
 	enabled = false;
 }
@@ -196,6 +205,10 @@ const float NullWeapon::DistanceToFirePoint() const {
 }
 
 const unsigned int NullWeapon::GetRoundsPerClip() const {
+	return 0;
+}
+
+const unsigned int NullWeapon::GetMaxAmmo() const {
 	return 0;
 }
 
@@ -232,4 +245,8 @@ const float Grenade::DistanceToFirePoint() const {
 
 const unsigned int Grenade::GetRoundsPerClip() const {
 	return 1;
+}
+
+const unsigned int Grenade::GetMaxAmmo() const {
+	return 99;
 }

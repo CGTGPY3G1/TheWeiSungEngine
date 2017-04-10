@@ -32,7 +32,8 @@ public:
 	void Move(Vector2 toMove);
 	void Translate(const Vector2 & translation);
 	void Rotate(const float & angle);
-	void Scale(Vector2 scale);
+	void Scale(const float & scaleBy);
+	void Scale(const Vector2 & scale);
 	const sf::Transform & GetLocalTransform();
 	const sf::Transform & GetWorldTransform();
 	const sf::Transform & GetWorldToLocalTransform();

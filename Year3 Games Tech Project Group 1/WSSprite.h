@@ -177,8 +177,16 @@ public:
 	///
 	////////////////////////////////////////////////////////////
 	sf::FloatRect getGlobalBounds() const;
-	void AppendTo(sf::VertexArray& array) { for(const auto& vertex : m_vertices) array.append(vertex); }
-	sf::Vertex getVertex(const unsigned int & index) { return m_vertices[index]; }
+	void AppendTo(sf::VertexArray& array) { 
+		updatePositions();
+		updateTexCoords();
+		for(const auto& vertex : m_vertices) array.append(vertex); 
+	}
+	sf::Vertex getVertex(const unsigned int & index) { 
+		updatePositions();
+		updateTexCoords();
+		return m_vertices[index]; 
+	}
 private:
 
 	////////////////////////////////////////////////////////////

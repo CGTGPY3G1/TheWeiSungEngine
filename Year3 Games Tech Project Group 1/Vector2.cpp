@@ -143,11 +143,11 @@ const Vector2 Vector2::Normalized() const {
 	return Vector2(x, y).Normalize();
 }
 
-float Vector2::AngleInRadians() {
+const float Vector2::AngleInRadians() const {
 	return atan2(y, x);
 }
 
-float Vector2::AngleInDegrees() {
+const float Vector2::AngleInDegrees() const {
 	return AngleInRadians() * Math::RadiansToDegrees();
 }
 

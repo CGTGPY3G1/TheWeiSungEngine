@@ -20,6 +20,7 @@ private:
 	bool oldInputStyle = true;
 	bool driving = false;
 	bool printBMF = false;
+	int playerHealthPercentage = 100;
 };
 
 #endif // !WS_TEST_SCENE_H+

@@ -39,19 +39,23 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 
 	const float animSpeed = 0.3f;
 	Animation idle = Animation("Idle");
+	idle.looping = false;
 	idle.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, 0, tileSize, tileSize));
 	Animation idleWithGun = Animation("IdleWithGun");
+	idleWithGun.looping = false;
 	idleWithGun.AddFrame(AnimationFrame(0.4f, tileSize * characterType, tileSize * 3, tileSize, tileSize));
-	Animation walk = Animation("Walk");
+	Animation walk = Animation("Walk");	
 	walk.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize, tileSize, tileSize));
 	walk.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, 0, tileSize, tileSize));
 	walk.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize * 2, tileSize, tileSize));
 	walk.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, 0, tileSize, tileSize));
+	walk.looping = true;
 	Animation walkWithGun = Animation("WalkWithGun");
 	walkWithGun.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize * 4, tileSize, tileSize));
 	walkWithGun.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize * 3, tileSize, tileSize));
 	walkWithGun.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize * 5, tileSize, tileSize));
 	walkWithGun.AddFrame(AnimationFrame(animSpeed, tileSize * characterType, tileSize * 3, tileSize, tileSize));
+	walkWithGun.looping = true;
 	std::shared_ptr<SpriteAnimator> sa = character->AddComponent<SpriteAnimator>().lock();
 	sa->AddAnimation(idle);
 	sa->AddAnimation(idleWithGun);
@@ -59,7 +63,6 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 	sa->AddAnimation(walkWithGun);
 	sa->PlayAnimation("Idle");
 	sa->Start();
-
 
 	std::shared_ptr<CharacterScript> cs = character->AddComponent<CharacterScript>().lock();
 	cs->SetArtificiallyIntelligent(aiControlled);
@@ -72,11 +75,11 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_PLAYER);
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_PLAYER, mask);
 		hs->Start();
-		hs->SetHealth(1000000.0);
+		hs->SetHealth(1000.0);
 		std::shared_ptr<PlayerScript> playerScript = character->AddComponent<PlayerScript>().lock();
 		playerScript->Start();
-		weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
-		weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
+		weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 10000);
+		weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 10000);
 		weaponCache->AddWeapon(WeaponType::WeaponTypeGrenade, 100);
 	}
 	else {
@@ -84,8 +87,10 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
 		hs->Start();
 		hs->SetHealth(50.0f);
-		if(Random::RandomBool()) weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
-		else weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
+		const int r = Random::RandomInt(100);
+		if(r < 70) weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
+		else if(r < 90) weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);
+		else weaponCache->AddWeapon(WeaponType::WeaponTypeGrenade, 50);
 	}
 	character->AddComponent<DamageScript>().lock()->Start();
 	return character;
@@ -279,7 +284,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const std::weak_ptr<Ga
 	bullet->AddComponent<DamageScript>().lock()->Start();
 	if(creator.use_count() > 0) {
 		std::shared_ptr<AttackerIdentityScript> ais = bullet->AddComponent<AttackerIdentityScript>().lock();
-		ais->SetAttacker(creator, creatorName);
+		ais->SetAttacker(creator, creatorName, AttackType::ProjectileHit);
 		ais->Start();
 	}
 	return bullet;
@@ -302,7 +307,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateGrenade(const std::weak_ptr<G
 	sprite->SetTextureRect(100, 60, 14, 8);
 	if(creator.use_count() > 0) {
 		std::shared_ptr<AttackerIdentityScript> ais = grenade->AddComponent<AttackerIdentityScript>().lock();
-		ais->SetAttacker(creator, creatorName);
+		ais->SetAttacker(creator, creatorName, AttackType::GrenadeHit);
 		ais->Start();
 	}
 	return grenade;
@@ -318,13 +323,13 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateVehicle(const int & vehicleNu
 	vehicle->AddComponent<PolygonCollider>().lock()->Init(Vector2(116.0f, 0.0f), {Vector2(-100.0f, -48.0f), Vector2(76.0f, -64.0f), Vector2(112.0f, -38.0f), Vector2(124.0f, -24.0f), Vector2(124.0f, 24.0f), Vector2(112.0f, 38.0f), Vector2(76.0f, 64.0f), Vector2(-100.0f, 48.0f)}, false, 200.0f);
 
 	std::shared_ptr<SpriteRenderer> carSprite = vehicle->AddComponent<SpriteRenderer>().lock();
-	carSprite->Init("Images/Cars.png", PivotPoint::Left, RenderLayer::MIDGROUND_LAYER);
+	carSprite->Init("Images/Cars.png", PivotPoint::TopLeft, RenderLayer::MIDGROUND_LAYER);
 	carSprite->SetTextureRect(0, 132 * vehicleNumber, 288, 132);
 	carSprite->SetPivotManually(44.0f, carSprite->GetHeight() / 2.0f);
 	vehicle->AddComponent<VehicleController>().lock()->Start();
 	vehicle->SetTag("Vehicle");
 	std::shared_ptr<HealthScript> hs = vehicle->AddComponent<HealthScript>().lock();
-	hs->SetHealth(25000.0f);
+	hs->SetHealth(10000.0f);
 	vehicle->AddComponent<DamageScript>().lock()->Start();
 	std::shared_ptr<AttackerIdentityScript> ais = vehicle->AddComponent<AttackerIdentityScript>().lock();
 	ais->SetAttacker();
@@ -351,4 +356,44 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBloodSplat(const Vector2 & po
 	std::shared_ptr<DeathTimer> dt = splat->AddComponent<DeathTimer>().lock();
 	dt->SetTime(45.0f);
 	return splat;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateBloodSpray(const Vector2 & position, const Vector2 & direction, const Vector2 & scale) {
+	static int sortOrder = -1000000;
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> spray = gameObjectManager.CreateGameObject("BloodSplat").lock();
+	spray->Init(position, direction.AngleInDegrees(), scale);
+	std::shared_ptr<SpriteRenderer> sr = spray->AddComponent<SpriteRenderer>().lock();
+	sr->Init("Images/Blood.png", PivotPoint::TopLeft, RenderLayer::BACKGROUND_LAYER, sortOrder++);
+	sr->SetTextureRect(0, 96, 128, 64);
+	sr->SetPivotManually(Vector2(16.0f, 32.0f));
+	std::shared_ptr<DeathTimer> dt = spray->AddComponent<DeathTimer>().lock();
+	dt->SetTime(45.0f);
+	return spray;
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateExplosionAnim(const Vector2 & position, const float & rotation) {
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> explosion = gameObjectManager.CreateGameObject("Explosion").lock();
+	explosion->Init(position, rotation, Vector2(8.0f, 8.0f));
+
+	std::shared_ptr<Transform2D> characterTransform = explosion->GetComponent<Transform2D>().lock();
+	std::shared_ptr<SpriteRenderer> sr = explosion->AddComponent<SpriteRenderer>().lock();
+	sr->Init("Images/ExplosionAnim.png", PivotPoint::Centre, RenderLayer::FOREGROUND_LAYER, 1000);
+	const int tileSize = 64;
+	const float animSpeed = 0.1f;
+	sr->SetTextureRect(0, 0, tileSize, tileSize);
+	Animation eplosionAnim = Animation("Eplosion");
+	for(size_t i = 0; i < 10; i++) {
+		eplosionAnim.AddFrame(AnimationFrame(animSpeed, i * tileSize, 0, tileSize, tileSize));
+	}
+	eplosionAnim.looping = false;
+	std::shared_ptr<SpriteAnimator> sa = explosion->AddComponent<SpriteAnimator>().lock();
+	sa->AddAnimation(eplosionAnim);
+	sa->PlayAnimation("Eplosion");
+	sa->Start();
+	std::shared_ptr<AudioSource> as = explosion->AddComponent<AudioSource>().lock();
+	as->Init("Audio/Explosion.wav", true);
+	explosion->AddComponent<SelfDestructingAnimScript>().lock()->Start();
+	return explosion;
 }

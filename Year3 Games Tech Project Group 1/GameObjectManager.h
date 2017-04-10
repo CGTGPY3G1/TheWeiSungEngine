@@ -13,8 +13,8 @@ public:
 	~GameObjectManager();
 	std::weak_ptr<GameObject> CreateGameObject(const std::string & name = "New GameObject");
 	std::vector<std::shared_ptr<GameObject>> GetGameObjects();
-	std::weak_ptr<GameObject> GetGameObject(const unsigned int & id);
-	std::weak_ptr<GameObject> GetGameObject(const std::string & name);
+	std::weak_ptr<GameObject> GetGameObject(const unsigned int & id, const bool retrieveDeleted = false);
+	std::weak_ptr<GameObject> GetGameObject(const std::string & name, const bool retrieveDeleted = false);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithName(const std::string & name);
 	std::vector<std::shared_ptr<GameObject>> GetGameObjectsWithComponent(const unsigned int & componentMask);
 	void DeleteGameObject(const unsigned int & id);

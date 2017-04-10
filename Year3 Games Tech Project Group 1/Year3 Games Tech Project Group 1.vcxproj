@@ -189,10 +189,12 @@
     <ClInclude Include="HealthScript.h" />
     <ClInclude Include="Joint.h" />
     <ClInclude Include="ParsedTMX.h" />
+    <ClInclude Include="PivotPoint.h" />
     <ClInclude Include="PlayerScript.h" />
     <ClInclude Include="PopulationController.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="AABB.h" />
+    <ClInclude Include="SelfDestructingAnimScript.h" />
     <ClInclude Include="SpriteAnimator.h" />
     <ClInclude Include="TileInfo.h" />
     <ClInclude Include="VehicleController.h" />
@@ -286,6 +288,7 @@
     <ClCompile Include="PolygonCollider.cpp" />
     <ClCompile Include="PopulationController.cpp" />
     <ClCompile Include="Random.cpp" />
+    <ClCompile Include="SelfDestructingAnimScript.cpp" />
     <ClCompile Include="SpriteAnimator.cpp" />
     <ClCompile Include="TileMapper.cpp" />
     <ClCompile Include="VehicleController.cpp" />

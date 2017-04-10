@@ -34,7 +34,8 @@ enum ComponentType : unsigned int {
 	COMPONENT_BLOOD_SPLATTER_SCRIPT = 1 << 19,
 	COMPONENT_WEAPON_CACHE = 1 << 20,
 	COMPONENT_DAMAGE_SCRIPT = 1 << 21,
-	COMPONENT_GRENADE_SCRIPT = 1 << 22
+	COMPONENT_GRENADE_SCRIPT = 1 << 22,
+	COMPONENT_SELF_DESTRUCTING_ANIM_SCRIPT = 1 << 23
 };
 
 #define NUMBER_OF_COMPONENTS = 20
@@ -132,9 +133,6 @@ template<typename T> std::vector<std::weak_ptr<T>> Component::GetComponents() {
 template<typename T>
 bool Component::ComponentExistsInParents() {
 	return gameObject.lock()->ComponentExistsInParents<T>();
-}
-template<typename T>
-inline void Component::RemoveComponent(const unsigned int & id) {
 }
 #endif // !WS_COMPONENT_H
 

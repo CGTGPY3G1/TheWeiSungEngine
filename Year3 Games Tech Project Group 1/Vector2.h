@@ -60,8 +60,8 @@ public:
 	const Vector2 Normalized() const;
 	const float SquareMagnitude() const;
 	const float Magnitude() const;
-	float AngleInRadians();
-	float AngleInDegrees();
+	const float AngleInRadians() const;
+	const float AngleInDegrees() const;
 	Vector2 RotateInRadians(const float & angle);
 	Vector2 RotatedInRadians(const float & angle);
 	Vector2 RotateInDegrees(const float & angle);

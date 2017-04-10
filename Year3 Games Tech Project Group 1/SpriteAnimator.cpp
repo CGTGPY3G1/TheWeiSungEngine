@@ -30,13 +30,26 @@ void SpriteAnimator::PlayAnimation(const std::string & animName) {
 			if(anims[i].name.compare(animName) == 0) {
 				currentAnim = anims[i];
 				currentAnim.currentFrameIndex = 0;
-				currentAnim.timeTilSwitch = currentAnim.frames[currentAnim.currentFrameIndex].frameTime;
+				currentAnim.timeTilSwitch = currentAnim.frames[0].frameTime;
+				currentAnim.playing = true;
 				UpdateRenderer();
 				break;
 			}
 		}
 	}
-	
+}
+
+const bool SpriteAnimator::IsLooping() const {
+	return currentAnim.looping;
+}
+
+
+const bool SpriteAnimator::IsPlaying() const {
+	return currentAnim.playing;
+}
+
+void SpriteAnimator::SetPlaying(const bool & playing) {
+	currentAnim.playing = playing;
 }
 
 void SpriteAnimator::UpdateRenderer() {

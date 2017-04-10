@@ -29,11 +29,12 @@ const std::string AttackerIdentityScript::GetAttackerName() const {
 	return info.name;
 }
 
-void AttackerIdentityScript::SetAttacker(std::weak_ptr<GameObject> attacker, const std::string & name) {
+void AttackerIdentityScript::SetAttacker(std::weak_ptr<GameObject> attacker, const std::string & name, const AttackType attackType) {
 	valid = (attacker.use_count() > 0);
 	info.iD = valid ? attacker.lock()->GetCombinedObjectID() : 0;
 	info.gameObject = attacker;
 	info.name = name;
+	info.attackType = attackType;
 }
 
 const std::weak_ptr<GameObject> AttackerIdentityScript::GetAttacker() const {
@@ -53,7 +54,7 @@ int AttackerIdentityScript::GetSortOrder() {
 	return order;
 }
 
-AttackerInfo::AttackerInfo(std::weak_ptr<GameObject> attacker, const std::string & attackerName, const unsigned int & attackerID) : gameObject(attacker), name(attackerName), iD(attackerID) {
+AttackerInfo::AttackerInfo(std::weak_ptr<GameObject> attacker, const std::string & attackerName, const unsigned int & attackerID, const AttackType & type) : gameObject(attacker), name(attackerName), iD(attackerID), attackType(type) {
 }
 
 const bool AttackerInfo::IsAlive() const {
@@ -65,13 +66,13 @@ const Vector2 AttackerInfo::GetPosition() {
 }
 
 bool operator==(const AttackerInfo & lhs, const AttackerInfo & rhs) {
-	return lhs.iD == rhs.iD;
+	return lhs.iD == rhs.iD && lhs.name.compare(rhs.name) == 0;
+}
+
+bool operator==(const AttackerInfo & lhs, const std::string & rhs) {
+	return lhs.name.compare(rhs) == 0;
 }
 
 bool operator==(const AttackerInfo & lhs, const unsigned int & rhs) {
 	return lhs.iD == rhs;
-}
-
-bool operator==(const unsigned int & lhs, const AttackerInfo & rhs) {
-	return lhs == rhs.iD;
 }

@@ -47,7 +47,7 @@ bool AudioSource::IsPlaying() {
 }
 
 bool AudioSource::IsPaused() {
-	return sound.getStatus() == sf::Sound::Status::Paused;
+	return sound.getStatus() == sf::Sound::Status::Paused || sound.getStatus() == sf::Sound::Status::Stopped;
 }
 
 void AudioSource::Play() {

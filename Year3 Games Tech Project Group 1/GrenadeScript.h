@@ -23,6 +23,7 @@ public:
 	void SetDamage(const float & damage);
 	void OnCollisionEnter(const CollisionData & data) override;
 private:
+	std::weak_ptr<Transform2D> transform;
 	float lifeTime = 3.0f;
 	bool alive = true;
 	float radius = 5.0f, explosionForce = 100.0f, damage = 200.0f;

@@ -14,26 +14,35 @@ struct Animation {
 	std::string name;
 	int currentFrameIndex = 0;
 	float timeTilSwitch = 0.2f;
-	bool playInReverse = false;
+	bool looping = true;
+	bool playing = false;
 	std::vector<AnimationFrame> frames;
 	Animation(const std::string animName = "Null Anim") : name(animName) {}
 	void AddFrame(const AnimationFrame & frame) { frames.push_back(frame); }
 	bool Update(const float & delta) {
 		bool toReturn = false;
 		const int numberOfFrames = (int)frames.size();
-		if(currentFrameIndex >= 0 && currentFrameIndex < numberOfFrames) {
-			timeTilSwitch -= delta;
-			while(timeTilSwitch <= 0.0f) {
-				if(playInReverse) {
-					currentFrameIndex--;
-					if(currentFrameIndex < 0) currentFrameIndex = numberOfFrames - 1;
+		
+		if(currentFrameIndex >= 0 && currentFrameIndex < numberOfFrames) {			
+			if(playing) {
+				timeTilSwitch -= delta;
+				while(timeTilSwitch <= 0.0f) {
+					if(looping) {
+						currentFrameIndex++;
+						toReturn = true;
+						if(currentFrameIndex >= numberOfFrames) {
+							currentFrameIndex = 0;
+						}
+					}
+					else {
+						if(currentFrameIndex < numberOfFrames - 1) {
+							currentFrameIndex++;
+							toReturn = true;
+						}
+						else playing = false;
+					}
+					timeTilSwitch += frames[currentFrameIndex].frameTime;
 				}
-				else {
-					currentFrameIndex++;
-					if(currentFrameIndex >= numberOfFrames) currentFrameIndex = 0;
-				}
-				timeTilSwitch += frames[currentFrameIndex].frameTime;
-				if(!toReturn) toReturn = true;
 			}
 		}
 		return toReturn;
@@ -57,13 +66,14 @@ public:
 	
 	void AddAnimation(const Animation & newAnim);
 	void PlayAnimation(const std::string & animName);
-
+	const bool IsLooping() const;
+	const bool IsPlaying() const;
+	void SetPlaying(const bool & playing);
 private:
 	void UpdateRenderer();
 	std::weak_ptr<SpriteRenderer> renderer;
 	std::vector<Animation> anims;
 	Animation currentAnim;
-	bool alive = true;
 };
 
 #endif // !WS_SPRITE_ANIMATOR_H
