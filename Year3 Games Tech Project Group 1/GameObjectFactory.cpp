@@ -274,7 +274,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const std::weak_ptr<Ga
 	rb->Init(b2_dynamicBody, true, 0.0f, 0.005f);
 	rb->SetVelocity(bullet->GetComponent<Transform2D>().lock()->GetForward() * speed);
 	std::shared_ptr<BoxCollider> bc = bullet->AddComponent<BoxCollider>().lock();
-	bc->Init(Vector2(), Vector2(6.0f, 2.0f), false, 1000.0f);
+	bc->Init(Vector2(), Vector2(12.0f, 6.0f), false, 400.0f);
 	std::shared_ptr<SpriteRenderer> sprite = bullet->AddComponent<SpriteRenderer>().lock();
 	sprite->Init("Images/Bullet.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, 0);
 	std::shared_ptr<AudioSource> as = bullet->AddComponent<AudioSource>().lock();

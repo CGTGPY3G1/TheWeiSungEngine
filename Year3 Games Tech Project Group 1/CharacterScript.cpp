@@ -232,7 +232,10 @@ void CharacterScript::Attack(const float & deltaTime) {
 		}
 	}
 	else {
-		NewRandomState();
+		SetClosestHostileAsCurrent();
+		currentHostile = GetCurrentHostile();
+		if(!currentHostile.IsAlive()) NewRandomState();
+
 	}
 }
 
@@ -291,7 +294,7 @@ const bool CharacterScript::React(const bool & nearestContact) {
 			if(aiState != AIState::RunAway) aiState = AIState::RunAway;
 		}
 	}
-	if(aiState != AIState::Attack) {
+	if(aiMentality != AIMentality::Angry) {
 		while(IsArmed()) TryToSwitchWeapon(true);
 	}
 	return true;
@@ -481,21 +484,25 @@ void CharacterScript::SetCurrentHostile(const AttackerInfo & hostile) {
 
 void CharacterScript::SetClosestHostileAsCurrent() {
 	std::shared_ptr<Transform2D> t = transform.lock();
-	const Vector2 myPosition = t->GetPosition();
-	float nearestDistance = std::numeric_limits<float>().max();
-	unsigned int nearestIndex = 0;
-
-	for(std::vector<AttackerInfo>::iterator it = hostiles.begin(); it != hostiles.end(); ) {
-		if((*it).IsAlive()) {
-			const float sqrDistance = (myPosition - (*it).GetPosition()).SquareMagnitude();
-			if(sqrDistance < nearestDistance) {
-				nearestDistance = sqrDistance;
-				nearestIndex = (it - hostiles.begin());
+	if(t) {
+		const Vector2 myPosition = t->GetPosition();
+		float nearestDistance = std::numeric_limits<float>().max();
+		unsigned int nearestIndex = 0;
+		unsigned int index = 0;
+		std::vector<AttackerInfo>::iterator it = hostiles.begin();
+		while(it != hostiles.end()) {
+			if((*it).IsAlive()) {
+				const float sqrDistance = (myPosition - (*it).GetPosition()).SquareMagnitude();
+				if(sqrDistance < nearestDistance) {
+					nearestDistance = sqrDistance;
+					nearestIndex = index;
+				}
+				++it;
+				++index;
 			}
-			++it;
-		}
-		else {
-			it = hostiles.erase(it);
+			else {
+				it = hostiles.erase(it);
+			}
 		}
 	}
 }

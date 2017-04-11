@@ -6,6 +6,7 @@
 #include "Vector2.h"
 
 class GameObject;
+class RigidBody2D;
 class TestScene : public Scene {
 public:
 	TestScene();
@@ -15,7 +16,9 @@ public:
 	void FixedUpdate(const float & fixedDeltaTime) override;
 	void Update(const float & deltaTime) override;
 	void Render() override;
+	void SetCamTarget(const std::weak_ptr<RigidBody2D> & camTarget);
 private:
+	std::weak_ptr<RigidBody2D> camTarget;
 	Vector2 mousePosition;
 	bool oldInputStyle = true;
 	bool driving = false;

@@ -62,11 +62,11 @@ AttackerInfo::AttackerInfo(std::weak_ptr<GameObject> attacker, const std::string
 }
 
 const bool AttackerInfo::IsAlive() const {
-	return gameObject.use_count() > 0;
+	return gameObject.use_count() > 0 && gameObject.lock()->GetComponent<Transform2D>().use_count() > 0;
 }
 
 const Vector2 AttackerInfo::GetPosition() {
-	return gameObject.use_count() > 0 ? gameObject.lock()->GetComponent<Transform2D>().lock()->GetPosition() : Vector2();
+	return gameObject.use_count() > 0 ? gameObject.lock()->GetComponent<Transform2D>().use_count() > 0 ? gameObject.lock()->GetComponent<Transform2D>().lock()->GetPosition() : Vector2() : Vector2();
 }
 
 bool operator==(const AttackerInfo & lhs, const AttackerInfo & rhs) {

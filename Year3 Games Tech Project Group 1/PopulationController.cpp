@@ -69,6 +69,11 @@ unsigned int PopulationController::GetScore(const std::string & characterName) {
 	return 0;
 }
 
+std::weak_ptr<GameObject> PopulationController::GetRandomCiv() {
+	const int index = Random::RandomInt(civs.size());
+	return index < civs.size() ? civs[index].lock()->GetGameObject() : std::weak_ptr<GameObject>();
+}
+
 void PopulationController::ManagePopulation() {
 	std::shared_ptr<Graphics> graphics = Engine::GetInstance().GetGraphics().lock();
 	const unsigned int scaledMaxCivs = maxCivs * (spawnScale * spawnScale);

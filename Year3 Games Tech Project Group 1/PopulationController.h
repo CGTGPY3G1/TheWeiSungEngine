@@ -41,6 +41,7 @@ public:
 	void SetMaxCivs(const unsigned int & max);
 	unsigned int GetMaxCivs();
 	unsigned int GetScore(const std::string & characterName);
+	std::weak_ptr<GameObject> GetRandomCiv();
 private:
 	PopulationController();
 	int maxCivs = 10;

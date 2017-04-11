@@ -21,6 +21,8 @@
 #include <SFML\Audio\Listener.hpp>
 #include "AssetManager.h"
 #include "WeaponCache.h"
+#include "RigidBody2D.h"
+
 sf::Sprite healthSprite, weaponOverlay, weaponSprite;
 void TestScene::Detonate(Vector2 position, float radius, float explosionForce, float damage) {
 	std::vector<std::weak_ptr<Collider>> colliders = PhysicsSystem::GetInstance().CircleCast(position, radius);
@@ -138,6 +140,28 @@ void TestScene::Update(const float & deltaTime) {
 	std::shared_ptr<GameObject> p = gameObjectManager.GetGameObject("Player", true).lock();
 	if(p) playerHealthPercentage = std::min(100, std::max((int)0, (int)std::ceill(p->GetComponent<HealthScript>().lock()->GetHealthAsPercentage())));
 	else {
+		if(camTarget.use_count() == 0) {
+			std::shared_ptr<GameObject> g = PopulationController::GetInstance().GetRandomCiv().lock();
+			if(g) {			
+				camTarget = g->GetComponent<RigidBody2D>().lock();
+				
+			}
+		}
+		else {
+			std::shared_ptr<RigidBody2D> rb = camTarget.lock();
+			if(rb) {
+				float dot = rb->GetVelocity().Dot(rb->GetForward());
+				dot = (dot < 0.0001f) ? -1.0f : 1.0f;
+				const float cameraScale = (dot < 0.0f) ? -0.4f : dot;
+				const Vector2 camPos = rb->GetPosition() - Engine::GetInstance().GetGraphics().lock()->GetCameraPosition();
+				Engine::GetInstance().GetGraphics().lock()->MoveCamera((driving ? (camPos + (rb->GetForward() * cameraScale * rb->GetSpeed())) : camPos) * (deltaTime * 1.5f));
+				const float maxVelocity = Physics::PIXELS_PER_METRE * 3.0f;
+				const float speed = rb->GetSpeed();
+				float oldZoom = Engine::GetInstance().GetGraphics().lock()->GetCameraZoom();
+				float newZoom = (speed / maxVelocity) * 0.4f;
+				Engine::GetInstance().GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - deltaTime) + ((1.5f + newZoom) * deltaTime))));
+			}	
+		}
 		if(input->GetKeyDown(KeyCodes::KeyCode::R)) GameObjectFactory::CreateCharacter("Player", 0, false, playerPosition, Vector2::One, 0.0f);
 	}
 }
@@ -187,4 +211,8 @@ void TestScene::Render() {
 	graphics->Draw(healthSring, Vector2(100.0f, 20.0f), Vector2(healthSring.size() * 60.0f, 80.0f), 1.0f, 0.0f, 0.0f, 1.0f, LEFT_ALIGNED);
 	std::string pointsAsString = "Score = " + std::to_string(PopulationController::GetInstance().GetScore("Player"));
 	graphics->Draw(pointsAsString, Vector2(20.0f, 620.0f), Vector2(pointsAsString.size() * 50.0f, 80.0f), 0.0f, 0.0f, 0.0f, 1.0f, LEFT_ALIGNED);
+}
+
+void TestScene::SetCamTarget(const std::weak_ptr<RigidBody2D> & camTarget) {
+	this->camTarget = camTarget;
 }
