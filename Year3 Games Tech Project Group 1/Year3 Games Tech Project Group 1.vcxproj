@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
+    <ClInclude Include="AttackTypes.h" />
     <ClInclude Include="AudioSource.h" />
     <ClInclude Include="BitmapFont.h" />
     <ClInclude Include="BitmapString.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="BulletScript.h" />
     <ClInclude Include="CameraFollowScript.h" />
     <ClInclude Include="CerealTypeRegistration.h" />
+    <ClInclude Include="Collectable.h" />
     <ClInclude Include="GrenadeScript.h" />
     <ClInclude Include="NameGenerator.h" />
     <ClInclude Include="CharacterScript.h" />
@@ -241,7 +243,6 @@
     <ClInclude Include="Vector2.h" />
     <ClInclude Include="WeaponCache.h" />
     <ClInclude Include="Weapons.h" />
-    <ClInclude Include="WheelJoint.h" />
     <ClInclude Include="WSSprite.h" />
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +260,7 @@
     <ClCompile Include="CharacterScript.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="CivWaypointScript.cpp" />
+    <ClCompile Include="Collectable.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionData.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -307,7 +309,6 @@
     <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="WeaponCache.cpp" />
     <ClCompile Include="Weapons.cpp" />
-    <ClCompile Include="WheelJoint.cpp" />
     <ClCompile Include="WSSprite.cpp" />
   </ItemGroup>
   <ItemGroup>

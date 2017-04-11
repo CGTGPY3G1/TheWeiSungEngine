@@ -1,6 +1,7 @@
 #include "GameObjectFactory.h"
 #include <SFML\Graphics\Texture.hpp>
 #include "Math.h"
+std::vector<CollectableData> GameObjectFactory::data = std::vector<CollectableData>();
 
 std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string & name, const int & characterType, const bool & aiControlled, const Vector2 & position, const Vector2 & scale, const float & rotation) {
 	if(characterType > 8) std::cout << "Invalid Character ID!" << std::endl;
@@ -396,4 +397,44 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateExplosionAnim(const Vector2 &
 	as->Init("Audio/Explosion.wav", true);
 	explosion->AddComponent<SelfDestructingAnimScript>().lock()->Start();
 	return explosion;
+}
+
+void GameObjectFactory::ScheduleCollectableCreation(const std::string & name, const CollectableType & type, const unsigned int amountOfType, const Vector2 & position, const Vector2 & scale) {
+	CollectableData newData;
+	newData.name = name;
+	newData.type = type;
+	newData.amountOfType = amountOfType;
+	newData.position = position;
+	newData.scale = scale;
+	data.push_back(newData);
+}
+
+void GameObjectFactory::CreateScheduledCollectables() {
+	for(size_t i = 0; i < data.size(); i++) {
+		CollectableData toCreate = data[i];
+		CreateCollectable(toCreate.name, toCreate.type, toCreate.amountOfType, toCreate.position, toCreate.scale);
+	}
+	data.clear();
+}
+
+std::weak_ptr<GameObject> GameObjectFactory::CreateCollectable(const std::string & name, const CollectableType & type, const unsigned int amountOfType, const Vector2 & position, const Vector2 & scale) {
+	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
+	std::shared_ptr<GameObject> collectable = gameObjectManager.CreateGameObject("Collectable").lock();
+	collectable->Init(position, 0.0f, scale);
+	collectable->SetTag("Collectable");
+	std::shared_ptr<Collectable> c = collectable->AddComponent<Collectable>().lock();
+	c->Init(type, amountOfType);
+	std::shared_ptr<SpriteRenderer> sprite = collectable->AddComponent<SpriteRenderer>().lock();
+	sprite->Init("Images/Items.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, -5, true, false);
+	sprite->SetTextureRect(128, 0, 32, 32);
+	sprite->SetColour(1.0f, 1.0f, 1.0f, 0.5f);
+	std::shared_ptr<SpriteRenderer> sprite2 = collectable->AddComponent<SpriteRenderer>().lock();
+	sprite2->Init("Images/Items.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, -4, true, false);
+	sprite2->SetTextureRect(32 * (int)type, 0, 32, 32);
+	sprite2->SetColour(1.0f, 1.0f, 1.0f, 0.5f);
+	std::shared_ptr<RigidBody2D> rb = collectable->AddComponent<RigidBody2D>().lock();
+	rb->Init(b2BodyType::b2_kinematicBody);
+	std::shared_ptr<BoxCollider> box = rb->AddComponent<BoxCollider>().lock();
+	box->Init(Vector2(0.0f, 0.0f), Vector2(32.0f, 32.0f), true);
+	return collectable;
 }

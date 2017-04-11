@@ -7,6 +7,7 @@
 #include "Graphics.h"
 #include "Math.h"
 #include "AttackerIdentityScript.h"
+#include <algorithm>
 
 PopulationController & PopulationController::GetInstance() {
 	static PopulationController instance;
@@ -42,7 +43,9 @@ void PopulationController::RegisterKill(const AttackerInfo & attacker, const uns
 	killData.killType = attacker.attackType;
 	killData.victimId = victimID;
 	killData.victimName = victimName;
-	std::cout << attacker.name + " killed " + victimName << std::endl;
+	killRegister[killerData].points += attacker.attackType == AttackType::VehicleHit ? 20 : (attacker.attackType == AttackType::GrenadeHit) ? 10 : 50;
+	killRegister[killerData].kills.push_back(killData);
+	std::cout << attacker.name + " killed " + victimName + " with " + (attacker.attackType == AttackType::VehicleHit ? "a Vehicle " : (attacker.attackType == AttackType::GrenadeHit) ? "an Explosion" : "a Bullet" ) + " Total Points = " + std::to_string(killRegister[killerData].points) << std::endl;
 }
 
 void PopulationController::SetSpawnRadius(const float & radius) {
@@ -55,6 +58,15 @@ void PopulationController::SetMaxCivs(const unsigned int & max) {
 
 unsigned int PopulationController::GetMaxCivs() {
 	return maxCivs;
+}
+
+unsigned int PopulationController::GetScore(const std::string & characterName) {
+	for(std::unordered_map<KillerData, ScoreTracker>::iterator i = killRegister.begin(); i != killRegister.end(); ++i) {
+		if((*i).first.killerName.compare(characterName) == 0) {
+			return (*i).second.points;
+		}
+	}
+	return 0;
 }
 
 void PopulationController::ManagePopulation() {

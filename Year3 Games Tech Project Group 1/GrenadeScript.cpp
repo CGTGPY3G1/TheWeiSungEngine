@@ -75,6 +75,15 @@ void GrenadeScript::SetDamage(const float & damage) {
 
 void GrenadeScript::OnCollisionEnter(const CollisionData & data) {
 	if(data.gameObject.use_count() > 0) {
-		if(data.gameObject.lock()->GetName().compare("Bullet") == 0) Detonate();
+		std::shared_ptr<GameObject> object = data.gameObject.lock();
+		if(object->GetName().compare("Bullet") == 0) {
+			std::shared_ptr<AttackerIdentityScript> newAttacker = object->GetComponent<AttackerIdentityScript>().lock();
+			std::shared_ptr<AttackerIdentityScript> ais = GetComponent<AttackerIdentityScript>().lock();
+			if(newAttacker && ais) {
+				ais->SetAttackerName(newAttacker->GetAttackerName());
+				ais->SetAttackerID(newAttacker->GetAttackerID());
+			}
+			Detonate();
+		}
 	}
 }

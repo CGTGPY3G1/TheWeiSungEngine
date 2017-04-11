@@ -41,6 +41,10 @@ const std::weak_ptr<GameObject> AttackerIdentityScript::GetAttacker() const {
 	return info.gameObject;
 }
 
+void AttackerIdentityScript::SetAttackerID(const unsigned int & newId) {
+	info.iD = newId;
+}
+
 const unsigned int AttackerIdentityScript::GetAttackerID() const {
 	return info.iD;
 }

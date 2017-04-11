@@ -8,7 +8,7 @@
 #include "BoxCollider.h"
 #include "CircleCollider.h"
 #include "PolygonCollider.h"
-#include "WheelJoint.h"
+#include "Collectable.h"
 #include "ScriptableComponent.h"
 #include "AttackerIdentityScript.h"
 #include "CharacterScript.h"

@@ -186,9 +186,6 @@
     <ClInclude Include="Joint.h">
       <Filter>Header Files\Engine\Components</Filter>
     </ClInclude>
-    <ClInclude Include="WheelJoint.h">
-      <Filter>Header Files\Engine\Components</Filter>
-    </ClInclude>
     <ClInclude Include="ComponentData.h">
       <Filter>Header Files\Engine\Components</Filter>
     </ClInclude>
@@ -300,6 +297,12 @@
     <ClInclude Include="PivotPoint.h">
       <Filter>Header Files\Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="AttackTypes.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Collectable.h">
+      <Filter>Header Files\Engine\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -382,9 +385,6 @@
     </ClCompile>
     <ClCompile Include="WSSprite.cpp">
       <Filter>Source Files\Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="WheelJoint.cpp">
-      <Filter>Source Files\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Joint.cpp">
       <Filter>Source Files\Engine\Components</Filter>
@@ -487,6 +487,9 @@
     </ClCompile>
     <ClCompile Include="GameObjectFactory.cpp">
       <Filter>Source Files\Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Collectable.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

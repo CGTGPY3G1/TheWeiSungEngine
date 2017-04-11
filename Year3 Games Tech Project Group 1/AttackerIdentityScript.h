@@ -2,17 +2,12 @@
 #ifndef WS_ATTACKER_IDENTITY_H
 #define WS_ATTACKER_IDENTITY_H
 #include "ScriptableComponent.h"
+#include "AttackTypes.h"
+
 class GameObject;
 class RigidBody2D;
 class TileMapper;
 class Transform2D;
-
-enum AttackType {
-	NullHit,
-	ProjectileHit,
-	GrenadeHit,
-	VehicleHit
-};
 
 struct AttackerInfo {
 	AttackerInfo(std::weak_ptr<GameObject> attacker = std::weak_ptr<GameObject>(), const std::string & attackerName = "", const unsigned int & attackerID = 0, const AttackType & type = AttackType::NullHit);
@@ -26,12 +21,6 @@ struct AttackerInfo {
 	AttackType attackType;
 	std::weak_ptr<GameObject> gameObject;
 	unsigned int iD = 0;
-};
-
-struct KillData {
-	AttackType killType;
-	unsigned int victimId = 0;
-	std::string victimName = "";
 };
 
 class AttackerIdentityScript : public ScriptableComponent {
@@ -49,6 +38,7 @@ public:
 	const std::string GetAttackerName() const;
 	void SetAttacker(std::weak_ptr<GameObject> attacker = std::weak_ptr<GameObject>(), const std::string & name = "", const AttackType attackType = AttackType::NullHit);
 	const std::weak_ptr<GameObject> GetAttacker() const;
+	void SetAttackerID(const unsigned int & newId);
 	const unsigned int GetAttackerID() const;
 	const bool IsValid() const;
 private:

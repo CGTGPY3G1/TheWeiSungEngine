@@ -299,14 +299,13 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 		RigidBodyData *data = (RigidBodyData*)message.data;
 		std::shared_ptr<RigidBody2D> r = std::static_pointer_cast<RigidBody2D>(data->data.lock());
 		r->body = world->CreateBody(r->bodyDef);
-		break;
-	}
+	}break;
 	case MessageType::MESSAGE_TYPE_UNREGISTER_RIGIDBODY:
 	{
 		b2Body *data = (b2Body*)message.data;
 		world->DestroyBody(data);
-		break;
-	}
+		
+	}break;
 	case MessageType::MESSAGE_TYPE_REGISTER_COLLIDER:
 	{
 		ComponentData *data = (ComponentData*)message.data;
@@ -328,8 +327,7 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			p->fixture = r->body->CreateFixture(p->fixtureDef);
 			r->body->ResetMassData();
 		}
-		break;
-	}
+	}break;
 	case MessageType::MESSAGE_TYPE_UNREGISTER_COLLIDER:
 	{
 		ComponentData *data = (ComponentData*)message.data;
@@ -351,26 +349,7 @@ void PhysicsSystem::HandleMessage(const Message & message) {
 			r->body->DestroyFixture(p->fixture);
 			r->body->ResetMassData();
 		}
-		break;
-	}
-	case MessageType::MESSAGE_TYPE_REGISTER_JOINT:
-	{
-		ComponentData *data = (ComponentData*)message.data;
-		if(data->type == ComponentType::COMPONENT_WHEEL_JOINT) {
-			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
-			wj->joint = world->CreateJoint(wj->jointDef);
-		}
-		break;
-	}
-	case MessageType::MESSAGE_TYPE_UNREGISTER_JOINT:
-	{
-		ComponentData *data = (ComponentData*)message.data;
-		if(data->type == ComponentType::COMPONENT_WHEEL_JOINT) {
-			std::shared_ptr<WheelJoint> wj = std::static_pointer_cast<WheelJoint>(data->comp.lock());
-			world->DestroyJoint(wj->joint);
-		}
-		break;
-	}
+	}break;
 	default:
 		break;
 	}

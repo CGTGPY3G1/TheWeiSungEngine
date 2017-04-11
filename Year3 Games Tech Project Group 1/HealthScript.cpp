@@ -53,6 +53,7 @@ void HealthScript::SetHealth(const float & newHealth) {
 void HealthScript::AddToHealth(const float & amount) {
 	health += amount;
 	if(health > maxHealth) health = maxHealth;
+	else if(health < 0) health = 0;
 }
 
 bool HealthScript::Hit(const float & damage) {
@@ -67,6 +68,8 @@ bool HealthScript::Hit(const float & damage) {
 			if(health <= 0.0f) {
 				std::shared_ptr<CharacterScript> cs = GetComponent<CharacterScript>().lock();
 				if(cs) {
+					std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
+					GameObjectFactory::ScheduleCollectableCreation("Collectable", CollectableHealth, 20, t->GetPosition(), Vector2(2.0f, 2.0f));
 					PopulationController::GetInstance().RegisterKill(lastAttacker, cs->GetCharacterID(), cs->GetCharacterName());
 				}
 				return true;
@@ -89,6 +92,8 @@ bool HealthScript::Hit(const float & damage, const AttackerInfo & attacker) {
 			if(health <= 0.0f) {
 				std::shared_ptr<CharacterScript> cs = GetComponent<CharacterScript>().lock();
 				if(cs) {
+					std::shared_ptr<Transform2D> t = GetComponent<Transform2D>().lock();
+					GameObjectFactory::ScheduleCollectableCreation("Collectable", CollectableHealth, 20, t->GetPosition(), Vector2(2.0f, 2.0f));
 					PopulationController::GetInstance().RegisterKill(attacker, cs->GetCharacterID(), cs->GetCharacterName());
 				}
 				return true;

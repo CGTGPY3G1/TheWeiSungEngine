@@ -121,7 +121,7 @@ void TestScene::FixedUpdate(const float & fixedDeltaTime) {
 
 void TestScene::Update(const float & deltaTime) {
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
-	
+	GameObjectFactory::CreateScheduledCollectables();
 	Scene::Update(deltaTime);
 	std::shared_ptr<Input> input = Engine::GetInstance().GetInput().lock();
 	mousePosition = input->GetMousePosition();
@@ -185,4 +185,6 @@ void TestScene::Render() {
 		}
 	}
 	graphics->Draw(healthSring, Vector2(100.0f, 20.0f), Vector2(healthSring.size() * 60.0f, 80.0f), 1.0f, 0.0f, 0.0f, 1.0f, LEFT_ALIGNED);
+	std::string pointsAsString = "Score = " + std::to_string(PopulationController::GetInstance().GetScore("Player"));
+	graphics->Draw(pointsAsString, Vector2(20.0f, 620.0f), Vector2(pointsAsString.size() * 50.0f, 80.0f), 0.0f, 0.0f, 0.0f, 1.0f, LEFT_ALIGNED);
 }

@@ -13,7 +13,7 @@ public:
 	template<> const static ComponentType GetTypeID<BoxCollider>() { return COMPONENT_BOX_COLLIDER_2D; }
 	template<> const static ComponentType GetTypeID<CircleCollider>() { return COMPONENT_CIRCLE_COLLIDER; }
 	template<> const static ComponentType GetTypeID<PolygonCollider>() { return COMPONENT_POLYGON_COLLIDER_2D; }
-	template<> const static ComponentType GetTypeID<WheelJoint>() { return COMPONENT_WHEEL_JOINT; }
+	template<> const static ComponentType GetTypeID<Collectable>() { return COMPONENT_COLLECTABLE; }
 	template<> const static ComponentType GetTypeID<AttackerIdentityScript>() { return COMPONENT_ATTACKER_IDENTITY_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CharacterScript>() { return COMPONENT_CHARACTER_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CameraFollowScript>() { return COMPONENT_CAMERA_FOLLOW; }
@@ -37,7 +37,6 @@ public:
 	template<> const static bool AllowMultiple<BoxCollider>() { return true; }
 	template<> const static bool AllowMultiple<CircleCollider>() { return true; }
 	template<> const static bool AllowMultiple<PolygonCollider>() { return true; }
-	template<> const static bool AllowMultiple<WheelJoint>() { return true; }
 	template<> const static bool AllowMultiple<TileMapper>() { return true; }
 	template<> const static bool AllowMultiple<AudioSource>() { return true; }
 

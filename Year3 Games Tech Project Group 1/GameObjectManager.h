@@ -21,7 +21,7 @@ public:
 protected:
 	friend class Scene;
 	GameObjectManager();
-	
+	unsigned int playerID = 432164565;
 	std::vector<unsigned int> freeIDs = std::vector<unsigned int>();
 	std::vector<std::shared_ptr<GameObject>> gameObjects;
 	void RemoveDeleted();
