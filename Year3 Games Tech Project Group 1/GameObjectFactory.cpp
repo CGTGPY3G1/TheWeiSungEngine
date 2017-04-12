@@ -87,7 +87,7 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateCharacter(const std::string &
 		const int mask = (CollisionCategory::CATEGORY_ALL & ~CollisionCategory::CATEGORY_AI_CHARACTER);
 		character->SetCollisionFilter(CollisionCategory::CATEGORY_AI_CHARACTER, mask);
 		hs->Start();
-		hs->SetHealth(50.0f);
+		hs->SetHealth(150.0f);
 		const int r = Random::RandomInt(100);
 		if(r < 70) weaponCache->AddWeapon(WeaponType::WeaponTypePistol, 1000);
 		else if(r < 90) weaponCache->AddWeapon(WeaponType::WeaponTypeUzi, 1000);

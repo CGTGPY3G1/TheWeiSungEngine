@@ -186,38 +186,7 @@ void PlayerScript::OnCollisionExit(const CollisionData & data) {
 }
 
 void PlayerScript::OnSensorEnter(const std::weak_ptr<Collider>& collider) {
-	if(collider.use_count() > 0) {
-		std::shared_ptr<GameObject> g = collider.lock()->GetGameObject().lock();
-		if(g->GetTag().compare("Collectable") == 0) {
-			std::shared_ptr<Collectable> c = g->GetComponent<Collectable>().lock();
-			if(c) {
-				if(c->IsValid()) {
-					CollectionCache cache = c->Activate();
-					switch(cache.type) {
-					case CollectableType::CollectableHealth:
-					{
-						std::shared_ptr<HealthScript> hs = GetComponent<HealthScript>().lock();
-						if(hs) hs->AddToHealth(cache.amount);
-					}
-						break;
-					case CollectableType::CollectablePistol:
-					case CollectableType::CollectableUzi:
-					case CollectableType::CollectableGrenade:
-					{
-						std::shared_ptr<CharacterScript> cs = GetComponent<CharacterScript>().lock();
-						if(cs) {
-							std::shared_ptr<WeaponCache> wc = cs->GetWeaponCache().lock();
-							if(wc) wc->AddAmmo(cache.type == CollectableType::CollectablePistol ? WeaponTypePistol : cache.type == CollectableType::CollectableUzi ? WeaponTypeUzi : WeaponTypeGrenade, cache.amount);
-						}
-					}
-					break;
-					default:
-						break;
-					}
-				}
-			}
-		}
-	}
+	
 	
 }
 
