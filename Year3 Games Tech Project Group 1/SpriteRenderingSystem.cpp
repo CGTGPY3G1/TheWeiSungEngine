@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Graphics.h"
 
-SpriteRenderingSystem::SpriteRenderingSystem() {
+SpriteRenderingSystem::SpriteRenderingSystem() : System() {
 }
 
 SpriteRenderingSystem::~SpriteRenderingSystem() {

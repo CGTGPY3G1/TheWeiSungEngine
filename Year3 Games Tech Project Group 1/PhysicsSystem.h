@@ -63,7 +63,6 @@ private:
 	bool dirty = false, reportSensors = true;
 	int raycastFilter, aabbFilter;
 	bool aabbHit = false, checkMultipleAABBs = false;
-	unsigned int collidingID1 = 0, collidingID2 = 0;
 };
 
 #endif // !WS_PHYSICS_SYSTEM_H

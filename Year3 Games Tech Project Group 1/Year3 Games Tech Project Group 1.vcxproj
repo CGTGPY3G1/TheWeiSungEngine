@@ -168,13 +168,12 @@
   <ItemGroup>
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="AttackTypes.h" />
+    <ClInclude Include="AudioManagementSystem.h" />
     <ClInclude Include="AudioSource.h" />
     <ClInclude Include="BitmapFont.h" />
     <ClInclude Include="BitmapString.h" />
     <ClInclude Include="BloodSplatterScript.h" />
     <ClInclude Include="BulletScript.h" />
-    <ClInclude Include="CameraFollowScript.h" />
-    <ClInclude Include="CerealTypeRegistration.h" />
     <ClInclude Include="Collectable.h" />
     <ClInclude Include="GrenadeScript.h" />
     <ClInclude Include="NameGenerator.h" />
@@ -250,13 +249,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="AudioManagementSystem.cpp" />
     <ClCompile Include="AudioSource.cpp" />
     <ClCompile Include="BitmapFont.cpp" />
     <ClCompile Include="BitmapString.cpp" />
     <ClCompile Include="BloodSplatterScript.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="BulletScript.cpp" />
-    <ClCompile Include="CameraFollowScript.cpp" />
     <ClCompile Include="CharacterScript.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="CivWaypointScript.cpp" />

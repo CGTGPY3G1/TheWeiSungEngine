@@ -15,7 +15,8 @@ public:
 	const std::string GetName() const override { return "AudioSource"; }
 	void SetVolume(const float & volume);
 	float GetVolume();
-	void SetAttenuation(const float & attenuation);
+	void SetAttenuation(const float & maxDistance, const float & attenuation);
+	void SetPosition(const Vector2 & position);
 	float GetAttenuation();
 	void SetLooping(const bool & looping);
 	bool GetLooping();
@@ -23,15 +24,6 @@ public:
 	bool IsPaused();
 	void Play();
 	void Stop();
-	template <class Archive>
-	void load(Archive & ar) {
-
-	}
-
-	template <class Archive>
-	void save(Archive & ar) const {
-		Component::save(ar);
-	}
 private:
 	sf::Sound sound;
 };

@@ -1,13 +1,14 @@
 #include "PlayerScript.h"
 #include "Engine.h"
 #include "Input.h"
-
 #include "Transform2D.h"
 #include "GameObjectFactory.h"
 #include "PhysicsSystem.h"
 #include "SpriteRenderer.h"
 #include "HealthScript.h"
 #include "CharacterScript.h"
+#include <SFML\Audio\Listener.hpp>
+
 PlayerScript::PlayerScript() : ScriptableComponent() {
 }
 
@@ -115,7 +116,10 @@ void PlayerScript::FixedUpdate(const float & fixedDeltaTime) {
 			float newZoom = (speed / maxVelocity) * 0.4f;
 			engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.5f + newZoom) * fixedDeltaTime))));
 			std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
-
+			const Vector2 listenerPosition = engine.GetGraphics().lock()->GetCameraPosition();
+			sf::Listener::setDirection(0.0f, 0.0f, -1.0f);
+			sf::Listener::setUpVector(0.0f, 1.0f, 0.0f);
+			sf::Listener::setPosition(listenerPosition.x, 1.0f, listenerPosition.y);
 			if(cc) {
 				if(!cc->IsArtificiallyIntelligent()) {
 					if(driving) {

@@ -26,8 +26,13 @@ float AudioSource::GetVolume() {
 	return sound.getVolume() * (1.0f / 100.0f);
 }
 
-void AudioSource::SetAttenuation(const float & attenuation) {
+void AudioSource::SetAttenuation(const float & maxDistance, const float & attenuation) {
+	sound.setMinDistance(maxDistance);
 	sound.setAttenuation(attenuation);
+}
+
+void AudioSource::SetPosition(const Vector2 & position) {
+	sound.setPosition(position.x, 0.0f, position.y);
 }
 
 float AudioSource::GetAttenuation() {

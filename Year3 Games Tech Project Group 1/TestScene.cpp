@@ -15,7 +15,6 @@
 #include "FileManager.h"
 #include "TileMapper.h"
 #include <memory>
-#include "CerealTypeRegistration.h"
 #include "EngineSettings.h"
 #include "PopulationController.h"
 #include <SFML\Audio\Listener.hpp>
@@ -47,6 +46,7 @@ TestScene::~TestScene() {
 }
 
 void TestScene::Start() {
+	
 	GameObjectManager & gameObjectManager = GameObjectManager::GetInstance();
 	Scene::Start();
 	Engine::GetInstance().GetInput().lock()->SetControllerActive(0, false);
@@ -144,7 +144,6 @@ void TestScene::Update(const float & deltaTime) {
 			std::shared_ptr<GameObject> g = PopulationController::GetInstance().GetRandomCiv().lock();
 			if(g) {			
 				camTarget = g->GetComponent<RigidBody2D>().lock();
-				
 			}
 		}
 		else {
@@ -159,6 +158,10 @@ void TestScene::Update(const float & deltaTime) {
 				const float speed = rb->GetSpeed();
 				float oldZoom = Engine::GetInstance().GetGraphics().lock()->GetCameraZoom();
 				float newZoom = (speed / maxVelocity) * 0.4f;
+				const Vector2 listenerPosition = Engine::GetInstance().GetGraphics().lock()->GetCameraPosition();
+				sf::Listener::setDirection(0.0f, 0.0f, -1.0f);
+				sf::Listener::setUpVector(0.0f, 1.0f, 0.0f);
+				sf::Listener::setPosition(listenerPosition.x, 0.0f, listenerPosition.y);
 				Engine::GetInstance().GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - deltaTime) + ((1.5f + newZoom) * deltaTime))));
 			}	
 		}

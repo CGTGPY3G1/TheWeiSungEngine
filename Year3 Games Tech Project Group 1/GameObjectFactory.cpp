@@ -278,8 +278,9 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateBullet(const std::weak_ptr<Ga
 	std::shared_ptr<SpriteRenderer> sprite = bullet->AddComponent<SpriteRenderer>().lock();
 	sprite->Init("Images/Bullet.png", PivotPoint::Centre, RenderLayer::MIDGROUND_LAYER, 0);
 	std::shared_ptr<AudioSource> as = bullet->AddComponent<AudioSource>().lock();
-	as->Init("Audio/9mm.wav", true);
+	as->Init("Audio/9mm.ogg", true);
 	as->SetVolume(0.5f);
+	as->SetAttenuation(7.5f * Physics::PIXELS_PER_METRE, 10.0f);
 	std::shared_ptr<BulletScript> bs = bullet->AddComponent<BulletScript>().lock();
 	bs->Start();
 	bullet->AddComponent<DamageScript>().lock()->Start();
@@ -394,7 +395,8 @@ std::weak_ptr<GameObject> GameObjectFactory::CreateExplosionAnim(const Vector2 &
 	sa->PlayAnimation("Eplosion");
 	sa->Start();
 	std::shared_ptr<AudioSource> as = explosion->AddComponent<AudioSource>().lock();
-	as->Init("Audio/Explosion.wav", true);
+	as->Init("Audio/Explosion.ogg", true);
+	as->SetAttenuation(8.0f * Physics::PIXELS_PER_METRE, 2.0f);
 	explosion->AddComponent<SelfDestructingAnimScript>().lock()->Start();
 	return explosion;
 }

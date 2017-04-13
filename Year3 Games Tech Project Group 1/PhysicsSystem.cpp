@@ -64,7 +64,6 @@ PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::Update(const float & deltaTime) {
-	collidingID1 = 0; collidingID2 = 0;
 	world->Step(deltaTime, settings.velocityIterations, settings.positionIterations);
 }
 

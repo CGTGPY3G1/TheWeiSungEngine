@@ -12,7 +12,6 @@
 #include "ScriptableComponent.h"
 #include "AttackerIdentityScript.h"
 #include "CharacterScript.h"
-#include "CameraFollowScript.h"
 #include "CivWaypointScript.h"
 #include "TileMapper.h"
 #include "VehicleController.h"

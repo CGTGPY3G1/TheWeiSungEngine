@@ -213,17 +213,11 @@
     <ClInclude Include="GameObjectFactory.h">
       <Filter>Header Files\Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="CameraFollowScript.h">
-      <Filter>Header Files\Engine\Components\Scripted</Filter>
-    </ClInclude>
     <ClInclude Include="CivWaypointScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
     </ClInclude>
     <ClInclude Include="VehicleController.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
-    </ClInclude>
-    <ClInclude Include="CerealTypeRegistration.h">
-      <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="BulletScript.h">
       <Filter>Header Files\Engine\Components\Scripted</Filter>
@@ -302,6 +296,9 @@
     </ClInclude>
     <ClInclude Include="Collectable.h">
       <Filter>Header Files\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioManagementSystem.h">
+      <Filter>Header Files\Engine\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -401,9 +398,6 @@
     <ClCompile Include="BulletScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
-    <ClCompile Include="CameraFollowScript.cpp">
-      <Filter>Source Files\Engine\Components\Scripted</Filter>
-    </ClCompile>
     <ClCompile Include="CivWaypointScript.cpp">
       <Filter>Source Files\Engine\Components\Scripted</Filter>
     </ClCompile>
@@ -490,6 +484,9 @@
     </ClCompile>
     <ClCompile Include="Collectable.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioManagementSystem.cpp">
+      <Filter>Source Files\Engine\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

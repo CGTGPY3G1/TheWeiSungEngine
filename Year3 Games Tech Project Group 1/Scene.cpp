@@ -3,6 +3,7 @@
 #include "PhysicsSystem.h"
 #include "TypeInfo.h"
 #include "SpriteRenderingSystem.h"
+#include "AudioManagementSystem.h"
 #include "ScriptManagementSystem.h"
 #include "AssetManager.h"
 #include "Message.h"
@@ -19,6 +20,7 @@ Scene::~Scene() {
 void Scene::Start() {
 	scriptManagementSystem = std::make_shared<ScriptManagementSystem>();
 	systems.push_back(std::make_shared<SpriteRenderingSystem>());
+	systems.push_back(std::make_shared<AudioManagementSystem>());
 }
 
 void Scene::Reset() {
@@ -41,8 +43,8 @@ void Scene::Update(const float & deltaTime) {
 	scriptManagementSystem->LoadScripts(gameObjects);
 	scriptManagementSystem->Update(deltaTime);
 	for(std::vector<std::shared_ptr<System>>::iterator i = systems.begin(); i != systems.end(); ++i) {
-		//if(((*i)->GetComponentMask() & ComponentType::COMPONENT_SPRITE_RENDERER) != ComponentType::COMPONENT_SPRITE_RENDERER)
-		//	(*i)->ProcessComponents(gameObjects);
+		if(((*i)->GetComponentMask() & ComponentType::COMPONENT_AUDIO_SOURCE) == ComponentType::COMPONENT_AUDIO_SOURCE)
+			(*i)->ProcessComponents(gameObjects);
 	}
 }
 

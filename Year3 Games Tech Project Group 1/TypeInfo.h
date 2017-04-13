@@ -16,7 +16,6 @@ public:
 	template<> const static ComponentType GetTypeID<Collectable>() { return COMPONENT_COLLECTABLE; }
 	template<> const static ComponentType GetTypeID<AttackerIdentityScript>() { return COMPONENT_ATTACKER_IDENTITY_SCRIPT; }
 	template<> const static ComponentType GetTypeID<CharacterScript>() { return COMPONENT_CHARACTER_SCRIPT; }
-	template<> const static ComponentType GetTypeID<CameraFollowScript>() { return COMPONENT_CAMERA_FOLLOW; }
 	template<> const static ComponentType GetTypeID<CivWaypointScript>() { return COMPONENT_CIV_WAYPOINT; }
 	template<> const static ComponentType GetTypeID<TileMapper>() { return COMPONENT_TILE_MAPPER; }
 	template<> const static ComponentType GetTypeID<VehicleController>() { return COMPONENT_VEHICLE_CONTROLLER; }
@@ -42,7 +41,6 @@ public:
 
 	template <typename T> const static bool IsScriptable() { return false; };
 	template<> const static bool IsScriptable<CharacterScript>() { return true; }
-	template<> const static bool IsScriptable<CameraFollowScript>() { return true; }
 	template<> const static bool IsScriptable<CivWaypointScript>() { return true; }
 	template<> const static bool IsScriptable<VehicleController>() { return true; }
 	template<> const static bool IsScriptable<BulletScript>() { return true; }
@@ -62,7 +60,6 @@ public:
 	template<> const static int ScriptSortOrder<CharacterScript>() { return 1; }
 	template<> const static int ScriptSortOrder<VehicleController>() { return 2; }
 	template<> const static int ScriptSortOrder<CivWaypointScript>() { return 3; }	
-	template<> const static int ScriptSortOrder<CameraFollowScript>() { return 4; }
 	template<> const static int ScriptSortOrder<AttackerIdentityScript>() { return 5; }
 	template<> const static int ScriptSortOrder<BulletScript>() { return 6; }
 	template<> const static int ScriptSortOrder<HealthScript>() { return 7; }
@@ -80,7 +77,7 @@ public:
 	template<> const static bool IsCollider<PolygonCollider>() { return true; }
 
 	const static bool IsUpdatable(const ComponentType & type) {
-		static const int mask = COMPONENT_BLOOD_SPLATTER_SCRIPT | COMPONENT_SPRITE_ANIMATOR | COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT | COMPONENT_CAMERA_FOLLOW |
+		static const int mask = COMPONENT_BLOOD_SPLATTER_SCRIPT | COMPONENT_SPRITE_ANIMATOR | COMPONENT_DEATH_TIMER | COMPONENT_BULLET_SCRIPT |
 			COMPONENT_PLAYER_SCRIPT | COMPONENT_HEALTH_SCRIPT | COMPONENT_WEAPON_CACHE | COMPONENT_GRENADE_SCRIPT| COMPONENT_SELF_DESTRUCTING_ANIM_SCRIPT;
 		return ((mask & type) == type);
 	};
