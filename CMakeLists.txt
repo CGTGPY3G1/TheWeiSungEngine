@@ -13,8 +13,13 @@ include(CMakeSources.cmake)
 hunter_add_package(Box2D)
 find_package(Box2D CONFIG REQUIRED)
 
-hunter_add_package(SFML)
-find_package(SFML CONFIG REQUIRED)
+hunter_add_package(cereal)
+find_package(cereal CONFIG REQUIRED)
+
+hunter_add_package(ZLIB)
+find_package(ZLIB CONFIG REQUIRED)
+
+include_directories(ext/SFML)
 
 add_executable(runshootdrive src/main.cpp)
 
