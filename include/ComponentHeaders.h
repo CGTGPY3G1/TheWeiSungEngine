@@ -1,4 +1,4 @@
-#pragma once
+
 #ifndef WS_COMPENENT_HEADERS_H
 #define WS_COMPENENT_HEADERS_H
 #include "Transform2D.h"

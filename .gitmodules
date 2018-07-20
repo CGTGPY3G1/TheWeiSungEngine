@@ -1,3 +1,6 @@
 [submodule "ext/SFML"]
 	path = ext/SFML
 	url = ../../SFML/SFML.git
+[submodule "ext/box2d"]
+	path = ext/box2d
+	url = https://github.com/behdad/box2d.git

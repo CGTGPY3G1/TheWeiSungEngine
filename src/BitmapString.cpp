@@ -1,69 +1,70 @@
 #include "BitmapString.h"
 #include "BitmapFont.h"
 #include "TypeConversion.h"
+namespace WeiSungEngine {
+	BitmapString::BitmapString() {
+	}
 
-BitmapString::BitmapString() {
-}
-
-BitmapString::BitmapString(const std::string & string, const std::shared_ptr<BitmapFont> & font, const sf::Color colour) : toPrint(string), drawFont(font), vertexArray(sf::Quads), drawColour(colour) {
-	unsigned int noOfChars = string.size();
-	int nextX = 0;
-	for(size_t i = 0; i < noOfChars; i++) {
-		BitmapGlyph glyph = font->GetGlyph((int)string[i]);
-		for(size_t j = 0; j < glyph.verts.size(); j++) {
-			sf::Vertex v = glyph.verts[j];
-			v.position.x += nextX;
-			vertexArray.append(v);
+	BitmapString::BitmapString(const std::string & string, const std::shared_ptr<BitmapFont> & font, const sf::Color colour) : toPrint(string), drawFont(font), vertexArray(sf::Quads), drawColour(colour) {
+		unsigned int noOfChars = string.size();
+		int nextX = 0;
+		for (size_t i = 0; i < noOfChars; i++) {
+			BitmapGlyph glyph = font->GetGlyph((int)string[i]);
+			for (size_t j = 0; j < glyph.verts.size(); j++) {
+				sf::Vertex v = glyph.verts[j];
+				v.position.x += nextX;
+				vertexArray.append(v);
+			}
+			nextX += glyph.textureBounds.width;
 		}
-		nextX += glyph.textureBounds.width;
+		bounds = vertexArray.getBounds();
 	}
-	bounds = vertexArray.getBounds();
-}
 
-const std::string & BitmapString::GetString() const {
-	return toPrint;
-}
-
-void BitmapString::SetColour(const float & r, const float & g, const float & b, const float & a) {
-	drawColour = TypeConversion::ConvertToSFColour(r, g, b, a);
-	for(size_t i = 0; i < vertexArray.getVertexCount(); i++) {
-		vertexArray[i].color = drawColour;
+	const std::string & BitmapString::GetString() const {
+		return toPrint;
 	}
-}
 
-sf::Color BitmapString::GetColour() const {
-	return drawColour;
-}
+	void BitmapString::SetColour(const float & r, const float & g, const float & b, const float & a) {
+		drawColour = TypeConversion::ConvertToSFColour(r, g, b, a);
+		for (size_t i = 0; i < vertexArray.getVertexCount(); i++) {
+			vertexArray[i].color = drawColour;
+		}
+	}
 
-sf::FloatRect BitmapString::GetBounds() {
-	return sf::FloatRect(0.0f, 0.0f, bounds.width, bounds.height);
-}
+	sf::Color BitmapString::GetColour() const {
+		return drawColour;
+	}
 
-sf::Vector2f BitmapString::GetSize() const {
-	const sf::FloatRect b = getTransform().transformRect(bounds);
-	return sf::Vector2f(b.width, b.height);
-}
+	sf::FloatRect BitmapString::GetBounds() {
+		return sf::FloatRect(0.0f, 0.0f, bounds.width, bounds.height);
+	}
 
-void BitmapString::SetSize(const sf::Vector2f & newSize) {
-	sf::Vector2f currentSize = GetSize();
-	scale(sf::Vector2f(newSize.x / currentSize.x, newSize.y / currentSize.y));
-}
+	sf::Vector2f BitmapString::GetSize() const {
+		const sf::FloatRect b = getTransform().transformRect(bounds);
+		return sf::Vector2f(b.width, b.height);
+	}
 
-sf::FloatRect BitmapString::getLocalBounds() const {
-	return sf::FloatRect(0.0f, 0.0f, bounds.width, bounds.height);
-}
+	void BitmapString::SetSize(const sf::Vector2f & newSize) {
+		sf::Vector2f currentSize = GetSize();
+		scale(sf::Vector2f(newSize.x / currentSize.x, newSize.y / currentSize.y));
+	}
 
-sf::FloatRect BitmapString::getGlobalBounds() const {
-	return getTransform().transformRect(getLocalBounds());
-}
+	sf::FloatRect BitmapString::getLocalBounds() const {
+		return sf::FloatRect(0.0f, 0.0f, bounds.width, bounds.height);
+	}
 
-void BitmapString::BuildBitmapString() {
-}
+	sf::FloatRect BitmapString::getGlobalBounds() const {
+		return getTransform().transformRect(getLocalBounds());
+	}
 
-void BitmapString::draw(sf::RenderTarget & target, sf::RenderStates states) const {
-	if(drawFont) {
-		states.transform *= getTransform();
-		states.texture = drawFont->GetTexture();
-		target.draw(vertexArray, states);
+	void BitmapString::BuildBitmapString() {
+	}
+
+	void BitmapString::draw(sf::RenderTarget & target, sf::RenderStates states) const {
+		if (drawFont) {
+			states.transform *= getTransform();
+			states.texture = drawFont->GetTexture();
+			target.draw(vertexArray, states);
+		}
 	}
 }

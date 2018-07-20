@@ -3,9 +3,9 @@
 #include "TestScene.h"
 
 void main(int argA, char** argB) {
-	Engine & engine = Engine::GetInstance();
+	WeiSungEngine::Engine & engine = WeiSungEngine::Engine::GetInstance();
 	engine.Start();
-	std::shared_ptr<Game> game = std::make_shared<RunShootDrive>();
+	std::shared_ptr<WeiSungEngine::Game> game = std::make_shared<WeiSungEngine::RunShootDrive>();
 	engine.SetGame(game);
 	while(engine.IsRunning()) {
 		engine.Run();

@@ -2,38 +2,39 @@
 #include "Random.h"
 #include <fstream>
 #include <iostream>
-
-NameGenerator & NameGenerator::GetInstance() {
-	static NameGenerator instance;
-	return instance;
-}
-
-NameGenerator::NameGenerator() {
-	std::ifstream nameList("CharacterInfo/FirstNames.txt");
-	if(nameList.is_open()) {
-		while(nameList.good()) {
-			std::string name;
-			getline(nameList, name);
-			firstNames.push_back(name);
-		}
-		nameList.close();
+namespace WeiSungEngine {
+	NameGenerator & NameGenerator::GetInstance() {
+		static NameGenerator instance;
+		return instance;
 	}
 
-	nameList = std::ifstream("CharacterInfo/Surnames.txt");
-	if(nameList.is_open()) {
-		while(nameList.good()) {
-			std::string name;
-			getline(nameList, name);
-			lastNames.push_back(name);
+	NameGenerator::NameGenerator() {
+		std::ifstream nameList("CharacterInfo/FirstNames.txt");
+		if (nameList.is_open()) {
+			while (nameList.good()) {
+				std::string name;
+				getline(nameList, name);
+				firstNames.push_back(name);
+			}
+			nameList.close();
 		}
-		nameList.close();
+
+		nameList = std::ifstream("CharacterInfo/Surnames.txt");
+		if (nameList.is_open()) {
+			while (nameList.good()) {
+				std::string name;
+				getline(nameList, name);
+				lastNames.push_back(name);
+			}
+			nameList.close();
+		}
 	}
-}
 
-NameGenerator::~NameGenerator() {
-}
+	NameGenerator::~NameGenerator() {
+	}
 
-std::string NameGenerator::GetRandomName() {
-	unsigned int index1 = Random::RandomInt(firstNames.size()), index2 = Random::RandomInt(lastNames.size());
-	return firstNames[index1] + " " + lastNames[index2];
+	std::string NameGenerator::GetRandomName() {
+		unsigned int index1 = Random::RandomInt(firstNames.size()), index2 = Random::RandomInt(lastNames.size());
+		return firstNames[index1] + " " + lastNames[index2];
+	}
 }
