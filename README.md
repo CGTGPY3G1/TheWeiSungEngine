@@ -2,7 +2,7 @@
 
 ## Credits
 ### Kieran Rennie
-level Design and Assistant Game Design
+Level Design and Assistant Game Design
 ### Wei Sung Shek
 Team Mascot + Some Building Images
 ### Grant Gilmour
