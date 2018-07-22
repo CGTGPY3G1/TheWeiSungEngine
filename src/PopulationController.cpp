@@ -70,6 +70,17 @@ namespace WeiSungEngine {
 		return 0;
 	}
 
+	unsigned int PopulationController::ResetScore(const std::string & characterName) {
+		for (std::unordered_map<KillerData, ScoreTracker>::iterator i = killRegister.begin(); i != killRegister.end(); ++i) {
+			if ((*i).first.killerName.compare(characterName) == 0) {
+				std::uint32_t sc = (*i).second.points;
+				(*i).second.points = 0;
+				(*i).second.kills.clear();
+				return sc;
+			}
+		}
+		return 0;
+	}
 	std::weak_ptr<GameObject> PopulationController::GetRandomCiv() {
 		const int index = Random::RandomInt(civs.size());
 		return index < civs.size() ? civs[index].lock()->GetGameObject() : std::weak_ptr<GameObject>();

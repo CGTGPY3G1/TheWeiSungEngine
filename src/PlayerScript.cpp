@@ -117,9 +117,10 @@ namespace WeiSungEngine {
 				engine.GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - fixedDeltaTime) + ((1.5f + newZoom) * fixedDeltaTime))));
 				std::shared_ptr<CharacterScript> cc = p->GetComponent<CharacterScript>().lock();
 				const Vector2 listenerPosition = engine.GetGraphics().lock()->GetCameraPosition();
-				sf::Listener::setDirection(0.0f, 0.0f, -1.0f);
+				Vector2 r = playerTransform->GetRight();
+				sf::Listener::setDirection(r.x, r.y, 0.0f);
 				sf::Listener::setUpVector(0.0f, 1.0f, 0.0f);
-				sf::Listener::setPosition(listenerPosition.x, 1.0f, listenerPosition.y);
+				sf::Listener::setPosition(listenerPosition.x, listenerPosition.y, 1.0f);
 				if (cc) {
 					if (!cc->IsArtificiallyIntelligent()) {
 						if (driving) {

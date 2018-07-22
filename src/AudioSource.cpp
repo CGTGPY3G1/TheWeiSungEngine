@@ -32,7 +32,7 @@ namespace WeiSungEngine {
 	}
 
 	void AudioSource::SetPosition(const Vector2 & position) {
-		sound.setPosition(position.x, 0.0f, position.y);
+		sound.setPosition(position.x, position.y, 0.0f);
 	}
 
 	float AudioSource::GetAttenuation() {

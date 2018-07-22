@@ -161,13 +161,20 @@ namespace WeiSungEngine {
 					float oldZoom = Engine::GetInstance().GetGraphics().lock()->GetCameraZoom();
 					float newZoom = (speed / maxVelocity) * 0.4f;
 					const Vector2 listenerPosition = Engine::GetInstance().GetGraphics().lock()->GetCameraPosition();
+					
+					std::shared_ptr<Transform2D> targetTransform = rb->GetComponent<Transform2D>().lock();
+					Vector2 r = targetTransform->GetRight();
+					sf::Listener::setDirection(r.x, r.y, 0.0f);
 					sf::Listener::setDirection(0.0f, 0.0f, -1.0f);
 					sf::Listener::setUpVector(0.0f, 1.0f, 0.0f);
-					sf::Listener::setPosition(listenerPosition.x, 0.0f, listenerPosition.y);
+					sf::Listener::setPosition(listenerPosition.x, listenerPosition.y, 1.0f);
 					Engine::GetInstance().GetGraphics().lock()->SetCameraZoom(std::max<float>(1.5f, (oldZoom * (1.0f - deltaTime) + ((1.5f + newZoom) * deltaTime))));
 				}
 			}
-			if (input->GetKeyDown(KeyCodes::KeyCode::R)) GameObjectFactory::CreateCharacter("Player", 0, false, playerPosition, Vector2::One, 0.0f);
+			if (input->GetKeyDown(KeyCodes::KeyCode::R)) {
+				GameObjectFactory::CreateCharacter("Player", 0, false, playerPosition, Vector2::One, 0.0f);
+				PopulationController::GetInstance().ResetScore("Player");
+			}
 		}
 	}
 
