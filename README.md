@@ -10,4 +10,3 @@ Everything Else
 ## Screenshots
 ![untitled-1](https://user-images.githubusercontent.com/22331925/43050286-44308cba-8dfe-11e8-9130-306a584aaf98.png)
 ![untitled-2](https://user-images.githubusercontent.com/22331925/43050326-c1c4f7c4-8dfe-11e8-9350-be13399065e2.png)
-![logo](https://user-images.githubusercontent.com/22331925/43050180-99d3d62e-8dfc-11e8-8f39-7c511814acbc.png)
